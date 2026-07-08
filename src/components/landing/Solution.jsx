@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import './Hero/Hero.css';
 import { solutionFeatures } from '../../data/landingContent';
 
@@ -51,9 +51,274 @@ const navItems = [
   },
 ];
 
+const statData = {
+  default: [
+    { label: 'Projects', value: 24, prefix: '', suffix: '', change: '+3', up: true, color: '#2563EB', icon: 'folder' },
+    { label: 'Tasks', value: 156, prefix: '', suffix: '', change: '+12%', up: true, color: '#7C3AED', icon: 'check' },
+    { label: 'Completed', value: 87, prefix: '', suffix: '', change: '+5%', up: true, color: '#10B981', icon: 'check-circle' },
+  ],
+  projects: [
+    { label: 'Active Projects', value: 42, prefix: '', suffix: '', change: '+8', up: true, color: '#2563EB', icon: 'folder' },
+    { label: 'Tasks', value: 318, prefix: '', suffix: '', change: '+23', up: true, color: '#7C3AED', icon: 'check' },
+    { label: 'Deadlines', value: 12, prefix: '', suffix: '', change: '2', up: false, color: '#EF4444', icon: 'clock' },
+  ],
+  automation: [
+    { label: 'Automations', value: 56, prefix: '', suffix: '', change: '+8', up: true, color: '#2563EB', icon: 'zap' },
+    { label: 'Hours Saved', value: 420, prefix: '', suffix: '', change: '+42', up: true, color: '#7C3AED', icon: 'bar-chart' },
+    { label: 'AI Actions', value: 1842, prefix: '', suffix: '', change: '+156', up: true, color: '#10B981', icon: 'activity' },
+  ],
+  analytics: [
+    { label: 'Revenue', value: 84200, prefix: '$', suffix: 'K', change: '+18.7%', up: true, color: '#10B981', icon: 'dollar', display: '84.2' },
+    { label: 'Growth', value: 26, prefix: '+', suffix: '%', change: '+5.2%', up: true, color: '#7C3AED', icon: 'zap' },
+    { label: 'Conversion', value: 84, prefix: '', suffix: '%', change: '+1.2%', up: true, color: '#06B6D4', icon: 'activity' },
+  ],
+};
+
+const panelData = {
+  default: {
+    chartTitle: 'Revenue Growth',
+    chartBadge: '+23.4%',
+    notifs: [
+      { avatar: 'S', gradient: 'linear-gradient(135deg,#10B981,#059669)', text: 'Sarah completed Marketing Campaign', time: '2 min ago', dot: 'green' },
+      { avatar: 'A', gradient: 'linear-gradient(135deg,#2563EB,#1D4ED8)', text: 'New Automation Created', time: '14 min ago', dot: 'blue' },
+      { avatar: 'R', gradient: 'linear-gradient(135deg,#38BDF8,#0284C7)', text: 'Revenue increased by 18%', time: '1h ago', dot: 'cyan' },
+    ],
+  },
+  projects: {
+    chartTitle: 'Project Progress',
+    chartBadge: '12 tasks',
+    timeline: [
+      { dot: 'blue', text: 'Sarah created Project Alpha', time: '12 min ago' },
+      { dot: 'green', text: 'John completed UI Design', time: '45 min ago' },
+      { dot: 'cyan', text: 'Sprint Planning started', time: '2h ago' },
+      { dot: 'purple', text: 'David uploaded Wireframes', time: '4h ago', last: true },
+    ],
+  },
+  automation: {
+    chartTitle: 'Workflow Activity',
+    chartBadge: 'Active',
+    timeline: [
+      { dot: 'purple', text: 'I can automate your workflow. Ready to help.', time: 'Just now' },
+      { dot: 'purple', text: 'Suggest a timeline for Q3', time: '5 min ago' },
+      { dot: 'purple', text: 'Draft ready based on current velocity.', time: '32 min ago', last: true },
+    ],
+  },
+  analytics: {
+    chartTitle: 'Revenue Analytics',
+    chartBadge: '+18.7%',
+    timeline: [
+      { dot: 'cyan', text: 'Revenue report generated', time: '8 min ago' },
+      { dot: 'cyan', text: 'Growth target exceeded by 5.2%', time: '1h ago' },
+      { dot: 'cyan', text: 'Conversion rate optimized to 8.4%', time: '3h ago', last: true },
+    ],
+  },
+};
+
+const chartPaths = {
+  default: 'M8 50 L30 44 L55 32 L80 22 L105 26 L130 18 L155 14 L180 20 L200 12',
+  projects: null,
+  automation: 'M8 48 L35 40 L60 20 L85 30 L110 14 L135 10 L160 6 L185 8 L200 4',
+  analytics: 'M8 52 L35 46 L60 38 L85 28 L110 20 L135 12 L160 8 L185 6 L200 4',
+};
+
+function useAnimatedValue(target, duration = 600) {
+  const [display, setDisplay] = useState(target);
+  const frameRef = useRef(null);
+  const startRef = useRef(null);
+  const fromRef = useRef(target);
+
+  useEffect(() => {
+    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    fromRef.current = display;
+    startRef.current = null;
+
+    const animate = (timestamp) => {
+      if (!startRef.current) startRef.current = timestamp;
+      const progress = Math.min((timestamp - startRef.current) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(fromRef.current + (target - fromRef.current) * eased);
+      setDisplay(current);
+      if (progress < 1) {
+        frameRef.current = requestAnimationFrame(animate);
+      }
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+    return () => { if (frameRef.current) cancelAnimationFrame(frameRef.current); };
+  }, [target, duration]);
+
+  return display;
+}
+
+function StatCard({ stat, animating }) {
+  const numericVal = stat.display ? parseFloat(stat.display) : stat.value;
+  const animatedVal = useAnimatedValue(animating ? numericVal : numericVal, 500);
+  const displayValue = stat.display
+    ? `$${(animatedVal / 1000).toFixed(1)}K`
+    : `${stat.prefix}${animatedVal.toLocaleString('en-US')}${stat.suffix}`;
+
+  const iconMap = {
+    folder: <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />,
+    check: <><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></>,
+    'check-circle': <polyline points="20 6 9 17 4 12" />,
+    clock: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>,
+    zap: <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />,
+    'bar-chart': <><path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" /></>,
+    activity: <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />,
+    dollar: <><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></>,
+  };
+
+  const sparkPaths = {
+    'Projects': '0,14 8,12 16,15 24,8 32,10 40,5 48,7 56,3',
+    'Tasks': '0,12 8,14 16,9 24,11 32,6 40,8 48,3 56,5',
+    'Completed': '0,16 8,10 16,12 24,7 32,9 40,3 48,5 56,2',
+    'Active Projects': '0,14 8,12 16,15 24,8 32,10 40,5 48,7 56,3',
+    'Deadlines': '0,4 8,6 16,8 24,7 32,10 40,12 48,14 56,16',
+    'Automations': '0,16 8,12 16,14 24,8 32,10 40,4 48,6 56,2',
+    'Hours Saved': '0,14 8,16 16,10 24,12 32,6 40,8 48,3 56,5',
+    'AI Actions': '0,12 8,10 16,14 24,6 32,8 40,3 48,5 56,1',
+    'Revenue': '0,16 8,14 16,13 24,10 32,8 40,5 48,4 56,2',
+    'Growth': '0,16 8,12 16,14 24,8 32,10 40,4 48,6 56,3',
+    'Conversion': '0,14 8,16 16,11 24,13 32,7 40,9 48,4 56,6',
+  };
+
+  return (
+    <div className="dash-stat-card">
+      <div className="stat-icon-row">
+        <svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {iconMap[stat.icon]}
+        </svg>
+        <span className={`stat-change ${stat.up ? 'stat-up' : 'stat-down'}`}>{stat.change}</span>
+      </div>
+      <span className="stat-label">{stat.label}</span>
+      <span className="stat-value" style={{ transition: 'opacity 0.2s ease' }}>{displayValue}</span>
+      <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18">
+        <polyline points={sparkPaths[stat.label] || sparkPaths['Tasks']} fill="none" stroke={stat.color} strokeWidth="1.5" />
+      </svg>
+    </div>
+  );
+}
+
+function NotifItem({ notif }) {
+  return (
+    <div className="notif-item">
+      <div className="notif-avatar" style={{ background: notif.gradient }}>{notif.avatar}</div>
+      <div className="notif-body">
+        <span className="notif-text">{notif.text}</span>
+        <span className="notif-time">{notif.time}</span>
+      </div>
+      <span className={`notif-status-dot notif-dot-${notif.dot}`} />
+    </div>
+  );
+}
+
+function TimelineItem({ item }) {
+  return (
+    <div className="tl-item">
+      <span className={`tl-dot tl-${item.dot}`} />
+      {!item.last && <div className="tl-line" />}
+      <div className="tl-content" style={item.last ? { paddingBottom: 0 } : undefined}>
+        <span className="tl-text">{item.text}</span>
+        <span className="tl-time">{item.time}</span>
+      </div>
+    </div>
+  );
+}
+
+function ChartPanel({ state }) {
+  const data = panelData[state];
+  const path = chartPaths[state];
+
+  return (
+    <div className="panel-chart">
+      <div className="panel-header">
+        <span className="panel-title">{data.chartTitle}</span>
+        <span className="panel-badge">{data.chartBadge}</span>
+      </div>
+      <div className="chart-wrapper">
+        {path ? (
+          <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chart" className="dash-chart-svg">
+            <defs>
+              <linearGradient id={`chartFill-${state}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#2563EB" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <line x1="8" y1="15" x2="192" y2="15" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" />
+            <line x1="8" y1="30" x2="192" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" />
+            <line x1="8" y1="45" x2="192" y2="45" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" />
+            <path d={`${path} L200 60 L8 60 Z`} fill={`url(#chartFill-${state})`} />
+            <path className="chart-line" d={path} stroke="#2563EB" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+            <circle className="chart-end-dot" cx="200" cy={state === 'default' ? '12' : state === 'automation' ? '4' : '4'} r="3" fill="#2563EB" stroke="#1E293B" strokeWidth="1.5" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Project chart">
+            <defs>
+              <linearGradient id="projChart" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#2563EB" stopOpacity="0.2" />
+                <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <line x1="8" y1="15" x2="192" y2="15" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" />
+            <line x1="8" y1="30" x2="192" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" />
+            <line x1="8" y1="45" x2="192" y2="45" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" />
+            <rect x="15" y="20" width="14" height="32" rx="3" fill="#2563EB" opacity="0.7" />
+            <rect x="43" y="12" width="14" height="40" rx="3" fill="#2563EB" opacity="0.9" />
+            <rect x="71" y="26" width="14" height="26" rx="3" fill="#2563EB" opacity="0.6" />
+            <rect x="99" y="8" width="14" height="44" rx="3" fill="#2563EB" />
+            <rect x="127" y="16" width="14" height="36" rx="3" fill="#2563EB" opacity="0.8" />
+            <rect x="155" y="30" width="14" height="22" rx="3" fill="#2563EB" opacity="0.5" />
+          </svg>
+        )}
+        <div className="chart-tooltip"><span className="chart-tooltip-val">$24.8K</span><span className="chart-tooltip-label">Revenue</span></div>
+      </div>
+    </div>
+  );
+}
+
+function ActivityPanel({ state }) {
+  const data = panelData[state];
+
+  if (state === 'default') {
+    return (
+      <div className="panel-activity">
+        <div className="panel-header"><span className="panel-title">Notifications</span></div>
+        <div className="notif-list">
+          {data.notifs.map((n, i) => <NotifItem key={i} notif={n} />)}
+        </div>
+      </div>
+    );
+  }
+
+  const titles = { projects: 'Activity', automation: 'AI Assistant', analytics: 'Updates' };
+
+  return (
+    <div className="panel-activity">
+      <div className="panel-header"><span className="panel-title">{titles[state]}</span></div>
+      <div className="activity-timeline">
+        {data.timeline.map((item, i) => <TimelineItem key={i} item={item} />)}
+      </div>
+    </div>
+  );
+}
+
 export default function Solution({ activeState: propState = 'default' }) {
   const [activeState, setActiveState] = useState(propState);
-  useEffect(() => { setActiveState(propState); }, [propState]);
+  const [animating, setAnimating] = useState(false);
+  const prevStateRef = useRef(propState);
+
+  useEffect(() => {
+    if (propState !== prevStateRef.current) {
+      setAnimating(true);
+      prevStateRef.current = propState;
+      const t = setTimeout(() => setAnimating(false), 600);
+      setActiveState(propState);
+      return () => clearTimeout(t);
+    }
+    setActiveState(propState);
+  }, [propState]);
+
+  const stats = statData[activeState] || statData.default;
 
   return (
     <section className="solution-section reveal" id="solution">
@@ -126,170 +391,22 @@ export default function Solution({ activeState: propState = 'default' }) {
                   </div>
 
                   <div className="dash-stats-container">
-                    <div className="dash-stats dash-stats-default">
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></svg><span className="stat-change stat-up">+3</span></div>
-                        <span className="stat-label">Projects</span>
-                        <span className="stat-value">24</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,14 8,12 16,15 24,8 32,10 40,5 48,7 56,3" fill="none" stroke="#2563EB" strokeWidth="1.5" /></svg>
+                    {dashboardStates.map((state) => (
+                      <div key={state} className={`dash-stats dash-stats-${state}`} style={{ pointerEvents: state === activeState ? 'auto' : 'none' }}>
+                        {statData[state].map((stat, i) => (
+                          <StatCard key={`${state}-${stat.label}`} stat={stat} animating={state === activeState && animating} />
+                        ))}
                       </div>
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg><span className="stat-change stat-up">+12%</span></div>
-                        <span className="stat-label">Tasks</span>
-                        <span className="stat-value">156</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,12 8,14 16,9 24,11 32,6 40,8 48,3 56,5" fill="none" stroke="#7C3AED" strokeWidth="1.5" /></svg>
-                      </div>
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg><span className="stat-change stat-up">+5%</span></div>
-                        <span className="stat-label">Completed</span>
-                        <span className="stat-value">87</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,16 8,10 16,12 24,7 32,9 40,3 48,5 56,2" fill="none" stroke="#10B981" strokeWidth="1.5" /></svg>
-                      </div>
-                    </div>
-                    <div className="dash-stats dash-stats-projects">
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></svg><span className="stat-change stat-up">+8</span></div>
-                        <span className="stat-label">Active Projects</span>
-                        <span className="stat-value">42</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,14 8,12 16,15 24,8 32,10 40,5 48,7 56,3" fill="none" stroke="#2563EB" strokeWidth="1.5" /></svg>
-                      </div>
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" /></svg><span className="stat-change stat-up">+23</span></div>
-                        <span className="stat-label">Tasks</span>
-                        <span className="stat-value">318</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,12 8,14 16,9 24,11 32,6 40,8 48,3 56,5" fill="none" stroke="#7C3AED" strokeWidth="1.5" /></svg>
-                      </div>
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg><span className="stat-change stat-down">2</span></div>
-                        <span className="stat-label">Deadlines</span>
-                        <span className="stat-value">12</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,4 8,6 16,8 24,7 32,10 40,12 48,14 56,16" fill="none" stroke="#EF4444" strokeWidth="1.5" /></svg>
-                      </div>
-                    </div>
-                    <div className="dash-stats dash-stats-automation">
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg><span className="stat-change stat-up">+8</span></div>
-                        <span className="stat-label">Automations</span>
-                        <span className="stat-value">56</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,16 8,12 16,14 24,8 32,10 40,4 48,6 56,2" fill="none" stroke="#2563EB" strokeWidth="1.5" /></svg>
-                      </div>
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" /></svg><span className="stat-change stat-up">+42</span></div>
-                        <span className="stat-label">Hours Saved</span>
-                        <span className="stat-value">420</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,14 8,16 16,10 24,12 32,6 40,8 48,3 56,5" fill="none" stroke="#7C3AED" strokeWidth="1.5" /></svg>
-                      </div>
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 1010 10 4 4 0 01-5-5 4 4 0 01-5-5" /><path d="M8.5 8.5a5 5 0 007 7" /></svg><span className="stat-change stat-up">+156</span></div>
-                        <span className="stat-label">AI Actions</span>
-                        <span className="stat-value">1842</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,12 8,10 16,14 24,6 32,8 40,3 48,5 56,1" fill="none" stroke="#10B981" strokeWidth="1.5" /></svg>
-                      </div>
-                    </div>
-                    <div className="dash-stats dash-stats-analytics">
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg><span className="stat-change stat-up">+18.7%</span></div>
-                        <span className="stat-label">Revenue</span>
-                        <span className="stat-value">$84.2K</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,16 8,14 16,13 24,10 32,8 40,5 48,4 56,2" fill="none" stroke="#10B981" strokeWidth="1.5" /></svg>
-                      </div>
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg><span className="stat-change stat-up">+5.2%</span></div>
-                        <span className="stat-label">Growth</span>
-                        <span className="stat-value">+26%</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,16 8,12 16,14 24,8 32,10 40,4 48,6 56,3" fill="none" stroke="#7C3AED" strokeWidth="1.5" /></svg>
-                      </div>
-                      <div className="dash-stat-card">
-                        <div className="stat-icon-row"><svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg><span className="stat-change stat-up">+1.2%</span></div>
-                        <span className="stat-label">Conversion</span>
-                        <span className="stat-value">84%</span>
-                        <svg className="stat-sparkline" viewBox="0 0 60 18" width="60" height="18"><polyline points="0,14 8,16 16,11 24,13 32,7 40,9 48,4 56,6" fill="none" stroke="#06B6D4" strokeWidth="1.5" /></svg>
-                      </div>
-                    </div>
+                    ))}
                   </div>
 
                   <div className="dash-panels-container">
-                    <div className="dash-chart-panel dash-panel-default">
-                      <div className="panel-chart">
-                        <div className="panel-header"><span className="panel-title">Revenue Growth</span><span className="panel-badge">+23.4%</span></div>
-                        <div className="chart-wrapper">
-                          <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Revenue chart" className="dash-chart-svg">
-                            <defs><linearGradient id="defChart" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" /><stop offset="100%" stopColor="#2563EB" stopOpacity="0" /></linearGradient><linearGradient id="defChartGlow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7C3AED" stopOpacity="0.15" /><stop offset="100%" stopColor="#7C3AED" stopOpacity="0" /></linearGradient></defs>
-                            <line x1="8" y1="15" x2="192" y2="15" stroke="rgba(255,255,255,0.04)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="27" x2="192" y2="27" stroke="rgba(255,255,255,0.04)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="39" x2="192" y2="39" stroke="rgba(255,255,255,0.04)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="51" x2="192" y2="51" stroke="rgba(255,255,255,0.04)" strokeWidth="1" strokeDasharray="2,2" />
-                            <path className="chart-fill" d="M8 50 L30 44 L55 32 L80 22 L105 26 L130 18 L155 14 L180 20 L200 12 L200 60 L8 60 Z" fill="url(#defChart)" />
-                            <path className="chart-fill-glow" d="M8 50 L30 44 L55 32 L80 22 L105 26 L130 18 L155 14 L180 20 L200 12 L200 60 L8 60 Z" fill="url(#defChartGlow)" />
-                            <path className="chart-line" d="M8 50 L30 44 L55 32 L80 22 L105 26 L130 18 L155 14 L180 20 L200 12" stroke="#2563EB" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                            <circle className="chart-end-dot" cx="200" cy="12" r="3" fill="#2563EB" stroke="#1E293B" strokeWidth="1.5" />
-                            <text x="16" y="58" fill="rgba(255,255,255,0.25)" fontSize="5" fontFamily="Inter,sans-serif">Jan</text>
-                            <text x="56" y="58" fill="rgba(255,255,255,0.25)" fontSize="5" fontFamily="Inter,sans-serif">Feb</text>
-                            <text x="96" y="58" fill="rgba(255,255,255,0.25)" fontSize="5" fontFamily="Inter,sans-serif">Mar</text>
-                            <text x="134" y="58" fill="rgba(255,255,255,0.25)" fontSize="5" fontFamily="Inter,sans-serif">Apr</text>
-                            <text x="174" y="58" fill="rgba(255,255,255,0.25)" fontSize="5" fontFamily="Inter,sans-serif">May</text>
-                          </svg>
-                          <div className="chart-tooltip"><span className="chart-tooltip-val">$24.8K</span><span className="chart-tooltip-label">Revenue</span></div>
-                        </div>
+                    {dashboardStates.map((state) => (
+                      <div key={state} className={`dash-chart-panel dash-panel-${state}`} style={{ pointerEvents: state === activeState ? 'auto' : 'none' }}>
+                        <ChartPanel state={state} />
+                        <ActivityPanel state={state} />
                       </div>
-                      <div className="panel-activity">
-                        <div className="panel-header"><span className="panel-title">Notifications</span></div>
-                        <div className="notif-list">
-                          <div className="notif-item"><div className="notif-avatar" style={{ background: 'linear-gradient(135deg,#10B981,#059669)' }}>S</div><div className="notif-body"><span className="notif-text">Sarah completed Marketing Campaign</span><span className="notif-time">2 min ago</span></div><span className="notif-status-dot notif-dot-green" /></div>
-                          <div className="notif-item"><div className="notif-avatar" style={{ background: 'linear-gradient(135deg,#2563EB,#1D4ED8)' }}>A</div><div className="notif-body"><span className="notif-text">New Automation Created</span><span className="notif-time">14 min ago</span></div><span className="notif-status-dot notif-dot-blue" /></div>
-                          <div className="notif-item"><div className="notif-avatar" style={{ background: 'linear-gradient(135deg,#38BDF8,#0284C7)' }}>R</div><div className="notif-body"><span className="notif-text">Revenue increased by 18%</span><span className="notif-time">1h ago</span></div><span className="notif-status-dot notif-dot-cyan" /></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="dash-chart-panel dash-panel-projects">
-                      <div className="panel-chart">
-                        <div className="panel-header"><span className="panel-title">Project Progress</span><span className="panel-badge">12 tasks</span></div>
-                        <div className="chart-wrapper">
-                          <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Project progress chart">
-                            <defs><linearGradient id="projChart" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#2563EB" stopOpacity="0.2" /><stop offset="100%" stopColor="#2563EB" stopOpacity="0" /></linearGradient></defs><line x1="8" y1="15" x2="192" y2="15" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="30" x2="192" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="45" x2="192" y2="45" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><rect x="15" y="20" width="14" height="32" rx="3" fill="#2563EB" opacity="0.7" /><rect x="43" y="12" width="14" height="40" rx="3" fill="#2563EB" opacity="0.9" /><rect x="71" y="26" width="14" height="26" rx="3" fill="#2563EB" opacity="0.6" /><rect x="99" y="8" width="14" height="44" rx="3" fill="#2563EB" /><rect x="127" y="16" width="14" height="36" rx="3" fill="#2563EB" opacity="0.8" /><rect x="155" y="30" width="14" height="22" rx="3" fill="#2563EB" opacity="0.5" /><text x="22" y="58" fill="rgba(255,255,255,0.2)" fontSize="5" fontFamily="Inter,sans-serif">M</text><text x="50" y="58" fill="rgba(255,255,255,0.2)" fontSize="5" fontFamily="Inter,sans-serif">T</text><text x="78" y="58" fill="rgba(255,255,255,0.2)" fontSize="5" fontFamily="Inter,sans-serif">W</text><text x="106" y="58" fill="rgba(255,255,255,0.2)" fontSize="5" fontFamily="Inter,sans-serif">T</text><text x="134" y="58" fill="rgba(255,255,255,0.2)" fontSize="5" fontFamily="Inter,sans-serif">F</text><text x="162" y="58" fill="rgba(255,255,255,0.2)" fontSize="5" fontFamily="Inter,sans-serif">S</text></svg>
-                        </div>
-                      </div>
-                      <div className="panel-activity">
-                        <div className="panel-header"><span className="panel-title">Activity</span></div>
-                        <div className="activity-timeline">
-                          <div className="tl-item"><span className="tl-dot tl-blue" /><div className="tl-line" /><div className="tl-content"><span className="tl-text">Sarah created Project Alpha</span><span className="tl-time">12 min ago</span></div></div>
-                          <div className="tl-item"><span className="tl-dot tl-green" /><div className="tl-line" /><div className="tl-content"><span className="tl-text">John completed UI Design</span><span className="tl-time">45 min ago</span></div></div>
-                          <div className="tl-item"><span className="tl-dot tl-cyan" /><div className="tl-line" /><div className="tl-content"><span className="tl-text">Sprint Planning started</span><span className="tl-time">2h ago</span></div></div>
-                          <div className="tl-item"><span className="tl-dot tl-violet" /><div className="tl-content" style={{ paddingBottom: 0 }}><span className="tl-text">David uploaded Wireframes</span><span className="tl-time">4h ago</span></div></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="dash-chart-panel dash-panel-automation">
-                      <div className="panel-chart">
-                        <div className="panel-header"><span className="panel-title">Workflow Activity</span><span className="panel-badge status-active">Active</span></div>
-                        <div className="chart-wrapper">
-                          <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Workflow automation chart">
-                            <defs><linearGradient id="autoChart" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7C3AED" stopOpacity="0.25" /><stop offset="100%" stopColor="#7C3AED" stopOpacity="0" /></linearGradient></defs><line x1="8" y1="15" x2="192" y2="15" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="30" x2="192" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="45" x2="192" y2="45" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><path d="M8 48 L35 40 L60 20 L85 30 L110 14 L135 10 L160 6 L185 8 L200 4" stroke="#7C3AED" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /><path d="M8 48 L35 40 L60 20 L85 30 L110 14 L135 10 L160 6 L185 8 L200 4 L200 60 L8 60 Z" fill="url(#autoChart)" /><circle cx="200" cy="4" r="3" fill="#7C3AED" stroke="#1E293B" strokeWidth="1.5" /></svg>
-                        </div>
-                      </div>
-                      <div className="panel-activity">
-                        <div className="panel-header"><span className="panel-title">AI Assistant</span></div>
-                        <div className="activity-timeline">
-                          <div className="tl-item"><span className="tl-dot tl-purple" /><div className="tl-line" /><div className="tl-content"><span className="tl-text">I can automate your workflow. Ready to help.</span><span className="tl-time">Just now</span></div></div>
-                          <div className="tl-item"><span className="tl-dot tl-purple" /><div className="tl-line" /><div className="tl-content"><span className="tl-text">Suggest a timeline for Q3</span><span className="tl-time">5 min ago</span></div></div>
-                          <div className="tl-item"><span className="tl-dot tl-purple" /><div className="tl-content" style={{ paddingBottom: 0 }}><span className="tl-text">Draft ready based on current velocity.</span><span className="tl-time">32 min ago</span></div></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="dash-chart-panel dash-panel-analytics">
-                      <div className="panel-chart">
-                        <div className="panel-header"><span className="panel-title">Revenue Analytics</span><span className="panel-badge">+18.7%</span></div>
-                        <div className="chart-wrapper">
-                          <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Business analytics chart">
-                            <defs><linearGradient id="analChart" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#06B6D4" stopOpacity="0.25" /><stop offset="100%" stopColor="#06B6D4" stopOpacity="0" /></linearGradient></defs><line x1="8" y1="15" x2="192" y2="15" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="30" x2="192" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><line x1="8" y1="45" x2="192" y2="45" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="2,2" /><path d="M8 52 L35 46 L60 38 L85 28 L110 20 L135 12 L160 8 L185 6 L200 4" stroke="#06B6D4" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /><path d="M8 52 L35 46 L60 38 L85 28 L110 20 L135 12 L160 8 L185 6 L200 4 L200 60 L8 60 Z" fill="url(#analChart)" /><circle cx="200" cy="4" r="3" fill="#06B6D4" stroke="#1E293B" strokeWidth="1.5" /></svg>
-                        </div>
-                      </div>
-                      <div className="panel-activity">
-                        <div className="panel-header"><span className="panel-title">Updates</span></div>
-                        <div className="activity-timeline">
-                          <div className="tl-item"><span className="tl-dot tl-cyan" /><div className="tl-line" /><div className="tl-content"><span className="tl-text">Revenue report generated</span><span className="tl-time">8 min ago</span></div></div>
-                          <div className="tl-item"><span className="tl-dot tl-cyan" /><div className="tl-line" /><div className="tl-content"><span className="tl-text">Growth target exceeded by 5.2%</span><span className="tl-time">1h ago</span></div></div>
-                          <div className="tl-item"><span className="tl-dot tl-cyan" /><div className="tl-content" style={{ paddingBottom: 0 }}><span className="tl-text">Conversion rate optimized to 8.4%</span><span className="tl-time">3h ago</span></div></div>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
