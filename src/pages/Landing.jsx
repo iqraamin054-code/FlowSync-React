@@ -1,10 +1,55 @@
-import React from 'react';
+import { useState } from 'react';
+import Navbar from '../components/layout/Navbar/Navbar.jsx';
+import Hero from '../components/landing/Hero/Hero.jsx';
+import TrustedCompanies from '../components/landing/TrustedCompanies.jsx';
+import Problems from '../components/landing/Problems.jsx';
+import Solution from '../components/landing/Solution.jsx';
+import Features from '../components/landing/Features.jsx';
+import Statistics from '../components/landing/Statistics.jsx';
+import Pricing from '../components/landing/Pricing.jsx';
+import FeatureComparison from '../components/landing/FeatureComparison.jsx';
+import PricingCalculator from '../components/landing/PricingCalculator.jsx';
+import Testimonials from '../components/landing/Testimonials.jsx';
+import BlogPreview from '../components/landing/BlogPreview.jsx';
+import Faq from '../components/landing/Faq.jsx';
+import Contact from '../components/landing/Contact.jsx';
+import CTA from '../components/landing/CTA.jsx';
+import Footer from '../components/layout/Footer.jsx';
+import LoginModal from '../components/common/LoginModal.jsx';
+import CursorGlow from '../components/common/CursorGlow.jsx';
+import BackToTop from '../components/common/BackToTop.jsx';
+import ScrollProgress from '../components/common/ScrollProgress.jsx';
+import useScrollReveal from '../hooks/useScrollReveal.js';
 
 export default function Landing() {
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [solutionState, setSolutionState] = useState('default');
+  useScrollReveal();
+
   return (
-    <main>
-      <h1>FlowSync Landing</h1>
-      <p>Landing page placeholder.</p>
-    </main>
+    <>
+      <ScrollProgress />
+      <Navbar onLoginClick={() => setLoginOpen(true)} />
+      <main>
+        <Hero />
+        <TrustedCompanies />
+        <Problems onHover={setSolutionState} />
+        <Solution activeState={solutionState} />
+        <Features />
+        <Statistics />
+        <Pricing />
+        <FeatureComparison />
+        <PricingCalculator />
+        <Testimonials />
+        <BlogPreview />
+        <Faq />
+        <Contact />
+        <CTA />
+      </main>
+      <Footer />
+      <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+      <CursorGlow />
+      <BackToTop />
+    </>
   );
 }
