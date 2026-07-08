@@ -1,10 +1,11 @@
-import { motion } from 'framer-motion';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { motion, useMotionValue, useTransform, animate, useReducedMotion } from 'framer-motion';
 import './Hero/Hero.css';
 
 const dashStats = [
-  { label: 'Revenue', value: '$54,200', change: '+12.5%', up: true },
-  { label: 'Users', value: '12,430', change: '+8.2%', up: true },
-  { label: 'Growth', value: '+18%', change: 'MoM', up: false },
+  { label: 'Revenue', raw: 54200, prefix: '$', suffix: '', change: '+12.5%', up: true },
+  { label: 'Users', raw: 12430, prefix: '', suffix: '', change: '+8.2%', up: true },
+  { label: 'Growth', raw: 18, prefix: '+', suffix: '%', change: 'MoM', up: false },
 ];
 
 const activityItems = [
@@ -66,17 +67,32 @@ const SidebarNavIcon = ({ type }) => {
   return null;
 };
 
-const dashboardVariants = {
-  hidden: { opacity: 0, x: 40, scale: 0.95 },
-  visible: {
-    opacity: 1, x: 0, scale: 1,
-    transition: { duration: 0.75, ease: 'easeOut', delay: 0.3 },
-  },
-};
+function useCountUp(target, duration = 1.6, delay = 0.8) {
+  const reduced = useReducedMotion();
+  const motionVal = useMotionValue(0);
+  const display = useTransform(motionVal, (v) => {
+    const rounded = Math.round(v);
+    return rounded >= 1000 ? rounded.toLocaleString('en-US') : String(rounded);
+  });
+  const [displayVal, setDisplayVal] = useState(reduced ? String(target >= 1000 ? target.toLocaleString('en-US') : target) : '0');
+
+  useEffect(() => {
+    if (reduced) return;
+    const controls = animate(motionVal, target, {
+      duration,
+      delay,
+      ease: [0.16, 1, 0.3, 1],
+    });
+    const unsub = display.on('change', setDisplayVal);
+    return () => { controls.stop(); unsub(); };
+  }, [target, duration, delay, reduced, motionVal, display]);
+
+  return displayVal;
+}
 
 const floatVariants = {
   animate: (custom) => ({
-    y: [-6, 6],
+    y: [-5, 5],
     transition: {
       duration: custom.duration,
       repeat: Infinity,
@@ -87,21 +103,90 @@ const floatVariants = {
   }),
 };
 
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.96 },
+  visible: {
+    opacity: 1, scale: 1,
+    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.3, staggerChildren: 0.08 },
+  },
+};
+
+const sidebarVariants = {
+  hidden: { x: -20, opacity: 0 },
+  visible: {
+    x: 0, opacity: 1,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
+  },
+};
+
+const statCardVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: (i) => ({
+    opacity: 1, y: 0,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.7 + i * 0.1 },
+  }),
+};
+
+const activityVariants = {
+  hidden: { opacity: 0, x: -8 },
+  visible: (i) => ({
+    opacity: 1, x: 0,
+    transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 1.2 + i * 0.12 },
+  }),
+};
+
+const CHART_PATH = 'M10 55 L35 48 L60 42 L85 34 L110 22 L135 26 L160 14 L185 18 L210 9 L230 12';
+
 export default function ProductOverview({ prefersReduced }) {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const chartLineRef = useRef(null);
+  const [pathLen, setPathLen] = useState(320);
+  const [chartVisible, setChartVisible] = useState(false);
+
+  useEffect(() => {
+    if (chartLineRef.current) {
+      setPathLen(chartLineRef.current.getTotalLength());
+    }
+    const t = setTimeout(() => setChartVisible(true), 700);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (prefersReduced) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 6;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -6;
+    setTilt({ x, y });
+  }, [prefersReduced]);
+
+  const handleMouseLeave = useCallback(() => setTilt({ x: 0, y: 0 }), []);
+
+  const revenue = useCountUp(54200, 1.8, 0.7);
+  const users = useCountUp(12430, 1.6, 0.9);
+  const growth = useCountUp(18, 1.4, 1.1);
+
+  const kpiValues = [
+    { formatted: `$${revenue}` },
+    { formatted: users },
+    { formatted: `+${growth}%` },
+  ];
+
   return (
     <div className="hero-visual" id="product-showcase">
       <motion.div
         className="dash-wrapper"
-        initial={prefersReduced ? { opacity: 1 } : 'hidden'}
+        variants={containerVariants}
+        initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.2 }}
-        variants={dashboardVariants}
-        whileHover={prefersReduced ? {} : { scale: 1.01 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ transform: `perspective(800px) rotateY(${tilt.x}deg) rotateX(${tilt.y}deg)` }}
       >
         <div className="dash-glow" aria-hidden="true" />
+        <div className="dash-glow-ring" aria-hidden="true" />
         <div className="dash-preview" role="img" aria-label="FlowSync dashboard preview showing revenue, users, growth statistics, and activity feed">
-          <div className="dash-sidebar">
+          <motion.div className="dash-sidebar" variants={sidebarVariants}>
             <div className="dash-logo-icon">
               <svg width="20" height="20" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="2" y="2" width="24" height="24" rx="6" fill="url(#dashLogo)" />
@@ -118,10 +203,11 @@ export default function ProductOverview({ prefersReduced }) {
               {sidebarNavItems.map(({ label, active, type }) => (
                 <button key={label} className={`dash-nav-item${active ? ' active' : ''}`} aria-label={label} tabIndex={-1}>
                   <SidebarNavIcon type={type} />
+                  {active && <span className="nav-active-glow" aria-hidden="true" />}
                 </button>
               ))}
             </nav>
-          </div>
+          </motion.div>
 
           <div className="dash-main">
             <div className="dash-header">
@@ -139,12 +225,20 @@ export default function ProductOverview({ prefersReduced }) {
             </div>
 
             <div className="dash-stats">
-              {dashStats.map(({ label, value, change, up }) => (
-                <div key={label} className={`dash-stat-card stat-${label.toLowerCase()}`}>
+              {dashStats.map(({ label, change, up }, i) => (
+                <motion.div
+                  key={label}
+                  className={`dash-stat-card stat-${label.toLowerCase()}`}
+                  custom={i}
+                  variants={statCardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                >
                   <span className="stat-label">{label}</span>
-                  <span className="stat-value">{value}</span>
+                  <span className="stat-value">{kpiValues[i].formatted}</span>
                   <span className={`stat-change${up ? ' stat-up' : ''}`}>{change}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -155,19 +249,65 @@ export default function ProductOverview({ prefersReduced }) {
                   <span className="panel-badge">+23.4%</span>
                 </div>
                 <div className="chart-container">
-                  <svg viewBox="0 0 240 70" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Line chart showing revenue growth trend">
+                  <svg viewBox="0 0 240 65" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Line chart showing revenue growth trend">
                     <defs>
                       <linearGradient id="chartArea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.25" />
+                        <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.22" />
                         <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
                       </linearGradient>
                     </defs>
-                    <line x1="10" y1="18" x2="230" y2="18" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-                    <line x1="10" y1="35" x2="230" y2="35" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-                    <line x1="10" y1="52" x2="230" y2="52" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-                    <path d="M10 62 L35 55 L60 50 L85 42 L110 30 L135 33 L160 20 L185 24 L210 15 L230 18" stroke="#7C3AED" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M10 62 L35 55 L60 50 L85 42 L110 30 L135 33 L160 20 L185 24 L210 15 L230 18 L230 70 L10 70 Z" fill="url(#chartArea)" />
-                    <circle cx="210" cy="15" r="3.5" fill="#7C3AED" stroke="#1E293B" strokeWidth="1.5" />
+                    <line x1="10" y1="15" x2="230" y2="15" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                    <line x1="10" y1="30" x2="230" y2="30" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                    <line x1="10" y1="45" x2="230" y2="45" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+                    {prefersReduced ? (
+                      <>
+                        <path d={CHART_PATH} stroke="url(#chartStroke)" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                        <defs>
+                          <linearGradient id="chartStroke" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#7C3AED" />
+                            <stop offset="100%" stopColor="#60A5FA" />
+                          </linearGradient>
+                        </defs>
+                        <path d={`${CHART_PATH} L230 65 L10 65 Z`} fill="url(#chartArea)" />
+                      </>
+                    ) : (
+                      <>
+                        <defs>
+                          <linearGradient id="chartStroke" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#7C3AED" />
+                            <stop offset="100%" stopColor="#60A5FA" />
+                          </linearGradient>
+                        </defs>
+                        <motion.path
+                          ref={chartLineRef}
+                          d={CHART_PATH}
+                          stroke="url(#chartStroke)"
+                          strokeWidth="2"
+                          fill="none"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          initial={{ strokeDasharray: pathLen, strokeDashoffset: pathLen }}
+                          animate={chartVisible ? { strokeDashoffset: 0 } : {}}
+                          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+                        />
+                        <motion.path
+                          d={`${CHART_PATH} L230 65 L10 65 Z`}
+                          fill="url(#chartArea)"
+                          initial={{ opacity: 0 }}
+                          animate={chartVisible ? { opacity: 1 } : {}}
+                          transition={{ duration: 1, delay: 0.7, ease: 'easeOut' }}
+                        />
+                      </>
+                    )}
+                    <motion.circle
+                      cx="210" cy="9" r="3.5"
+                      fill="#7C3AED"
+                      stroke="#1E293B"
+                      strokeWidth="1.5"
+                      initial={prefersReduced ? {} : { scale: 0, opacity: 0 }}
+                      animate={chartVisible ? { scale: 1, opacity: 1 } : {}}
+                      transition={{ duration: 0.4, delay: 2, ease: [0.34, 1.56, 0.64, 1] }}
+                    />
                   </svg>
                 </div>
               </div>
@@ -175,14 +315,22 @@ export default function ProductOverview({ prefersReduced }) {
               <div className="dash-activity-panel">
                 <span className="panel-title">Recent Activity</span>
                 <div className="activity-list">
-                  {activityItems.map(({ dot, text, time }) => (
-                    <div className="activity-item" key={text}>
+                  {activityItems.map(({ dot, text, time }, i) => (
+                    <motion.div
+                      className="activity-item"
+                      key={text}
+                      custom={i}
+                      variants={activityVariants}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                    >
                       <span className={`activity-dot activity-dot-${dot}`} aria-hidden="true" />
                       <div className="activity-content">
                         <span className="activity-text">{text}</span>
                         <span className="activity-time">{time}</span>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
@@ -190,6 +338,7 @@ export default function ProductOverview({ prefersReduced }) {
           </div>
         </div>
 
+        {/* Float Card 1: Revenue — Top Right */}
         <motion.div
           className="float-card float-card-1"
           aria-hidden="true"
@@ -197,9 +346,9 @@ export default function ProductOverview({ prefersReduced }) {
           animate={prefersReduced ? {} : 'animate'}
           variants={floatVariants}
         >
-          <div className="float-card-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          <div className="float-card-icon float-card-icon-violet">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
             </svg>
           </div>
           <div className="float-card-info">
@@ -208,6 +357,7 @@ export default function ProductOverview({ prefersReduced }) {
           </div>
         </motion.div>
 
+        {/* Float Card 2: Active Users — Bottom Left */}
         <motion.div
           className="float-card float-card-2"
           aria-hidden="true"
@@ -215,14 +365,14 @@ export default function ProductOverview({ prefersReduced }) {
           animate={prefersReduced ? {} : 'animate'}
           variants={floatVariants}
         >
-          <div className="float-card-icon">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="float-card-icon float-card-icon-pink">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EC4899" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" />
             </svg>
           </div>
           <div className="float-card-info">
             <span className="float-card-label">Active Users</span>
-            <span className="float-card-value">12.4K</span>
+            <span className="float-card-value">+18K</span>
           </div>
         </motion.div>
       </motion.div>

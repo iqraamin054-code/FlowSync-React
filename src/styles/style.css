@@ -960,82 +960,6 @@ html {
 }
 
 /* ============================
-   FLOATING ANALYTICS CARDS
-   ============================ */
-
-.float-card {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 14px;
-    padding: 0.6rem 0.9rem;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow:
-        0 4px 8px rgba(0, 0, 0, 0.04),
-        0 8px 16px rgba(0, 0, 0, 0.06),
-        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-    z-index: 2;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.float-card:hover {
-    transform: translateY(-4px) scale(1.04);
-    border-color: rgba(37, 99, 235, 0.2);
-    box-shadow:
-        0 8px 16px rgba(0, 0, 0, 0.06),
-        0 16px 32px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(37, 99, 235, 0.08) inset;
-}
-
-.float-card-icon {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-}
-
-.float-card-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-}
-
-.float-card-label {
-    font-size: 0.6rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.float-card-value {
-    font-family: var(--font-heading);
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.2px;
-}
-
-.float-card-1 {
-    top: -6%;
-    right: -8%;
-    animation: float1 5s ease-in-out infinite;
-}
-
-.float-card-2 {
-    bottom: 8%;
-    left: -10%;
-    animation: float2 6s ease-in-out infinite;
-}
-
-/* ============================
    TRUSTED COMPANIES SECTION
    ============================ */
 
@@ -3460,26 +3384,7 @@ html {
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
 }
 
-[data-theme="light"] .float-card {
-    background: var(--bg-secondary);
-    border-color: rgba(124, 58, 237, 0.08);
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03), 0 4px 8px rgba(0, 0, 0, 0.04);
-}
-
-[data-theme="light"] .float-card:hover {
-    background: var(--bg-tertiary);
-    border-color: rgba(124, 58, 237, 0.2);
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.04), 0 8px 16px rgba(0, 0, 0, 0.06);
-}
-
-[data-theme="light"] .float-card-icon {
-    background: rgba(124, 58, 237, 0.08);
-}
-
-/* float-card animations intentionally kept active in light mode */
+/* float-card styles now in Hero.css */
 
 [data-theme="light"] .btn-primary {
     background: linear-gradient(135deg, var(--color-primary), #6D28D9);

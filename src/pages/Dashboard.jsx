@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import useScrollReveal from '../hooks/useScrollReveal.js';
 
 const TRANSLATIONS = {
@@ -268,6 +269,81 @@ export default function Dashboard() {
     return () => document.removeEventListener('keydown', handler);
   }, [modal]);
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, scale: 0.98 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
+
+  const sidebarVariants = {
+    hidden: { x: -60, opacity: 0 },
+    visible: { 
+      x: 0, 
+      opacity: 1,
+      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
+
+  const kpiVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { 
+        delay: 0.1 + i * 0.08,
+        duration: 0.5,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    })
+  };
+
+  const chartVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { delay: 0.4, duration: 0.5, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
+
+  const activityVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: (i) => ({
+      opacity: 1,
+      x: 0,
+      transition: { 
+        delay: 0.5 + i * 0.12,
+        duration: 0.4,
+        ease: [0.16, 1, 0.3, 1]
+      }
+    })
+  };
+
+  const floatingCardVariants = {
+    animate: (i) => ({
+      y: [0, -8, 0],
+      transition: {
+        duration: 4 + i * 0.5,
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay: i * 0.3
+      }
+    })
+  };
+
+  const hoverLift = {
+    rest: { y: 0, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' },
+    hover: { 
+      y: -4, 
+      boxShadow: '0 16px 48px rgba(0,0,0,0.3), 0 0 24px var(--shadow-glow-primary)',
+      transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
+
   return (
     <>
       <div className="db-bg" aria-hidden="true">
@@ -278,8 +354,19 @@ export default function Dashboard() {
 
       <div className={`sidebar-overlay${sidebarOpen ? ' is-visible' : ''}`} onClick={() => setSidebarOpen(false)} aria-hidden="true"></div>
 
-      <div className="db-wrapper">
-        <aside className={`db-sidebar${sidebarOpen ? ' is-open' : ''}`} aria-label="Sidebar navigation">
+      <motion.div 
+        className="db-wrapper"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.aside 
+          className={`db-sidebar${sidebarOpen ? ' is-open' : ''}`} 
+          aria-label="Sidebar navigation"
+          variants={sidebarVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <div className="sidebar-header">
             <Link to="/" className="db-logo" aria-label="FlowSync Home">
               <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
@@ -351,7 +438,7 @@ export default function Dashboard() {
               <div className="profile-info"><span className="profile-name">{username}</span><span className="profile-status">{t('active')}</span></div>
             </div>
           </div>
-        </aside>
+        </motion.aside>
 
         <main className="db-main" role="main" aria-label="Workspace dashboard">
           <header className="db-header">
@@ -390,7 +477,64 @@ export default function Dashboard() {
             </div>
           </header>
 
-          <div className="db-content">
+          <div className="db-content" style={{ position: 'relative' }}>
+            {/* Floating Stat Cards */}
+            <motion.div 
+              className="floating-stat-card floating-stat-card--users"
+              variants={floatingCardVariants}
+              custom={0}
+              animate="animate"
+              whileHover={{ scale: 1.05, y: -8 }}
+            >
+              <div className="floating-stat-icon" style={{ background: 'rgba(37,99,235,0.15)', color: '#2563EB' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div className="floating-stat-label">{t('activeUsers')}</div>
+              <div className="floating-stat-value">18,450</div>
+              <div className="floating-stat-change positive">↑ +12%</div>
+            </motion.div>
+            <motion.div 
+              className="floating-stat-card floating-stat-card--revenue"
+              variants={floatingCardVariants}
+              custom={1}
+              animate="animate"
+              whileHover={{ scale: 1.05, y: -8 }}
+            >
+              <div className="floating-stat-icon" style={{ background: 'rgba(16,185,129,0.15)', color: '#10B981' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div className="floating-stat-label">{t('monthlyRevenue')}</div>
+              <div className="floating-stat-value">$94,201</div>
+              <div className="floating-stat-change positive">↑ +8.2%</div>
+            </motion.div>
+            <motion.div 
+              className="floating-stat-card floating-stat-card--satisfaction"
+              variants={floatingCardVariants}
+              custom={2}
+              animate="animate"
+              whileHover={{ scale: 1.05, y: -8 }}
+            >
+              <div className="floating-stat-icon" style={{ background: 'rgba(245,158,11,0.15)', color: '#F59E0B' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+              </div>
+              <div className="floating-stat-label">Satisfaction</div>
+              <div className="floating-stat-value">96%</div>
+              <div className="floating-stat-change positive">↑ +2.4%</div>
+            </motion.div>
+            <motion.div 
+              className="floating-stat-card floating-stat-card--productivity"
+              variants={floatingCardVariants}
+              custom={3}
+              animate="animate"
+              whileHover={{ scale: 1.05, y: -8 }}
+            >
+              <div className="floating-stat-icon" style={{ background: 'rgba(124,58,237,0.15)', color: '#7C3AED' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              </div>
+              <div className="floating-stat-label">Productivity</div>
+              <div className="floating-stat-value">87%</div>
+              <div className="floating-stat-change positive">↑ +5.7%</div>
+            </motion.div>
             <div className="db-title-row">
               <h1 className="db-title">FLOWSYNC • {company.toUpperCase()} OVERVIEW</h1>
               <div className="db-badge-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>{t('global')}</span></div>
@@ -476,7 +620,7 @@ export default function Dashboard() {
             </div>
           </div>
         </main>
-      </div>
+      </motion.div>
 
       <div className="cursor-glow" id="cursor-glow" aria-hidden="true"></div>
       <button className="back-to-top" id="back-to-top" aria-label="Back to top" onClick={() => window.scrollTo({top:0,behavior:'smooth'})}>

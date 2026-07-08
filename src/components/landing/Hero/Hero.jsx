@@ -51,7 +51,6 @@ const Hero = () => {
 
   return (
     <section className="hero">
-      {/* Background glow blobs */}
       <motion.div
         className="hero-glow hero-glow-1"
         aria-hidden="true"
@@ -74,6 +73,7 @@ const Hero = () => {
         variants={glowVariant}
       />
       <div className="hero-grid" aria-hidden="true" />
+      <div className="hero-radial" aria-hidden="true" />
 
       <div className="container hero-layout">
         {/* LEFT — Hero Content */}
@@ -101,7 +101,10 @@ const Hero = () => {
           >
             <span className="title-line">One Workspace.</span>
             <span className="title-line">Every Team.</span>
-            <span className="title-line title-gradient">Unlimited Growth.</span>
+            <span className="title-line title-gradient">
+              <span className="gradient-shimmer" aria-hidden="true" />
+              Unlimited Growth.
+            </span>
           </motion.h1>
 
           <motion.p
