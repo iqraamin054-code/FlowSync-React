@@ -1,21 +1,19 @@
 # 🚀 FlowSync – Interactive SaaS Landing Page & Product Experience Platform
 
-<p align="center">
-
+<div align="center">
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge)
 ![Responsive](https://img.shields.io/badge/Responsive-Yes-success?style=for-the-badge)
 ![Frontend](https://img.shields.io/badge/Frontend-React_Project-blueviolet?style=for-the-badge)
-
-</p>
+</div>
 
 ---
 
-<p align="center">
+<div align="center">
 <img src="src/assets/images/github-banner.png" width="100%" alt="FlowSync Banner">
-</p>
+</div>
 
 ---
 
@@ -242,9 +240,12 @@ FlowSync/
 
 ---
 
-## 📱 Mobile View
+<div align="center">
 
-![Mobile](src/assets/screenshots/mobile-view.png)
+## 📱 Mobile View
+![Mobile View Screenshot](assets/screenshots/mobile-view.png)
+
+</div>
 
 ---
 
