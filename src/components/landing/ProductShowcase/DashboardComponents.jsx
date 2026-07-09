@@ -103,10 +103,11 @@ export function KPICard({ card, index, value }) {
   return (
     <motion.div
       className="dsh-kpi"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.15 + index * 0.08, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0, y: 16, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: 0.12 + index * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       whileHover={{ y: -4, scale: 1.03 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
     >
       <div className="dsh-kpi-icon" style={{ background: card.gradient }} aria-hidden="true">
         {card.id === 'revenue' && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" /></svg>}
@@ -127,6 +128,7 @@ export function KPICard({ card, index, value }) {
         <span className={`dsh-kpi-change ${card.positive ? 'pos' : 'neg'}`}>
           {card.positive ? '↑' : '↓'} {card.change}%
         </span>
+        <Sparkline data={card.sparkline} color={card.positive ? '#10B981' : '#EF4444'} />
       </div>
     </motion.div>
   );
@@ -155,7 +157,7 @@ export function RevenueChart({ data }) {
     const prev = points[i - 1];
     const cpX1 = prev.x + (p.x - prev.x) / 3;
     const cpX2 = p.x - (p.x - prev.x) / 3;
-    return `${prev ? '' : ''}C${cpX1},${prev.y} ${cpX2},${p.y} ${p.x},${p.y}`;
+    return `C${cpX1},${prev.y} ${cpX2},${p.y} ${p.x},${p.y}`;
   }).join(' ');
 
   const areaPath = `${linePath} L${points[points.length - 1].x},${pad.top + innerH} L${points[0].x},${pad.top + innerH} Z`;
@@ -165,7 +167,7 @@ export function RevenueChart({ data }) {
       className="dsh-chart"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.45, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.4, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="dsh-chart-header">
         <div>
@@ -181,8 +183,12 @@ export function RevenueChart({ data }) {
         <svg viewBox={`0 0 ${width} ${height}`} className="dsh-chart-svg" preserveAspectRatio="none">
           <defs>
             <linearGradient id="chartAreaGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.25" />
+              <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.28" />
               <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="chartLineGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#7C3AED" />
+              <stop offset="100%" stopColor="#2563EB" />
             </linearGradient>
           </defs>
           {/* Grid lines */}
@@ -193,28 +199,31 @@ export function RevenueChart({ data }) {
               y1={pad.top + innerH * (1 - pct)}
               x2={width - pad.right}
               y2={pad.top + innerH * (1 - pct)}
-              stroke="rgba(255,255,255,0.04)"
+              stroke="rgba(255,255,255,0.035)"
               strokeWidth="1"
             />
           ))}
+          {/* Area */}
           <motion.path
             d={areaPath}
             fill="url(#chartAreaGrad)"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
+            transition={{ delay: 0.7, duration: 0.7 }}
           />
+          {/* Line - animated drawing */}
           <motion.path
             d={linePath}
             fill="none"
-            stroke="#7C3AED"
-            strokeWidth="2"
+            stroke="url(#chartLineGrad)"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
             initial={{ pathLength: 0 }}
             animate={{ pathLength: 1 }}
-            transition={{ duration: 1.2, ease: 'easeInOut', delay: 0.6 }}
+            transition={{ duration: 1.4, ease: 'easeInOut', delay: 0.5 }}
           />
+          {/* Hover points */}
           {points.map((p, i) => (
             <g key={i}>
               <circle
@@ -260,7 +269,7 @@ export function ActivityFeed({ items }) {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setIdx((i) => (i + 1) % items.length), 3000);
+    const id = setInterval(() => setIdx((i) => (i + 1) % items.length), 4000);
     return () => clearInterval(id);
   }, [items.length]);
 
@@ -274,7 +283,7 @@ export function ActivityFeed({ items }) {
       className="dsh-activity"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.55, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.55, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
       <h3 className="dsh-panel-title">Activity</h3>
       <div className="dsh-activity-list">
@@ -309,7 +318,7 @@ export function ProgressCard({ projects }) {
       className="dsh-progress-card"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.65, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.65, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
       <h3 className="dsh-panel-title">Project Progress</h3>
       <div className="dsh-progress-list">
@@ -326,7 +335,7 @@ export function ProgressCard({ projects }) {
                 initial={{ width: 0 }}
                 whileInView={{ width: `${proj.progress}%` }}
                 viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.7 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 1.2, delay: 0.8 + i * 0.15, ease: [0.16, 1, 0.3, 1] }}
               />
             </div>
           </div>
@@ -345,7 +354,7 @@ export function TeamCard({ members }) {
       className="dsh-team-card"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.75, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.75, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
       <h3 className="dsh-panel-title">Team Members</h3>
       <div className="dsh-team-list">
@@ -382,11 +391,11 @@ export function TeamCard({ members }) {
 }
 
 /* ── Floating Widget ── */
-export function FloatingWidget({ label, value, color, style, delay = 0 }) {
+export function FloatingWidget({ label, value, color, position, delay = 0 }) {
   return (
     <motion.div
       className="dsh-floating-widget"
-      style={style}
+      style={position}
       initial={{ opacity: 0, scale: 0.9, y: 12 }}
       animate={{
         opacity: 1,
@@ -400,9 +409,9 @@ export function FloatingWidget({ label, value, color, style, delay = 0 }) {
       }}
     >
       <div className="dsh-widget-icon" style={{ background: color }} aria-hidden="true">
-        {label === '+$8K Revenue' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /></svg>}
-        {label === '99.9% Uptime' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>}
-        {label === 'AI Active' && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+        </svg>
       </div>
       <div className="dsh-widget-text">
         <span className="dsh-widget-label">{label}</span>

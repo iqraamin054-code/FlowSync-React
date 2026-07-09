@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DashboardHeader,
@@ -7,8 +7,40 @@ import {
   ActivityFeed,
   ProgressCard,
   TeamCard,
+  FloatingWidget,
 } from './DashboardComponents';
-import { kpiCards, activityItems, chartData, projects, teamMembers } from '../../../data/dashboardData';
+import {
+  kpiCards,
+  activityItems,
+  chartData,
+  projects,
+  teamMembers,
+  floatingWidgets,
+  analyticsKpiCards,
+} from '../../../data/dashboardData';
+
+const ANALYTICS_SERIES = [
+  { key: 'revenue', color: '#7C3AED', gradId: 'analyticsLineGrad', data: [42, 50, 47, 60, 68, 64, 77, 85, 81, 92, 97, 108] },
+  { key: 'users', color: '#2563EB', gradId: 'analyticsLineGrad2', data: [33, 41, 45, 43, 52, 58, 55, 64, 70, 67, 76, 84] },
+  { key: 'conversions', color: '#10B981', gradId: 'analyticsLineGrad3', data: [22, 28, 31, 27, 35, 40, 38, 46, 51, 48, 56, 63] },
+];
+
+function buildSmoothPath(pts) {
+  if (!pts || pts.length < 2) return '';
+  let d = `M ${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || p2;
+    const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2[0]},${p2[1]}`;
+  }
+  return d;
+}
 
 const previewTransition = {
   initial: { opacity: 0, y: 20 },
@@ -50,7 +82,7 @@ function DashboardPreview({ prefersReduced }) {
       <div className="dsh-container">
         <DashboardHeader notifCount={notifCount} />
 
-        <section className="dsh-kpi-row">
+        <section className="dsh-kpi-row" aria-label="Key metrics">
           {kpiCards.map((card, i) => (
             <KPICard key={card.id} card={card} index={i} value={kpiValues[i]} />
           ))}
@@ -65,6 +97,17 @@ function DashboardPreview({ prefersReduced }) {
           <ProgressCard projects={projects} />
           <TeamCard members={teamMembers} />
         </section>
+
+        {floatingWidgets.map((widget) => (
+          <FloatingWidget
+            key={widget.id}
+            label={widget.label}
+            value={widget.value}
+            color={widget.color}
+            position={widget.position}
+            delay={widget.id * 0.15}
+          />
+        ))}
       </div>
     </div>
   );
@@ -72,17 +115,23 @@ function DashboardPreview({ prefersReduced }) {
 
 /* ── Analytics Preview ── */
 function AnalyticsPreview({ prefersReduced }) {
-  const [counters, setCounters] = useState({ conversion: 0, retention: 0, revenue: 0 });
+  const [analyticsKpiValues, setAnalyticsKpiValues] = useState(() => analyticsKpiCards.map((c) => c.value));
 
   useEffect(() => {
     if (prefersReduced) return;
-    const timer = setTimeout(() => setCounters({ conversion: 234, retention: 689, revenue: 7.2 }), 100);
-    return () => clearTimeout(timer);
+    const id = setInterval(() => {
+      setAnalyticsKpiValues((prev) =>
+        prev.map((v, i) => {
+          const card = analyticsKpiCards[i];
+          if (i === 0) return v + Math.floor(Math.random() * (card.incrementRange[1] - card.incrementRange[0]) + card.incrementRange[0]);
+          if (i === 1) return Math.round((v + (Math.random() * (card.incrementRange[1] - card.incrementRange[0]) + card.incrementRange[0])) * 10) / 10;
+          if (i === 2) return Math.round((v + (Math.random() * (card.incrementRange[1] - card.incrementRange[0]) + card.incrementRange[0])) * 10) / 10;
+          return Math.round((v + (Math.random() * (card.incrementRange[1] - card.incrementRange[0]) + card.incrementRange[0])) * 100) / 100;
+        })
+      );
+    }, 4500);
+    return () => clearInterval(id);
   }, [prefersReduced]);
-
-  const linePath = "M0,32 C10,28 20,24 30,28 C40,32 50,20 60,24 C70,28 80,16 90,20";
-
-  const barHeights = [35, 50, 42, 65, 55, 72, 48, 60, 78, 52, 68, 58];
 
   return (
     <div className="analytics-preview" role="img" aria-label="FlowSync analytics interface">
@@ -91,7 +140,7 @@ function AnalyticsPreview({ prefersReduced }) {
           <h2 className="page-title">Analytics</h2>
           <div className="analytics-controls">
             <div className="date-selector">
-              <span className="date-range">Oct 1 - Oct 31, 2024</span>
+              <span className="date-range">Last 30 Days</span>
             </div>
             <div className="filter-chips">
               <div className="filter-chip active">All Data</div>
@@ -104,44 +153,100 @@ function AnalyticsPreview({ prefersReduced }) {
       </header>
 
       <main className="analytics-content">
+        <section className="analytics-grid" aria-label="Key metrics">
+          {analyticsKpiCards.map((card, i) => (
+            <KPICard key={card.id} card={card} index={i} value={analyticsKpiValues[i]} />
+          ))}
+        </section>
+
         <section className="main-chart-section">
           <div className="chart-header-with-legend">
-            <h2 className="chart-title">Revenue Analytics</h2>
+            <h2 className="chart-title">Revenue Growth</h2>
             <div className="chart-legend">
               <div className="legend-item"><div className="legend-dot purple" aria-hidden="true" /> Revenue</div>
               <div className="legend-item"><div className="legend-dot blue" aria-hidden="true" /> Users</div>
-              <div className="legend-item"><div className="legend-dot green" aria-hidden="true" /> Growth</div>
+              <div className="legend-item"><div className="legend-dot green" aria-hidden="true" /> Conversions</div>
             </div>
           </div>
           <div className="chart-main-area">
             <div className="line-chart-container">
-              <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="line-chart">
+              <svg viewBox="0 0 320 120" preserveAspectRatio="none" className="line-chart" aria-label="Revenue, users and conversions growth over 12 months">
                 <defs>
                   <linearGradient id="analyticsLineGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.3" />
+                    <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.28" />
                     <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
                   </linearGradient>
+                  <linearGradient id="analyticsLineGrad2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2563EB" stopOpacity="0.20" />
+                    <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+                  </linearGradient>
+                  <linearGradient id="analyticsLineGrad3" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10B981" stopOpacity="0.16" />
+                    <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+                  </linearGradient>
+                  {ANALYTICS_SERIES.map((s, si) => (
+                    <clipPath key={s.key} id={`analyticsClip-${s.key}`}>
+                      <motion.rect
+                        x="0"
+                        y="0"
+                        height="120"
+                        initial={{ width: 0 }}
+                        animate={{ width: 320 }}
+                        transition={{ duration: 1.4, ease: "easeInOut", delay: 0.4 + si * 0.15 }}
+                      />
+                    </clipPath>
+                  ))}
                 </defs>
-                <path d={`${linePath} L90,40 L0,40 Z`} fill="url(#analyticsLineGrad)" />
-                <motion.path
-                  d={linePath}
-                  fill="none"
-                  stroke="#7C3AED"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 1.5, ease: "easeInOut" }}
-                />
-                <motion.circle cx="80" cy="20" r="2.5" fill="#7C3AED" stroke="#0F172A" strokeWidth="1.5"
-                  initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2, duration: 0.3 }} />
+
+                {[0, 1, 2, 3, 4].map((g) => (
+                  <line
+                    key={g}
+                    x1="8"
+                    x2="312"
+                    y1={14 + g * 23}
+                    y2={14 + g * 23}
+                    stroke="var(--border-subtle)"
+                    strokeWidth="1"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                ))}
+
+                {ANALYTICS_SERIES.map((s, si) => {
+                  const coords = s.data.map((v, i) => [
+                    8 + (i * 304) / (s.data.length - 1),
+                    112 - (v / 120) * 92,
+                  ]);
+                  const linePath = buildSmoothPath(coords);
+                  const areaPath = `${linePath} L ${coords[coords.length - 1][0]},112 L ${coords[0][0]},112 Z`;
+                  return (
+                    <g key={s.key} clipPath={`url(#analyticsClip-${s.key})`}>
+                      <motion.path
+                        d={areaPath}
+                        fill={`url(#${s.gradId})`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8 + si * 0.1, duration: 0.6 }}
+                      />
+                      <path
+                        d={linePath}
+                        fill="none"
+                        stroke={s.color}
+                        strokeWidth="2.2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                      <circle cx={coords[coords.length - 1][0]} cy={coords[coords.length - 1][1]} r="3" fill={s.color} vectorEffect="non-scaling-stroke" />
+                    </g>
+                  );
+                })}
               </svg>
             </div>
             <div className="chart-summary-cards">
               <div className="summary-card">
                 <div className="summary-icon conversion-icon" aria-hidden="true" />
                 <div className="summary-content">
-                  <span className="summary-value">{counters.conversion >= 234 ? "23.4%" : "0%"}</span>
+                  <span className="summary-value">23.4%</span>
                   <span className="summary-label">Conversion</span>
                   <span className="summary-trend positive">+12%</span>
                 </div>
@@ -149,7 +254,7 @@ function AnalyticsPreview({ prefersReduced }) {
               <div className="summary-card">
                 <div className="summary-icon retention-icon" aria-hidden="true" />
                 <div className="summary-content">
-                  <span className="summary-value">{counters.retention >= 689 ? "68.9%" : "0%"}</span>
+                  <span className="summary-value">68.9%</span>
                   <span className="summary-label">Retention</span>
                   <span className="summary-trend positive">+3%</span>
                 </div>
@@ -157,7 +262,7 @@ function AnalyticsPreview({ prefersReduced }) {
               <div className="summary-card">
                 <div className="summary-icon revenue-icon" aria-hidden="true" />
                 <div className="summary-content">
-                  <span className="summary-value">{counters.revenue >= 7.2 ? "$7.2M" : "$0"}</span>
+                  <span className="summary-value">$7.2M</span>
                   <span className="summary-label">Revenue</span>
                   <span className="summary-trend negative">-5%</span>
                 </div>
@@ -170,7 +275,7 @@ function AnalyticsPreview({ prefersReduced }) {
           <div className="bar-chart-section">
             <h3 className="section-title">Monthly Growth</h3>
             <div className="bar-chart-container">
-              {barHeights.map((h, i) => (
+              {[35, 50, 42, 65, 55, 72, 48, 60, 78, 52, 68, 58].map((h, i) => (
                 <motion.div key={i} className="bar-chart-bar" style={{ height: `${h}%` }}
                   initial={{ opacity: 0, scaleY: 0 }} animate={{ opacity: 1, scaleY: 1 }}
                   transition={{ delay: i * 0.06 + 0.8, duration: 0.3 }}>
@@ -184,12 +289,9 @@ function AnalyticsPreview({ prefersReduced }) {
             <h3 className="section-title">Distribution</h3>
             <div className="pie-chart-container">
               <svg viewBox="0 0 100 100" className="pie-chart">
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#7C3AED" strokeWidth="12"
-                  strokeDasharray="176 75" strokeDashoffset="0" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#38BDF8" strokeWidth="12"
-                  strokeDasharray="75 176" strokeDashoffset="-176" />
-                <circle cx="50" cy="50" r="40" fill="none" stroke="#10B981" strokeWidth="12"
-                  strokeDasharray="50 201" strokeDashoffset="-251" />
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#7C3AED" strokeWidth="12" strokeDasharray="176 75" strokeDashoffset="0" />
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#38BDF8" strokeWidth="12" strokeDasharray="75 176" strokeDashoffset="-176" />
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#10B981" strokeWidth="12" strokeDasharray="50 201" strokeDashoffset="-251" />
               </svg>
               <div className="pie-legend">
                 <div className="legend-item"><div className="legend-dot purple" aria-hidden="true" /> Revenue 55%</div>
@@ -202,7 +304,13 @@ function AnalyticsPreview({ prefersReduced }) {
 
         <aside className="ai-insights-panel">
           <div className="panel-header">
-            <div className="ai-icon" aria-hidden="true" />
+            <div className="ai-icon" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+            </div>
             <h3 className="panel-title">AI Insights</h3>
           </div>
           <div className="insights-content">
@@ -219,348 +327,22 @@ function AnalyticsPreview({ prefersReduced }) {
               <div className="insight-text"><span className="insight-label">Recommendation:</span> Optimize campaigns for Q4</div>
             </div>
           </div>
-          <button className="export-btn">Export Insights</button>
+          <button className="export-btn">
+            Export Report
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
+          </button>
         </aside>
       </main>
+
+      <footer className="analytics-footer">
+        Data updates every 5 minutes
+      </footer>
     </div>
   );
 }
-
-/* ── Automation Preview ── */
-function AutomationPreview() {
-  const [isRunning, setIsRunning] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsRunning(true), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  return (
-    <div className="automation-preview" role="img" aria-label="FlowSync automation interface">
-      <header className="automation-header">
-        <div className="automation-title-section">
-          <h2 className="page-title">Automation</h2>
-          <div className="automation-status">
-            <div className={`status-indicator ${isRunning ? "running" : ""}`} aria-hidden="true" />
-            <span className="status-text">Active</span>
-          </div>
-        </div>
-        <div className="automation-controls">
-          <button className="control-btn primary">New Workflow</button>
-          <button className="control-btn">Templates</button>
-        </div>
-      </header>
-
-      <main className="automation-content">
-        <section className="workflow-builder">
-          <h2 className="builder-title">Visual Workflow Builder</h2>
-          <div className="workflow-canvas">
-            <div className="workflow-nodes-container">
-              <motion.div className="workflow-node trigger-node" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
-                <div className="node-icon trigger-icon" aria-hidden="true" />
-                <div className="node-content">
-                  <span className="node-label">Trigger</span>
-                  <span className="node-sublabel">Schedule: Daily</span>
-                </div>
-              </motion.div>
-
-              <div className="workflow-connector" aria-hidden="true">
-                <svg viewBox="0 0 40 20" className="connector-svg">
-                  <path d="M0,10 L40,10" stroke="rgba(255,255,255,0.15)" strokeWidth="2" fill="none" strokeDasharray="4,4" />
-                  {isRunning && <motion.circle r="3" fill="#7C3AED"
-                    initial={{ cx: 0, opacity: 0 }} animate={{ cx: 40, opacity: [0, 1, 1, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }} />}
-                </svg>
-              </div>
-
-              <motion.div className="workflow-node condition-node" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 }}>
-                <div className="node-icon condition-icon" aria-hidden="true" />
-                <div className="node-content">
-                  <span className="node-label">Condition</span>
-                  <span className="node-sublabel">If revenue over $1,000</span>
-                </div>
-              </motion.div>
-
-              <div className="workflow-connector" aria-hidden="true">
-                <svg viewBox="0 0 40 20" className="connector-svg">
-                  <path d="M0,10 L40,10" stroke="rgba(255,255,255,0.15)" strokeWidth="2" fill="none" strokeDasharray="4,4" />
-                  {isRunning && <motion.circle r="3" fill="#38BDF8"
-                    initial={{ cx: 0, opacity: 0 }} animate={{ cx: 40, opacity: [0, 1, 1, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: 0.5 }} />}
-                </svg>
-              </div>
-
-              <motion.div className="workflow-node action-node active" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }}>
-                <div className="node-icon ai-icon" aria-hidden="true" />
-                <div className="node-content">
-                  <span className="node-label">AI Action</span>
-                  <span className="node-sublabel">Generate insights</span>
-                </div>
-                {isRunning && <div className="running-indicator" aria-hidden="true" />}
-              </motion.div>
-
-              <div className="workflow-connector" aria-hidden="true">
-                <svg viewBox="0 0 40 20" className="connector-svg">
-                  <path d="M0,10 L40,10" stroke="rgba(255,255,255,0.15)" strokeWidth="2" fill="none" strokeDasharray="4,4" />
-                  {isRunning && <motion.circle r="3" fill="#10B981"
-                    initial={{ cx: 0, opacity: 0 }} animate={{ cx: 40, opacity: [0, 1, 1, 0] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: "linear", delay: 1 }} />}
-                </svg>
-              </div>
-
-              <motion.div className="workflow-node notification-node" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.1 }}>
-                <div className="node-icon notif-icon" aria-hidden="true" />
-                <div className="node-content">
-                  <span className="node-label">Notification</span>
-                  <span className="node-sublabel">Send email</span>
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="workflow-triggers-panel">
-              <div className="trigger-card">
-                <div className="trigger-icon-wrap clock-icon" aria-hidden="true" />
-                <div className="trigger-content">
-                  <span className="trigger-title">Schedule</span>
-                  <span className="trigger-subtitle">Daily at 9 AM</span>
-                </div>
-                <div className="trigger-toggle" aria-label="Toggle schedule trigger">
-                  <div className="toggle-track"><div className="toggle-thumb" /></div>
-                </div>
-              </div>
-              <div className="trigger-card active">
-                <div className="trigger-icon-wrap email-icon" aria-hidden="true" />
-                <div className="trigger-content">
-                  <span className="trigger-title">Email Alert</span>
-                  <span className="trigger-subtitle">Send notification</span>
-                </div>
-                <div className="trigger-toggle active" aria-label="Toggle email trigger">
-                  <div className="toggle-track"><div className="toggle-thumb" /></div>
-                </div>
-              </div>
-              <div className="trigger-card">
-                <div className="trigger-icon-wrap webhook-icon" aria-hidden="true" />
-                <div className="trigger-content">
-                  <span className="trigger-title">Webhook</span>
-                  <span className="trigger-subtitle">POST to API</span>
-                </div>
-                <div className="trigger-toggle" aria-label="Toggle webhook trigger">
-                  <div className="toggle-track"><div className="toggle-thumb" /></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
-  );
-}
-
-/* ── Collaboration Preview ── */
-function CollaborationPreview() {
-  const [onlineUsers, setOnlineUsers] = useState(24);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setOnlineUsers((prev) => prev + (Math.random() > 0.5 ? 1 : 0));
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
-
-  return (
-    <div className="collaboration-preview" role="img" aria-label="FlowSync collaboration interface">
-      <header className="collaboration-header">
-        <div className="collaboration-title-section">
-          <h2 className="page-title">Team Workspace</h2>
-          <div className="team-status">
-            <div className="team-indicator" aria-hidden="true" />
-            <span className="status-text">4 active projects</span>
-          </div>
-        </div>
-        <div className="team-panel">
-          <div className="avatar-stack">
-            <div className="avatar-sm avatar-1" aria-hidden="true">AC</div>
-            <div className="avatar-sm avatar-2" aria-hidden="true">SK</div>
-            <div className="avatar-sm avatar-3" aria-hidden="true">MJ</div>
-            <div className="avatar-more">+{onlineUsers > 3 ? onlineUsers - 3 : 1}</div>
-          </div>
-          <div className="presence-indicator">
-            <div className="presence-dot active" aria-hidden="true" />
-            <span className="presence-text">Online</span>
-          </div>
-        </div>
-      </header>
-
-      <main className="collaboration-content">
-        <aside className="workspace-sidebar">
-          <div className="sidebar-members">
-            <h3 className="sidebar-title">Team Members</h3>
-            <div className="members-list">
-              {[
-                { name: "Alex Chen", role: "Admin", status: "active", color: "#2563EB" },
-                { name: "Sarah Kim", role: "Developer", status: "active", color: "#7C3AED" },
-                { name: "Mike Johnson", role: "Designer", status: "away", color: "#F59E0B" },
-                { name: "Emma Davis", role: "Manager", status: "active", color: "#10B981" },
-              ].map((member, i) => (
-                <motion.div key={i} className="member-item" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 + 0.6 }}>
-                  <div className="member-avatar" style={{ background: member.color }} aria-hidden="true">{member.name.split(" ").map(n => n[0]).join("")}</div>
-                  <div className="member-info">
-                    <span className="member-name">{member.name}</span>
-                    <span className="member-role">{member.role}</span>
-                  </div>
-                  <div className={`member-status ${member.status}`} aria-hidden="true" />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          <div className="sidebar-files">
-            <h3 className="sidebar-title">Shared Files</h3>
-            <div className="files-list">
-              {[
-                { name: "brief_v2.pdf", size: "2.4 MB", icon: "📄" },
-                { name: "assets.zip", size: "14.8 MB", icon: "📦" },
-                { name: "flows.png", size: "1.1 MB", icon: "🖼️" },
-              ].map((file, i) => (
-                <motion.div key={i} className="file-item" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 + 0.8 }} whileHover={{ x: 2 }}>
-                  <span className="file-icon" aria-hidden="true">{file.icon}</span>
-                  <div className="file-info">
-                    <span className="file-name">{file.name}</span>
-                    <span className="file-size">{file.size}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </aside>
-
-        <section className="workspace-main">
-          <header className="workspace-header">
-            <h2 className="workspace-title">Project Kanban</h2>
-            <button className="action-btn primary">New Task</button>
-          </header>
-
-          <div className="kanban-container">
-            <div className="kanban-column">
-              <div className="kanban-header">
-                <h3 className="kanban-title">To Do</h3>
-                <div className="kanban-count">3</div>
-              </div>
-              <div className="kanban-cards">
-                {[
-                  { title: "Design login page", priority: "high", comments: 3 },
-                  { title: "API integration", priority: "medium", comments: 1 },
-                  { title: "Database schema", priority: "high", comments: 0 },
-                ].map((card, i) => (
-                  <motion.div key={i} className="kanban-card todo" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 + 1.0 }} whileHover={{ scale: 1.02, y: -2 }}>
-                    <h4 className="card-title">{card.title}</h4>
-                    <div className="card-meta">
-                      <span className={`priority-badge ${card.priority}`}>{card.priority}</span>
-                      {card.comments > 0 && (
-                        <span className="comment-count">{card.comments} comments</span>
-                      )}
-                    </div>
-                    {i === 0 && (
-                      <div className="typing-indicator" aria-label="Someone is typing">
-                        <span className="typing-dot" />
-                        <span className="typing-dot" />
-                        <span className="typing-dot" />
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            <div className="kanban-column">
-              <div className="kanban-header">
-                <h3 className="kanban-title">In Progress</h3>
-                <div className="kanban-count">2</div>
-              </div>
-              <div className="kanban-cards">
-                {[
-                  { title: "UX research", priority: "medium", comments: 2 },
-                  { title: "Testing suite", priority: "high", comments: 5 },
-                ].map((card, i) => (
-                  <motion.div key={i} className="kanban-card in-progress" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 + 1.2 }} whileHover={{ scale: 1.02, y: -2 }}>
-                    <h4 className="card-title">{card.title}</h4>
-                    <div className="card-meta">
-                      <span className={`priority-badge ${card.priority}`}>{card.priority}</span>
-                      {card.comments > 0 && (
-                        <span className="comment-count">{card.comments} comments</span>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <aside className="workspace-right">
-          <div className="comments-panel">
-            <h3 className="sidebar-title">Comments</h3>
-            <div className="comments-list">
-              {[
-                { user: "Sarah Kim", text: "Pushed revisions!", time: "5m ago", avatar: "SK", color: "#7C3AED" },
-                { user: "Alex Chen", text: "Looks clean!", time: "2m ago", avatar: "AC", color: "#2563EB" },
-              ].map((cmt, i) => (
-                <div key={i} className="comment-bubble-item">
-                  <div className="comment-avatar" style={{ background: cmt.color }}>{cmt.avatar}</div>
-                  <div className="comment-body">
-                    <div className="comment-meta">
-                      <span className="comment-user">{cmt.user}</span>
-                      <span className="comment-time">{cmt.time}</span>
-                    </div>
-                    <p className="comment-text">{cmt.text}</p>
-                  </div>
-                </div>
-              ))}
-              <div className="typing-indicator-chat">
-                <span className="typing-dot" />
-                <span className="typing-dot" />
-                <span className="typing-dot" />
-                <span className="typing-text">Mike is typing...</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="activity-timeline">
-            <h3 className="timeline-title">Activity</h3>
-            <div className="timeline-items">
-              {[
-                { user: "Alex", action: "commented", target: "Login design", time: "2m ago", color: "#2563EB" },
-                { user: "Sarah", action: "shared file", target: "brief_v2.pdf", time: "15m ago", color: "#7C3AED" },
-                { user: "Mike", action: "completed", target: "DB schema", time: "1h ago", color: "#F59E0B" },
-              ].map((item, i) => (
-                <motion.div key={i} className="timeline-item" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 + 1.5 }}>
-                  <div className="timeline-avatar" style={{ background: item.color }} aria-hidden="true">{item.user[0]}</div>
-                  <div className="timeline-content">
-                    <span className="timeline-user">{item.user} </span>
-                    <span className="timeline-action">{item.action} </span>
-                    <span className="timeline-target">{item.target}</span>
-                    <span className="timeline-time">{item.time}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </aside>
-      </main>
-    </div>
-  );
-}
-
-const previewComponents = {
-  dashboard: DashboardPreview,
-  analytics: AnalyticsPreview,
-  automation: AutomationPreview,
-  collaboration: CollaborationPreview,
-};
 
 export default function ProductPreview({ categoryId, prefersReduced }) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const PreviewComponent = previewComponents[categoryId] || DashboardPreview;
 
   const handleMouseMove = useCallback(
     (e) => {
@@ -586,10 +368,26 @@ export default function ProductPreview({ categoryId, prefersReduced }) {
     >
       <div className="showcase-preview-glow" aria-hidden="true" />
       <div className="showcase-preview-ring" aria-hidden="true" />
-      <div className="showcase-preview" role="tabpanel" id={`panel-${categoryId}`} aria-labelledby={`tab-${categoryId}`}>
+      <div
+        className="showcase-preview"
+        role="tabpanel"
+        id={`panel-${categoryId}`}
+        aria-labelledby={`tab-${categoryId}`}
+        aria-label="FlowSync dashboard preview"
+      >
         <AnimatePresence mode="wait">
-          <motion.div key={categoryId} variants={previewTransition} initial="initial" animate="animate" exit="exit">
-            <PreviewComponent prefersReduced={prefersReduced} />
+          <motion.div
+            key={categoryId}
+            variants={previewTransition}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {categoryId === 'analytics' ? (
+              <AnalyticsPreview prefersReduced={prefersReduced} />
+            ) : (
+              <DashboardPreview prefersReduced={prefersReduced} />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

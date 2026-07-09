@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { categories, features } from '../../../data/productShowcase';
+import { categories, features, previewContent } from '../../../data/productShowcase';
 import CategoryTabs from './CategoryTabs';
 import FeatureCard from './FeatureCard';
 import ProductPreview from './ProductPreview';
@@ -87,16 +87,18 @@ export default function ProductShowcase() {
         {/* Content Area */}
         <div className="showcase-content">
           {/* Left: Feature Cards */}
-          <motion.div
-            className="showcase-features"
-            key={`features-${activeTab}`}
-            variants={contentVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            role="list"
-            aria-label="Product features"
-          >
+          <div className="showcase-features-col">
+            <div className="showcase-features-label">Capabilities</div>
+            <motion.div
+              className="showcase-features"
+              key={`features-${activeTab}`}
+              variants={contentVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              role="list"
+              aria-label="Product features"
+            >
             {currentFeatures.map((feature, i) => (
               <FeatureCard
                 key={feature.title}
@@ -106,9 +108,14 @@ export default function ProductShowcase() {
               />
             ))}
           </motion.div>
+          </div>
 
           {/* Right: Product Preview */}
           <div className="showcase-visual">
+            <div className="showcase-visual-label">
+              <span className="showcase-visual-dot" aria-hidden="true" />
+              Live Preview
+            </div>
             <ProductPreview
               categoryId={activeTab}
               prefersReduced={prefersReduced}
@@ -120,7 +127,9 @@ export default function ProductShowcase() {
               initial="initial"
               animate="animate"
               exit="exit"
-            ></motion.p>
+            >
+              {previewContent[activeTab]?.description}
+            </motion.p>
           </div>
         </div>
       </motion.div>

@@ -443,6 +443,38 @@
     }
 }
 
+/* --- Product Showcase (tablet) --- */
+@media (max-width: 1024px) {
+    .showcase-content {
+        grid-template-columns: 1fr;
+        gap: 28px;
+    }
+
+    .showcase-features {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .showcase-visual {
+        justify-content: flex-start;
+    }
+
+    .showcase-preview {
+        min-height: 440px;
+    }
+}
+
+/* --- Product Showcase (mobile) --- */
+@media (max-width: 576px) {
+    .showcase-features {
+        grid-template-columns: 1fr;
+    }
+
+    .showcase-features-label,
+    .showcase-visual-label {
+        text-align: left;
+    }
+}
+
 /* --- Small Phones (430 / 390 / 375 / 320) --- */
 @media (max-width: 480px) {
     .hero-content {
