@@ -75,13 +75,20 @@
 /* --- Tablet --- */
 @media (max-width: 991px) {
     .hero-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 3rem;
         text-align: center;
     }
 
     .hero-content {
         align-items: center;
+        min-width: 0;
+        width: 100%;
+    }
+
+    .hero-visual {
+        min-width: 0;
+        width: 100%;
     }
 
     .hero-desc {
@@ -193,6 +200,7 @@
     .dash-preview {
         height: 360px;
         border-radius: var(--radius-sm);
+        min-width: 0;
     }
 
     .dash-sidebar {
@@ -349,7 +357,14 @@
         display: none;
     }
 
+    .dash-wrapper {
+        max-width: 100%;
+        min-width: 0;
+    }
 
+    .dash-main {
+        min-width: 0;
+    }
 
     .float-card-glow {
         display: none;
@@ -425,6 +440,53 @@
     .footer-bottom {
         flex-direction: column;
         text-align: center;
+    }
+}
+
+/* --- Small Phones (430 / 390 / 375 / 320) --- */
+@media (max-width: 480px) {
+    .hero-content {
+        align-items: stretch;
+        text-align: left;
+    }
+
+    .hero-desc {
+        max-width: 100%;
+    }
+
+    .hero-buttons {
+        width: 100%;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-visual {
+        max-width: 100%;
+    }
+
+    .dash-wrapper {
+        max-width: 100%;
+    }
+
+    .dash-sidebar {
+        display: none;
+    }
+
+    .dash-preview {
+        min-height: 300px;
+        height: auto;
+    }
+
+    .dash-panels-container .panel-chart,
+    .dash-panels-container .panel-activity {
+        min-width: 0;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
     }
 }
 

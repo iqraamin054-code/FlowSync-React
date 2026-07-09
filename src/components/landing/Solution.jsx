@@ -193,7 +193,7 @@ function StatCard({ stat, animating }) {
   return (
     <div className="dash-stat-card">
       <div className="stat-icon-row">
-        <svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg className="stat-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           {iconMap[stat.icon]}
         </svg>
         <span className={`stat-change ${stat.up ? 'stat-up' : 'stat-down'}`}>{stat.change}</span>
@@ -361,7 +361,7 @@ export default function Solution({ activeState: propState = 'default' }) {
                         aria-label={item.label}
                         onClick={() => setActiveState(item.state)}
                       >
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           {item.activeIcon}
                         </svg>
                       </button>
@@ -372,12 +372,12 @@ export default function Solution({ activeState: propState = 'default' }) {
                   <div className="dash-header">
                     <div className="dash-header-left">
                       <div className="dash-workspace">
-                        <svg className="dash-workspace-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
+                        <svg className="dash-workspace-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
                         <span className="dash-workspace-name">FlowSync Hub</span>
-                        <svg className="dash-chevron-down" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+                        <svg className="dash-chevron-down" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
                       </div>
                       <div className="dash-search">
-                        <svg className="dash-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                        <svg className="dash-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
                         <input className="dash-search-input" type="text" placeholder={activeState === 'analytics' ? 'Business Analyti...' : activeState === 'workspaces' ? 'Project Workspa...' : 'Overview'} aria-label="Search" />
                       </div>
                     </div>
@@ -424,7 +424,7 @@ export default function Solution({ activeState: propState = 'default' }) {
               <div className="solution-float-card">
                 <div className="float-card-glow" />
                 <div className="float-card-icon-efficiency">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
                 </div>
                 <div className="float-card-info">
                   <span className="float-card-label">Efficiency</span>
@@ -454,7 +454,7 @@ export default function Solution({ activeState: propState = 'default' }) {
                     ease: [0.25, 0.46, 0.45, 0.94],
                   }}
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                   <span><strong>{item.title}</strong> {item.description}</span>

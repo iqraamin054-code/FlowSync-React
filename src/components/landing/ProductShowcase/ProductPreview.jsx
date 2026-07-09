@@ -88,7 +88,7 @@ function AnalyticsPreview({ prefersReduced }) {
     <div className="analytics-preview" role="img" aria-label="FlowSync analytics interface">
       <header className="analytics-header">
         <div className="analytics-title-section">
-          <h1 className="page-title">Analytics</h1>
+          <h2 className="page-title">Analytics</h2>
           <div className="analytics-controls">
             <div className="date-selector">
               <span className="date-range">Oct 1 - Oct 31, 2024</span>
@@ -239,7 +239,7 @@ function AutomationPreview({ prefersReduced }) {
     <div className="automation-preview" role="img" aria-label="FlowSync automation interface">
       <header className="automation-header">
         <div className="automation-title-section">
-          <h1 className="page-title">Automation</h1>
+          <h2 className="page-title">Automation</h2>
           <div className="automation-status">
             <div className={`status-indicator ${isRunning ? "running" : ""}`} aria-hidden="true" />
             <span className="status-text">Active</span>
@@ -371,7 +371,7 @@ function CollaborationPreview({ prefersReduced }) {
     <div className="collaboration-preview" role="img" aria-label="FlowSync collaboration interface">
       <header className="collaboration-header">
         <div className="collaboration-title-section">
-          <h1 className="page-title">Team Workspace</h1>
+          <h2 className="page-title">Team Workspace</h2>
           <div className="team-status">
             <div className="team-indicator" aria-hidden="true" />
             <span className="status-text">4 active projects</span>
