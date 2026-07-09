@@ -4,6 +4,7 @@ import Hero from '../components/landing/Hero/Hero.jsx';
 import TrustedCompanies from '../components/landing/TrustedCompanies.jsx';
 import Problems from '../components/landing/Problems.jsx';
 import Solution from '../components/landing/Solution.jsx';
+import ProductShowcase from '../components/landing/ProductShowcase/ProductShowcase.jsx';
 import Features from '../components/landing/Features.jsx';
 import Statistics from '../components/landing/Statistics.jsx';
 import Pricing from '../components/landing/Pricing.jsx';
@@ -35,6 +36,7 @@ export default function Landing() {
         <TrustedCompanies />
         <Problems onHover={setSolutionState} />
         <Solution activeState={solutionState} />
+        <ProductShowcase />
         <Features />
         <Statistics />
         <Pricing />
