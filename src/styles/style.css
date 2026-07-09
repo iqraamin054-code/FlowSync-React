@@ -4398,6 +4398,11 @@ html {
     cursor: pointer;
     transition: all 0.25s ease;
     text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
 }
 
 .calc-plan-btn:hover {
@@ -4411,6 +4416,43 @@ html {
     background: rgba(var(--color-primary-rgb, 37, 99, 235), 0.1);
     color: var(--color-primary, #2563EB);
     box-shadow: 0 0 16px var(--shadow-glow-primary);
+}
+
+/* Recommendation badge */
+.calc-rec-badge {
+    font-size: 0.55rem;
+    font-weight: var(--weight-bold);
+    color: #10B981;
+    background: rgba(16, 185, 129, 0.12);
+    padding: 0.1rem 0.4rem;
+    border-radius: var(--radius-full);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+/* Enterprise notice */
+.calc-enterprise-notice {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1rem;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    border-radius: var(--radius-md);
+    font-size: 0.82rem;
+    color: #F59E0B;
+    overflow: hidden;
+}
+
+.calc-enterprise-notice svg {
+    flex-shrink: 0;
+    color: #F59E0B;
+}
+
+.calc-enterprise-notice strong {
+    color: #FBBF24;
+    font-weight: var(--weight-semibold);
 }
 
 /* Pricing Reference */
@@ -4498,6 +4540,18 @@ html {
     color: var(--text-muted);
     font-weight: var(--weight-medium);
     margin-left: 0.15rem;
+}
+
+/* Pricing breakdown */
+.calc-breakdown {
+    font-family: var(--font-num);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    text-align: center;
 }
 
 /* Detail Rows */
@@ -4628,6 +4682,27 @@ html {
 [data-theme="light"] .calc-plan-btn {
     background: rgba(0, 0, 0, 0.02);
     border-color: rgba(124, 58, 237, 0.08);
+}
+
+[data-theme="light"] .calc-rec-badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+[data-theme="light"] .calc-enterprise-notice {
+    background: rgba(245, 158, 11, 0.06);
+    border-color: rgba(245, 158, 11, 0.12);
+    color: #D97706;
+}
+
+[data-theme="light"] .calc-enterprise-notice strong {
+    color: #B45309;
+}
+
+[data-theme="light"] .calc-breakdown {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(124, 58, 237, 0.08);
+    color: var(--text-muted);
 }
 
 [data-theme="light"] .calc-plan-btn:hover {
