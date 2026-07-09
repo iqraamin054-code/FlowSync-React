@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { categories, features, previewData } from '../../../data/productShowcase';
+import { categories, features } from '../../../data/productShowcase';
 import CategoryTabs from './CategoryTabs';
 import FeatureCard from './FeatureCard';
 import ProductPreview from './ProductPreview';

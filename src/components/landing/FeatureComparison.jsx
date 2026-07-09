@@ -52,7 +52,7 @@ export default function FeatureComparison() {
               </tr>
             </thead>
             <tbody>
-              {features.map((f, i) => (
+              {features.map((f) => (
                 <tr key={f.name} className="compare-row">
                   <td className="compare-feature-name">{f.name}</td>
                   <td className={`compare-cell${plans[0] === 'Professional' ? ' compare-cell-featured' : ''}`}>{cellValue(f.starter)}</td>

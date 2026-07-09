@@ -106,7 +106,7 @@ export default function BlogModal({ post, onClose }) {
 
           <div className="blog-modal-content">
             <div className="blog-modal-hero">
-              <img src={post.image} alt={post.title} />
+              <img src={post.image} alt={post.title} loading="lazy" />
               <div className="blog-modal-hero-overlay" />
             </div>
 

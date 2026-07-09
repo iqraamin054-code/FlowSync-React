@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BlogModal from './BlogModal';
+import productImg from '../../assets/images/product.webp';
+import engineeringImg from '../../assets/images/engineering.webp';
+import companyImg from '../../assets/images/companyblog.webp';
+
+const categoryImages = {
+  Product: productImg,
+  Engineering: engineeringImg,
+  Company: companyImg,
+};
 
 const blogPosts = [
   {
@@ -8,7 +17,7 @@ const blogPosts = [
     title: 'How FlowSync Revolutionizes Team Collaboration',
     body: 'Discover how FlowSync brings your entire team together with real-time collaboration tools that keep everyone on the same page.',
     category: 'Product',
-    image: 'https://picsum.photos/seed/flow1/600/340',
+    image: categoryImages.Product,
     fullBody: `Collaboration is the backbone of every successful team. Yet, most teams struggle with scattered tools, missed messages, and disorganized workflows. FlowSync was built to solve exactly that.
 
 With FlowSync, your team gets a single hub for tasks, messages, and file sharing. No more switching between five different apps. Everything you need is in one place.
@@ -26,7 +35,7 @@ Start your free trial today and experience the difference that a unified collabo
     title: 'Top 5 Productivity Tips for Remote Teams',
     body: 'Working remotely comes with unique challenges. Here are five proven strategies to keep your distributed team productive and engaged.',
     category: 'Engineering',
-    image: 'https://picsum.photos/seed/flow2/600/340',
+    image: categoryImages.Engineering,
     fullBody: `Remote work is here to stay. But managing a distributed team requires more than just a video call setup. Here are five strategies that actually work.
 
 First, establish clear communication channels. Define where discussions happen — whether it is Slack for quick chats, email for formal updates, or FlowSync for task-related conversations.
@@ -46,7 +55,7 @@ Implement these strategies today and watch your remote team thrive.`,
     title: 'Introducing FlowSync 2.0: What Is New',
     body: 'We are excited to announce FlowSync 2.0 with powerful new features designed to make your workflow smoother than ever.',
     category: 'Company',
-    image: 'https://picsum.photos/seed/flow3/600/340',
+    image: categoryImages.Company,
     fullBody: `Today marks a big milestone for FlowSync. We are thrilled to introduce FlowSync 2.0 — a complete redesign built around your feedback.
 
 The new dashboard gives you a bird's eye view of all your projects. See what needs attention, track progress across teams, and identify bottlenecks before they become problems.

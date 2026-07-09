@@ -227,7 +227,7 @@ function AnalyticsPreview({ prefersReduced }) {
 }
 
 /* ── Automation Preview ── */
-function AutomationPreview({ prefersReduced }) {
+function AutomationPreview() {
   const [isRunning, setIsRunning] = useState(false);
 
   useEffect(() => {
@@ -357,7 +357,7 @@ function AutomationPreview({ prefersReduced }) {
 }
 
 /* ── Collaboration Preview ── */
-function CollaborationPreview({ prefersReduced }) {
+function CollaborationPreview() {
   const [onlineUsers, setOnlineUsers] = useState(24);
 
   useEffect(() => {

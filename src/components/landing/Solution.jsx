@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import './Hero/Hero.css';
 import { solutionFeatures } from '../../data/landingContent';
@@ -328,8 +328,6 @@ export default function Solution({ activeState: propState = 'default' }) {
     setActiveState(propState);
   }, [propState]);
 
-  const stats = statData[activeState] || statData.default;
-
   return (
     <section className="solution-section reveal" id="solution">
       <div className="solution-glow solution-glow-1" />
@@ -403,7 +401,7 @@ export default function Solution({ activeState: propState = 'default' }) {
                   <div className="dash-stats-container">
                     {dashboardStates.map((state) => (
                       <div key={state} className={`dash-stats dash-stats-${state}`} style={{ pointerEvents: state === activeState ? 'auto' : 'none' }}>
-                        {statData[state].map((stat, i) => (
+                        {statData[state].map((stat) => (
                           <StatCard key={`${state}-${stat.label}`} stat={stat} animating={state === activeState && animating} />
                         ))}
                       </div>
