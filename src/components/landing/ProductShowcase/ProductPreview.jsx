@@ -1,5 +1,14 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  DashboardHeader,
+  KPICard,
+  RevenueChart,
+  ActivityFeed,
+  ProgressCard,
+  TeamCard,
+} from './DashboardComponents';
+import { kpiCards, activityItems, chartData, projects, teamMembers } from '../../../data/dashboardData';
 
 const previewTransition = {
   initial: { opacity: 0, y: 20 },
@@ -15,244 +24,48 @@ const previewTransition = {
   },
 };
 
-const revenueData = [32, 28, 24, 28, 20, 24, 18, 22, 16, 20, 14, 18];
-
 /* ── Dashboard Preview ── */
 function DashboardPreview({ prefersReduced }) {
-  const [counters, setCounters] = useState({ revenue: 0, users: 0, growth: 0 });
-  const [onlineUsers, setOnlineUsers] = useState(24);
+  const [kpiValues, setKpiValues] = useState(() => kpiCards.map((c) => c.value));
+  const [notifCount, setNotifCount] = useState(3);
 
   useEffect(() => {
     if (prefersReduced) return;
-    const timer = setTimeout(() => setCounters({ revenue: 54200, users: 18430, growth: 18 }), 100);
-    return () => clearTimeout(timer);
+    const id = setInterval(() => {
+      setKpiValues((prev) =>
+        prev.map((v, i) => {
+          if (i === 0) return v + Math.floor(Math.random() * 80 + 20);
+          if (i === 1) return v + Math.floor(Math.random() * 8 + 1);
+          if (i === 2) return v + Math.floor(Math.random() * 4 + 1);
+          return Math.round((v + (Math.random() * 0.2 - 0.05)) * 10) / 10;
+        })
+      );
+      setNotifCount((v) => (v % 5) + 1);
+    }, 4000);
+    return () => clearInterval(id);
   }, [prefersReduced]);
 
-  useEffect(() => {
-    if (prefersReduced) return;
-    const timer = setInterval(() => {
-      setOnlineUsers((prev) => prev + (Math.random() > 0.5 ? 1 : 0));
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const chartPath = revenueData.reduce((acc, val, i) => {
-    const x = (i / (revenueData.length - 1)) * 100;
-    const y = val;
-    if (i === 0) return `M${x},${y}`;
-    const prevX = ((i - 1) / (revenueData.length - 1)) * 100;
-    const cpX1 = prevX + (x - prevX) / 3;
-    const cpX2 = x - (x - prevX) / 3;
-    return `${acc} C${cpX1},${revenueData[i - 1]} ${cpX2},${y} ${x},${y}`;
-  }, '');
-
-  const chartAreaPath = `${chartPath} L100,40 L0,40 Z`;
-
-  const calendarDays = [];
-  for (let i = 1; i <= 31; i++) {
-    calendarDays.push(i);
-  }
-
   return (
-    <div className="dashboard-preview" role="img" aria-label="FlowSync dashboard interface">
-      <aside className="sidebar" aria-label="Application navigation">
-        <div className="sidebar-header">
-          <div className="app-logo" aria-hidden="true" />
-        </div>
-        <nav className="nav-menu" aria-label="Main navigation">
-          <button className="nav-item active" aria-current="page" aria-label="Dashboard">
-            <div className="nav-icon dash-icon" />
-            <span className="nav-tooltip">Dashboard</span>
-          </button>
-          <button className="nav-item" aria-label="Projects">
-            <div className="nav-icon projects-icon" />
-            <span className="nav-tooltip">Projects</span>
-          </button>
-          <button className="nav-item" aria-label="Analytics">
-            <div className="nav-icon analytics-icon" />
-            <span className="nav-tooltip">Analytics</span>
-          </button>
-          <button className="nav-item" aria-label="Team">
-            <div className="nav-icon team-icon" />
-            <span className="nav-tooltip">Team</span>
-          </button>
-          <button className="nav-item" aria-label="Settings">
-            <div className="nav-icon settings-icon" />
-            <span className="nav-tooltip">Settings</span>
-          </button>
-        </nav>
-        <div className="sidebar-footer">
-          <div className="status-indicator active" aria-hidden="true" />
-          <span className="status-text">Connected</span>
-        </div>
-      </aside>
+    <div className="dsh-root">
+      <div className="dsh-container">
+        <DashboardHeader notifCount={notifCount} />
 
-      <main className="main-content">
-        <header className="toolbar">
-          <div className="toolbar-left">
-            <div className="breadcrumb">
-              <span className="breadcrumb-item">Home</span>
-              <span className="breadcrumb-separator" aria-hidden="true">/</span>
-              <span className="breadcrumb-item current">Dashboard</span>
-            </div>
-          </div>
-          <div className="toolbar-right">
-            <div className="search-container">
-              <div className="search-icon" aria-hidden="true" />
-              <input type="search" className="search-input" placeholder="Search anything..." aria-label="Search" readOnly />
-            </div>
-            <button className="notif-btn" aria-label="Notifications">
-              <div className="notif-icon" />
-              <div className="notif-dot animated-pulse" aria-hidden="true" />
-            </button>
-            <button className="user-menu-btn" aria-label="User menu">
-              <div className="user-avatar" aria-hidden="true">JD</div>
-              <div className="user-status active" aria-hidden="true" />
-            </button>
-          </div>
-        </header>
-
-        <section className="kpi-grid">
-          <motion.div className="kpi-card revenue-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} whileHover={{ y: -5, scale: 1.02 }}>
-            <div className="kpi-icon revenue-icon" aria-hidden="true" />
-            <div className="kpi-content">
-              <span className="kpi-label">Revenue</span>
-              <span className="kpi-value">{counters.revenue >= 54200 ? `$${(counters.revenue / 1000).toFixed(1)}K` : "$0"}</span>
-              <span className="kpi-change positive">+12.5%</span>
-            </div>
-          </motion.div>
-
-          <motion.div className="kpi-card users-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} whileHover={{ y: -5, scale: 1.02 }}>
-            <div className="kpi-icon users-icon" aria-hidden="true" />
-            <div className="kpi-content">
-              <span className="kpi-label">Active Users</span>
-              <span className="kpi-value">{counters.users >= 18430 ? counters.users.toLocaleString() : "0"}</span>
-              <span className="kpi-change positive">+8.2%</span>
-            </div>
-          </motion.div>
-
-          <motion.div className="kpi-card growth-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} whileHover={{ y: -5, scale: 1.02 }}>
-            <div className="kpi-icon growth-icon" aria-hidden="true" />
-            <div className="kpi-content">
-              <span className="kpi-label">Growth</span>
-              <span className="kpi-value">{counters.growth >= 18 ? `+${counters.growth}%` : "+0%"}</span>
-              <span className="kpi-change negative">-2.4%</span>
-            </div>
-          </motion.div>
-
-          <motion.div className="kpi-card productivity-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} whileHover={{ y: -5, scale: 1.02 }}>
-            <div className="kpi-icon productivity-icon" aria-hidden="true" />
-            <div className="kpi-content">
-              <span className="kpi-label">Productivity</span>
-              <span className="kpi-value">+240%</span>
-              <span className="kpi-change positive">+18.5%</span>
-            </div>
-          </motion.div>
+        <section className="dsh-kpi-row">
+          {kpiCards.map((card, i) => (
+            <KPICard key={card.id} card={card} index={i} value={kpiValues[i]} />
+          ))}
         </section>
 
-        <section className="chart-section">
-          <div className="chart-header">
-            <h2 className="chart-title">Revenue Trend</h2>
-            <div className="chart-tabs">
-              <button className="chart-tab active" aria-label="Daily view">Day</button>
-              <button className="chart-tab" aria-label="Weekly view">Week</button>
-              <button className="chart-tab" aria-label="Monthly view">Month</button>
-            </div>
-          </div>
-          <div className="chart-container">
-            <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="revenue-line-chart">
-              <defs>
-                <linearGradient id="dashRevenueGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.35" />
-                  <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path d={chartAreaPath} fill="url(#dashRevenueGrad)" />
-              <motion.path
-                d={chartPath}
-                fill="none"
-                stroke="#7C3AED"
-                strokeWidth="2"
-                strokeLinecap="round"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 1.5, ease: "easeInOut", delay: 0.5 }}
-              />
-              <motion.circle cx="100" cy="18" r="2.5" fill="#7C3AED" stroke="#0F172A" strokeWidth="1.5"
-                initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2, duration: 0.3 }} />
-            </svg>
-          </div>
+        <section className="dsh-middle">
+          <RevenueChart data={chartData} />
+          <ActivityFeed items={activityItems} />
         </section>
 
-        <section className="bottom-row">
-          <div className="activity-panel">
-            <h3 className="panel-title">Team Activity</h3>
-            <div className="activity-list">
-              {[
-                { name: "AC", text: "Alex joined the team", time: "2m ago", color: "#2563EB" },
-                { name: "SK", text: "Milestone completed", time: "1h ago", color: "#10B981" },
-                { name: "MJ", text: "Workflow triggered", time: "3h ago", color: "#7C3AED" },
-              ].map((item, i) => (
-                <motion.div key={i} className="activity-item" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 + 1.0 }} whileHover={{ x: 4 }}>
-                  <div className="activity-avatar" style={{ background: item.color }} aria-hidden="true">{item.name}</div>
-                  <div className="activity-content">
-                    <span className="activity-text">{item.text}</span>
-                    <span className="activity-time">{item.time}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          <div className="calendar-panel">
-            <div className="calendar-header">
-              <h3 className="panel-title">Calendar</h3>
-              <span className="calendar-month">Oct 2024</span>
-            </div>
-            <div className="calendar-grid" role="grid" aria-label="October 2024 calendar">
-              {["S", "M", "T", "W", "T", "F", "S"].map((day, i) => (
-                <div key={i} className="calendar-day-header" role="columnheader">{day}</div>
-              ))}
-              {Array.from({ length: 7 }).map((_, i) => (
-                <div key={`pad-${i}`} className="calendar-day empty" />
-              ))}
-              {calendarDays.map((day) => (
-                <motion.div
-                  key={day}
-                  className={`calendar-day ${day === 15 ? "today" : ""} ${[5, 12, 20, 28].includes(day) ? "has-event" : ""}`}
-                  role="gridcell"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: day * 0.01 + 0.5 }}
-                  whileHover={{ backgroundColor: "rgba(124, 58, 237, 0.1)" }}
-                >
-                  {day}
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          <div className="status-panel">
-            <h3 className="panel-title">System Status</h3>
-            <div className="status-items">
-              {[
-                { label: "API", status: "healthy", latency: "12ms" },
-                { label: "Database", status: "healthy", latency: "8ms" },
-                { label: "Storage", status: "warning", latency: "45ms" },
-                { label: "Auth", status: "healthy", latency: "5ms" },
-              ].map((item, i) => (
-                <motion.div key={i} className="status-item" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 + 1.3 }} whileHover={{ scale: 1.03 }}>
-                  <div className={`status-dot ${item.status}`} aria-hidden="true" />
-                  <div className="status-content">
-                    <span className="status-label">{item.label}</span>
-                    <span className="status-latency">{item.latency}</span>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+        <section className="dsh-bottom">
+          <ProgressCard projects={projects} />
+          <TeamCard members={teamMembers} />
         </section>
-      </main>
+      </div>
     </div>
   );
 }
@@ -780,39 +593,6 @@ export default function ProductPreview({ categoryId, prefersReduced }) {
           </motion.div>
         </AnimatePresence>
       </div>
-
-      {[
-        { icon: "revenue", label: "Revenue", value: "+$54.2K", className: "widget-1" },
-        { icon: "productivity", label: "Productivity", value: "+240%", className: "widget-2" },
-        { icon: "projects", label: "Projects", value: "128", className: "widget-3" },
-        { icon: "users", label: "Users Online", value: "24", className: "widget-4" },
-      ].map((widget, i) => (
-        <motion.div
-          key={widget.className}
-          className={`floating-widget ${widget.className}`}
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: prefersReduced ? 0 : [0, -8, 0] }}
-          transition={{
-            y: prefersReduced ? { duration: 0.6 } : {
-              duration: 3.5 + i * 0.4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: i * 0.3
-            },
-            opacity: { duration: 0.6, delay: 0.5 + i * 0.15 },
-            scale: { duration: 0.6, delay: 0.5 + i * 0.15 }
-          }}
-          whileHover={{ scale: 1.08, y: -12 }}
-        >
-          <div className="widget-content">
-            <span className={`widget-icon ${widget.icon}-icon`} aria-hidden="true" />
-            <div className="widget-text">
-              <span className="widget-label">{widget.label}</span>
-              <span className="widget-value">{widget.value}</span>
-            </div>
-          </div>
-        </motion.div>
-      ))}
     </motion.div>
   );
 }
