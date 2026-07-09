@@ -1,3 +1,4 @@
+import { useRef, useCallback } from 'react';
 import './Hero/Hero.css';
 import { problems } from '../../data/landingContent';
 
@@ -26,7 +27,7 @@ const iconMap = {
 };
 
 const hoverStateMap = {
-  projects: 'default',
+  projects: 'workspaces',
   automation: 'automation',
   analytics: 'analytics',
 };
@@ -38,6 +39,23 @@ const dataHoverMap = {
 };
 
 export default function Problems({ onHover }) {
+  const leaveTimeoutRef = useRef(null);
+
+  const handleMouseEnter = useCallback((state) => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = null;
+    }
+    onHover?.(state);
+  }, [onHover]);
+
+  const handleMouseLeave = useCallback(() => {
+    leaveTimeoutRef.current = setTimeout(() => {
+      onHover?.('default');
+      leaveTimeoutRef.current = null;
+    }, 500);
+  }, [onHover]);
+
   return (
     <section className="problems-section reveal" id="why-switch">
       <div className="problems-glow problems-glow-1" />
@@ -61,8 +79,8 @@ export default function Problems({ onHover }) {
               data-hover={dataHoverMap[problem.title] || problem.title.toLowerCase()}
               tabIndex="0"
               key={problem.title}
-              onMouseEnter={() => onHover?.(hoverStateMap[dataHoverMap[problem.title]] || 'default')}
-              onMouseLeave={() => onHover?.('default')}
+              onMouseEnter={() => handleMouseEnter(hoverStateMap[dataHoverMap[problem.title]] || 'default')}
+              onMouseLeave={handleMouseLeave}
             >
               <div className="problem-icon">{iconMap[problem.icon]}</div>
               <h3 className="problem-title">{problem.title}</h3>

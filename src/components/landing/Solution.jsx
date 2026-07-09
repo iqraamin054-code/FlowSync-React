@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, useInView } from 'framer-motion';
 import './Hero/Hero.css';
 import { solutionFeatures } from '../../data/landingContent';
 
-const dashboardStates = ['default', 'projects', 'automation', 'analytics'];
+const dashboardStates = ['default', 'workspaces', 'automation', 'analytics'];
 
 const navItems = [
   {
@@ -20,7 +21,7 @@ const navItems = [
   },
   {
     label: 'Workflows',
-    state: 'projects',
+    state: 'workspaces',
     activeIcon: <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" />,
     type: 'folder',
   },
@@ -57,7 +58,7 @@ const statData = {
     { label: 'Tasks', value: 156, prefix: '', suffix: '', change: '+12%', up: true, color: '#7C3AED', icon: 'check' },
     { label: 'Completed', value: 87, prefix: '', suffix: '', change: '+5%', up: true, color: '#10B981', icon: 'check-circle' },
   ],
-  projects: [
+  workspaces: [
     { label: 'Active Projects', value: 42, prefix: '', suffix: '', change: '+8', up: true, color: '#2563EB', icon: 'folder' },
     { label: 'Tasks', value: 318, prefix: '', suffix: '', change: '+23', up: true, color: '#7C3AED', icon: 'check' },
     { label: 'Deadlines', value: 12, prefix: '', suffix: '', change: '2', up: false, color: '#EF4444', icon: 'clock' },
@@ -84,7 +85,7 @@ const panelData = {
       { avatar: 'R', gradient: 'linear-gradient(135deg,#38BDF8,#0284C7)', text: 'Revenue increased by 18%', time: '1h ago', dot: 'cyan' },
     ],
   },
-  projects: {
+  workspaces: {
     chartTitle: 'Project Progress',
     chartBadge: '12 tasks',
     timeline: [
@@ -116,20 +117,27 @@ const panelData = {
 
 const chartPaths = {
   default: 'M8 50 L30 44 L55 32 L80 22 L105 26 L130 18 L155 14 L180 20 L200 12',
-  projects: null,
+  workspaces: null,
   automation: 'M8 48 L35 40 L60 20 L85 30 L110 14 L135 10 L160 6 L185 8 L200 4',
   analytics: 'M8 52 L35 46 L60 38 L85 28 L110 20 L135 12 L160 8 L185 6 L200 4',
 };
 
-function useAnimatedValue(target, duration = 600) {
-  const [display, setDisplay] = useState(target);
+function useAnimatedValue(target, duration = 800) {
+  const mountRef = useRef(true);
+  const [display, setDisplay] = useState(0);
   const frameRef = useRef(null);
   const startRef = useRef(null);
-  const fromRef = useRef(target);
+  const fromRef = useRef(0);
 
   useEffect(() => {
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    fromRef.current = display;
+
+    if (mountRef.current) {
+      mountRef.current = false;
+      fromRef.current = 0;
+    } else {
+      fromRef.current = display;
+    }
     startRef.current = null;
 
     const animate = (timestamp) => {
@@ -152,7 +160,7 @@ function useAnimatedValue(target, duration = 600) {
 
 function StatCard({ stat, animating }) {
   const numericVal = stat.display ? parseFloat(stat.display) : stat.value;
-  const animatedVal = useAnimatedValue(animating ? numericVal : numericVal, 500);
+  const animatedVal = useAnimatedValue(animating ? numericVal : numericVal, 900);
   const displayValue = stat.display
     ? `$${(animatedVal / 1000).toFixed(1)}K`
     : `${stat.prefix}${animatedVal.toLocaleString('en-US')}${stat.suffix}`;
@@ -237,7 +245,7 @@ function ChartPanel({ state }) {
       </div>
       <div className="chart-wrapper">
         {path ? (
-          <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chart" className="dash-chart-svg">
+          <svg key={state} viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Chart" className="dash-chart-svg">
             <defs>
               <linearGradient id={`chartFill-${state}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#2563EB" stopOpacity="0.2" />
@@ -252,7 +260,7 @@ function ChartPanel({ state }) {
             <circle className="chart-end-dot" cx="200" cy={state === 'default' ? '12' : state === 'automation' ? '4' : '4'} r="3" fill="#2563EB" stroke="#1E293B" strokeWidth="1.5" />
           </svg>
         ) : (
-          <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Project chart">
+          <svg key={state} viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Project chart">
             <defs>
               <linearGradient id="projChart" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="#2563EB" stopOpacity="0.2" />
@@ -290,7 +298,7 @@ function ActivityPanel({ state }) {
     );
   }
 
-  const titles = { projects: 'Activity', automation: 'AI Assistant', analytics: 'Updates' };
+  const titles = { workspaces: 'Activity', automation: 'AI Assistant', analytics: 'Updates' };
 
   return (
     <div className="panel-activity">
@@ -306,6 +314,8 @@ export default function Solution({ activeState: propState = 'default' }) {
   const [activeState, setActiveState] = useState(propState);
   const [animating, setAnimating] = useState(false);
   const prevStateRef = useRef(propState);
+  const featuresRef = useRef(null);
+  const featuresInView = useInView(featuresRef, { once: true, margin: '-60px' });
 
   useEffect(() => {
     if (propState !== prevStateRef.current) {
@@ -368,7 +378,7 @@ export default function Solution({ activeState: propState = 'default' }) {
                       </div>
                       <div className="dash-search">
                         <svg className="dash-search-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-                        <input className="dash-search-input" type="text" placeholder="Overview" aria-label="Search" />
+                        <input className="dash-search-input" type="text" placeholder={activeState === 'analytics' ? 'Business Analyti...' : activeState === 'workspaces' ? 'Project Workspa...' : 'Overview'} aria-label="Search" />
                       </div>
                     </div>
 
@@ -431,14 +441,24 @@ export default function Solution({ activeState: propState = 'default' }) {
             <p className="section-desc" style={{ maxWidth: '100%' }}>
               FlowSync replaces 6+ tools with a single, unified workspace. No more switching between apps. No more data scattered across spreadsheets. No more guessing what your team is working on.
             </p>
-            <ul className="solution-features">
-              {solutionFeatures.map((item) => (
-                <li className="solution-feature-item" key={item.title}>
+            <ul className="solution-features" ref={featuresRef}>
+              {solutionFeatures.map((item, i) => (
+                <motion.li
+                  className="solution-feature-item"
+                  key={item.title}
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={featuresInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
+                  transition={{
+                    duration: 0.45,
+                    delay: 0.1 + i * 0.1,
+                    ease: [0.25, 0.46, 0.45, 0.94],
+                  }}
+                >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                   <span><strong>{item.title}</strong> {item.description}</span>
-                </li>
+                </motion.li>
               ))}
             </ul>
             <a href="#" className="btn btn-primary btn-lg" style={{ marginTop: '0.5rem' }}>See How It Works</a>
