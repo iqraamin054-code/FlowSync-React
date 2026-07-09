@@ -74,6 +74,13 @@ const Hero = () => {
       />
       <div className="hero-grid" aria-hidden="true" />
       <div className="hero-radial" aria-hidden="true" />
+      <div className="hero-particles" aria-hidden="true">
+        <span className="hero-particle" style={{ left: '15%', top: '45%' }} />
+        <span className="hero-particle" style={{ left: '20%', top: '30%' }} />
+        <span className="hero-particle" style={{ left: '70%', top: '60%' }} />
+        <span className="hero-particle" style={{ left: '45%', top: '80%' }} />
+        <span className="hero-particle" style={{ left: '85%', top: '20%' }} />
+      </div>
 
       <div className="container hero-layout">
         {/* LEFT — Hero Content */}

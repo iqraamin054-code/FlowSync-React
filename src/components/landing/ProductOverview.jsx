@@ -90,9 +90,10 @@ function useCountUp(target, duration = 1.6, delay = 0.8) {
   return displayVal;
 }
 
+/* ── Floating widget animation variants ── */
 const floatVariants = {
   animate: (custom) => ({
-    y: [-5, 5],
+    y: [custom.yStart || -6, custom.yEnd || 6],
     transition: {
       duration: custom.duration,
       repeat: Infinity,
@@ -103,35 +104,76 @@ const floatVariants = {
   }),
 };
 
+/* ── Dashboard entrance: staggered sequence ── */
 const containerVariants = {
-  hidden: { opacity: 0, scale: 0.96 },
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
   visible: {
-    opacity: 1, scale: 1,
-    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.3, staggerChildren: 0.08 },
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: [0.16, 1, 0.3, 1],
+      delay: 0.3,
+      staggerChildren: 0.06,
+    },
   },
 };
 
 const sidebarVariants = {
   hidden: { x: -20, opacity: 0 },
   visible: {
-    x: 0, opacity: 1,
+    x: 0,
+    opacity: 1,
     transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.5 },
   },
 };
 
 const statCardVariants = {
-  hidden: { opacity: 0, y: 12 },
+  hidden: { opacity: 0, y: 16, scale: 0.96 },
   visible: (i) => ({
-    opacity: 1, y: 0,
+    opacity: 1,
+    y: 0,
+    scale: 1,
     transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.7 + i * 0.1 },
   }),
 };
 
 const activityVariants = {
-  hidden: { opacity: 0, x: -8 },
+  hidden: { opacity: 0, x: -10 },
   visible: (i) => ({
-    opacity: 1, x: 0,
+    opacity: 1,
+    x: 0,
     transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: 1.2 + i * 0.12 },
+  }),
+};
+
+const chartPanelVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 1.0 },
+  },
+};
+
+const activityPanelVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 1.15 },
+  },
+};
+
+/* ── Floating widget entrance ── */
+const widgetEntrance = {
+  hidden: { opacity: 0, scale: 0.8, y: 20 },
+  visible: (delay) => ({
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay },
   }),
 };
 
@@ -154,8 +196,8 @@ export default function ProductOverview({ prefersReduced }) {
   const handleMouseMove = useCallback((e) => {
     if (prefersReduced) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 6;
-    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -6;
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 5;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -5;
     setTilt({ x, y });
   }, [prefersReduced]);
 
@@ -243,7 +285,7 @@ export default function ProductOverview({ prefersReduced }) {
             </div>
 
             <div className="dash-bottom">
-              <div className="dash-chart-panel">
+              <motion.div className="dash-chart-panel" variants={chartPanelVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
                 <div className="panel-header">
                   <span className="panel-title">Revenue Trend</span>
                   <span className="panel-badge">+23.4%</span>
@@ -310,9 +352,9 @@ export default function ProductOverview({ prefersReduced }) {
                     />
                   </svg>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="dash-activity-panel">
+              <motion.div className="dash-activity-panel" variants={activityPanelVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
                 <span className="panel-title">Recent Activity</span>
                 <div className="activity-list">
                   {activityItems.map(({ dot, text, time }, i) => (
@@ -333,46 +375,130 @@ export default function ProductOverview({ prefersReduced }) {
                     </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>
 
-        {/* Float Card 1: Revenue — Top Right */}
+        {/* ── Floating Widget 1: Revenue — Top Right ── */}
         <motion.div
           className="float-card float-card-1"
           aria-hidden="true"
-          custom={prefersReduced ? {} : { duration: 5, delay: 0 }}
+          custom={prefersReduced ? {} : { duration: 5, delay: 0, yStart: -7, yEnd: 7 }}
           animate={prefersReduced ? {} : 'animate'}
           variants={floatVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
         >
-          <div className="float-card-icon float-card-icon-violet">
+          <motion.div
+            className="float-card-icon float-card-icon-violet"
+            custom={1.6}
+            variants={widgetEntrance}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
             </svg>
-          </div>
+          </motion.div>
           <div className="float-card-info">
             <span className="float-card-label">Revenue</span>
             <span className="float-card-value">$54.2K</span>
           </div>
         </motion.div>
 
-        {/* Float Card 2: Active Users — Bottom Left */}
+        {/* ── Floating Widget 2: Active Users — Bottom Left ── */}
         <motion.div
           className="float-card float-card-2"
           aria-hidden="true"
-          custom={prefersReduced ? {} : { duration: 6, delay: 0.5 }}
+          custom={prefersReduced ? {} : { duration: 6, delay: 0.5, yStart: -5, yEnd: 5 }}
           animate={prefersReduced ? {} : 'animate'}
           variants={floatVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
         >
-          <div className="float-card-icon float-card-icon-pink">
+          <motion.div
+            className="float-card-icon float-card-icon-pink"
+            custom={1.8}
+            variants={widgetEntrance}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EC4899" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" />
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 00-3-3.87" />
+              <path d="M16 3.13a4 4 0 010 7.75" />
             </svg>
-          </div>
+          </motion.div>
           <div className="float-card-info">
             <span className="float-card-label">Active Users</span>
             <span className="float-card-value">+18K</span>
+          </div>
+        </motion.div>
+
+        {/* ── Floating Widget 3: Satisfaction — Upper Left ── */}
+        <motion.div
+          className="float-card float-card-3"
+          aria-hidden="true"
+          custom={prefersReduced ? {} : { duration: 5.5, delay: 1.0, yStart: -4, yEnd: 4 }}
+          animate={prefersReduced ? {} : 'animate'}
+          variants={floatVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <motion.div
+            className="float-card-icon float-card-icon-green"
+            custom={2.0}
+            variants={widgetEntrance}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 9V5a3 3 0 00-6 0v4" />
+              <path d="M18.8 22H5.2a2 2 0 01-2-2V11a2 2 0 012-2h13.6a2 2 0 012 2v9a2 2 0 01-2 2z" />
+              <circle cx="12" cy="16" r="1" fill="currentColor" />
+            </svg>
+          </motion.div>
+          <div className="float-card-info">
+            <span className="float-card-label">Satisfaction</span>
+            <span className="float-card-value">98.5%</span>
+          </div>
+        </motion.div>
+
+        {/* ── Floating Widget 4: Productivity — Bottom Right ── */}
+        <motion.div
+          className="float-card float-card-4"
+          aria-hidden="true"
+          custom={prefersReduced ? {} : { duration: 4.8, delay: 1.5, yStart: -6, yEnd: 6 }}
+          animate={prefersReduced ? {} : 'animate'}
+          variants={floatVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          <motion.div
+            className="float-card-icon float-card-icon-amber"
+            custom={2.2}
+            variants={widgetEntrance}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </motion.div>
+          <div className="float-card-info">
+            <span className="float-card-label">Productivity</span>
+            <span className="float-card-value">+240%</span>
           </div>
         </motion.div>
       </motion.div>
