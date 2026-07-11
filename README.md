@@ -1,4 +1,4 @@
-# 🚀 FlowSync – Interactive SaaS Landing Page & Product Experience Platform
+# 🚀 FlowSync — Interactive SaaS Landing Page & Product Experience Platform
 
 <div align="center">
 
@@ -14,20 +14,18 @@
 ---
 
 <p align="center">
-<img src="src/assets/images/github-banner.png"
- width="100%" 
- alt="FlowSync Banner">
+<img src="src/assets/images/github-banner.png" width="100%" alt="FlowSync Banner">
 </p>
 
 ---
 
 # 📖 Overview
 
-FlowSync is a modern SaaS (Software as a Service) Product Experience Platform built with **React** and **Vite**.
+**FlowSync** is a modern SaaS-inspired Product Experience Platform built using **React** and **Vite**.
 
-The project demonstrates a production-ready landing page focused on premium UI/UX, reusable React components, responsive layouts, accessibility, interactive product experiences, smooth animations, API integration, and modern frontend development practices.
+The project recreates the experience of a professional software company's marketing website through interactive dashboards, engaging animations, dynamic pricing, API-driven content, reusable React components, and responsive layouts.
 
-The application showcases how a modern SaaS company can present its product through engaging interactions, dynamic dashboards, feature-rich pricing, customer onboarding concepts, and conversion-focused design.
+It focuses on delivering a premium frontend experience while following modern React development practices, accessibility guidelines, and clean component architecture.
 
 ---
 
@@ -38,13 +36,11 @@ The application showcases how a modern SaaS company can present its product thro
 - Modern Hero Section
 - Sticky Navigation
 - Smooth Scroll Navigation
-- Interactive Product Experience
-- Product Showcase
-- Feature Highlights
+- Interactive Product Showcase
 - Animated Statistics
-- Responsive Design
-- Glassmorphism UI
-- Dark / Light Mode
+- Feature Highlights
+- Responsive Layout
+- Dark & Light Theme
 
 ---
 
@@ -52,23 +48,20 @@ The application showcases how a modern SaaS company can present its product thro
 
 - Interactive Dashboard Preview
 - Dashboard / Analytics / Automation / Collaboration Tabs
-- Animated Product Preview
-- Interactive Feature Cards
 - Live KPI Cards
 - Animated Charts
 - Activity Feed
 - Floating Widgets
-- Framer Motion Transitions
+- Framer Motion Animations
 
 ---
 
 ## 💰 Pricing
 
 - Monthly / Yearly Toggle
-- Dynamic Pricing Updates
-- Interactive Pricing Calculator
-- Popular Plan Highlight
+- Dynamic Pricing Calculator
 - Feature Comparison Table
+- Popular Plan Highlight
 - Responsive Pricing Cards
 
 ---
@@ -76,8 +69,6 @@ The application showcases how a modern SaaS company can present its product thro
 ## ⭐ Customer Experience
 
 - Testimonials Carousel
-- Auto Play
-- Previous / Next Controls
 - FAQ Accordion
 - Contact Form
 - Form Validation
@@ -87,38 +78,23 @@ The application showcases how a modern SaaS company can present its product thro
 
 ## 📰 Blog Preview
 
-- Blog Cards
 - API Integration (DummyJSON)
 - Loading State
 - Error Handling
+- Blog Cards
 - Read More Modal
-- Category Badges
 
 ---
 
-## 🎨 UI / UX Highlights
+## 🎨 User Experience
 
-- Premium Glassmorphism
-- Blue / Purple Gradient Design
-- Framer Motion Animations
-- Responsive Layout
+- Premium Glassmorphism Design
+- Blue & Purple Gradient Theme
+- Responsive Design
+- Smooth Animations
 - Modern Typography
 - Reusable Components
-- Smooth Hover Effects
-- Interactive Elements
-
----
-
-# ⚙ Interactive Components
-
-- Sticky Navbar
-- Dark / Light Theme
-- Scroll Progress Indicator
-- Back To Top Button
-- Animated Counters
-- Interactive Statistics
-- Hover Effects
-- Live Dashboard Preview
+- Interactive Hover Effects
 
 ---
 
@@ -127,25 +103,24 @@ The application showcases how a modern SaaS company can present its product thro
 - Semantic HTML
 - Keyboard Navigation
 - ARIA Labels
-- Visible Focus States
+- Visible Focus Indicators
 - Accessible Forms
 - Reduced Motion Support
 
 ---
 
-# ⚡ Performance Optimizations
+# ⚡ Performance
 
 - Component-Based Architecture
-- Reusable React Components
 - Lazy Loading
 - Optimized Assets
 - Responsive Images
+- Reusable Components
 - Clean Folder Structure
-- Efficient State Management
 
 ---
 
-# 🛠 Technologies Used
+# 🛠 Tech Stack
 
 - React.js
 - Vite
@@ -168,21 +143,13 @@ FlowSync/
 ├── public/
 │
 ├── src/
-│   │
 │   ├── assets/
-│   │
 │   ├── components/
-│   │
-│   ├── pages/
-│   │
-│   ├── data/
-│   │
 │   ├── context/
-│   │
+│   ├── data/
 │   ├── hooks/
-│   │
+│   ├── pages/
 │   ├── utils/
-│   │
 │   ├── App.jsx
 │   ├── main.jsx
 │   └── index.css
@@ -214,15 +181,15 @@ FlowSync/
 
 ---
 
-## 🧮 Pricing Calculator
+## 💰 Pricing Calculator
 
-![Calculator](src/assets/screenshots/pricing-calculator.png)
+![Pricing Calculator](src/assets/screenshots/pricing-calculator.png)
 
 ---
 
 ## 📊 Feature Comparison
 
-![Comparison](src/assets/screenshots/comparison-table.png)
+![Comparison Table](src/assets/screenshots/comparison-table.png)
 
 ---
 
@@ -238,7 +205,7 @@ FlowSync/
 
 ---
 
-## 📞 Contact
+## 📞 Contact Section
 
 ![Contact](src/assets/screenshots/contact.png)
 
@@ -247,7 +214,8 @@ FlowSync/
 <div align="center">
 
 ## 📱 Mobile View
-![Mobile View Screenshot](src/assets/screenshots/mobile-view.png)
+
+<img src="src/assets/screenshots/mobile-view.png" width="350">
 
 </div>
 
@@ -258,13 +226,13 @@ FlowSync/
 Clone the repository
 
 ```bash
-git clone https://github.com/iqraamin054-code/FlowSync-React
+git clone https://github.com/iqraamin054-code/FlowSync-React.git
 ```
 
 Navigate into the project
 
 ```bash
-cd FlowSync
+cd FlowSync-React
 ```
 
 Install dependencies
@@ -279,7 +247,7 @@ Run the development server
 npm run dev
 ```
 
-Create a production build
+Build the project
 
 ```bash
 npm run build
@@ -293,42 +261,48 @@ npm run preview
 
 ---
 
-# 🎯 Project Highlights
+# 🎯 Learning Outcomes
 
-✔ React Component-Based Architecture
+This project helped strengthen practical experience in:
 
-✔ Interactive SaaS Product Experience
+- React Component Architecture
+- React Router
+- API Integration
+- Framer Motion Animations
+- Responsive Design
+- Modern SaaS UI Design
+- Component Reusability
+- Frontend Performance Optimization
+- Accessibility Best Practices
+- Professional Project Organization
 
-✔ Modern Responsive Design
+---
 
-✔ API Integration
+# 🔮 Future Enhancements
 
-✔ Dynamic Pricing Calculator
-
-✔ Premium UI / UX
-
-✔ Glassmorphism Design
-
-✔ Framer Motion Animations
-
-✔ Accessibility Improvements
-
-✔ Performance Optimization
+- Backend Authentication
+- User Dashboard
+- Real-Time Notifications
+- Payment Integration
+- User Profiles
+- Team Collaboration
+- Calendar Integration
+- Task Management
+- Admin Dashboard
 
 ---
 
 # 👩‍💻 Author
 
-## **Iqra Amin**
+**Iqra Amin**
 
+Software Engineering Student  
 Frontend Developer
 
-**GitHub**
-
+🔗 **GitHub**  
 https://github.com/iqraamin054-code
 
-**LinkedIn**
-
+🔗 **LinkedIn**  
 https://www.linkedin.com/in/iqraamin-dev
 
 ---
@@ -337,4 +311,4 @@ https://www.linkedin.com/in/iqraamin-dev
 
 This project was developed for educational purposes and internship evaluation.
 
-All product names, branding, and content are fictional and created for demonstration purposes.
+All product names, branding, and content are fictional and created solely for demonstration purposes.
