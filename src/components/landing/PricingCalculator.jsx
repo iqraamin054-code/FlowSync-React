@@ -101,14 +101,15 @@ export default function PricingCalculator() {
     const yearlyAtFull = monthlyCost * 12;
     const savings = isYearly ? yearlyAtFull - yearlyTotal : 0;
     const displayPerUser = isYearly ? (pricePerUser * 0.8).toFixed(0) : pricePerUser;
+    const displayMonthlyCost = isYearly ? monthlyCost * 0.8 : monthlyCost;
 
-    return { pricePerUser, monthlyCost, yearlyTotal, yearlyAtFull, savings, displayPerUser };
+    return { pricePerUser, monthlyCost, yearlyTotal, yearlyAtFull, savings, displayPerUser, displayMonthlyCost };
   }, [plan, teamSize, isYearly]);
 
-  const { pricePerUser, monthlyCost, yearlyTotal, savings, displayPerUser } = calculations;
+  const { pricePerUser, yearlyTotal, savings, displayPerUser, displayMonthlyCost } = calculations;
 
   const animatedTeamSize = useCountUp(teamSize, 300);
-  const animatedMonthly = useCountUp(monthlyCost, 400);
+  const animatedMonthly = useCountUp(Math.round(displayMonthlyCost), 400);
   const animatedYearly = useCountUp(Math.round(yearlyTotal), 400);
   const animatedSavings = useCountUp(Math.round(savings), 400);
 
@@ -252,7 +253,7 @@ export default function PricingCalculator() {
               <div className="calc-result-amount">
                 <span className="calc-result-currency">$</span>
                 <span className="calc-result-price">
-                  <AnimatedPrice value={monthlyCost} />
+                  <AnimatedPrice value={displayMonthlyCost} />
                 </span>
                 <span className="calc-result-period">/mo</span>
               </div>
