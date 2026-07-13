@@ -43,12 +43,16 @@ export default function Faq() {
           </p>
         </div>
 
-        <div className="faq-list reveal-stagger" role="list">
+        <div className="faq-list" role="list">
           {faqItems.map((item, index) => (
-            <div
+            <motion.div
               key={index}
-              className={`faq-item reveal${activeIndex === index ? ' active' : ''}`}
+              className={`faq-item${activeIndex === index ? ' active' : ''}`}
               role="listitem"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
             >
               <button
                 className="faq-question"
@@ -92,7 +96,7 @@ export default function Faq() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
