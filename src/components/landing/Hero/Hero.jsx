@@ -3,12 +3,9 @@ import { motion, useReducedMotion } from 'framer-motion';
 import ProductOverview from '../ProductOverview.jsx';
 import './Hero.css';
 
-const trustItems = ['No credit card', 'Free 14-day trial', 'Cancel anytime'];
-
-const CheckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981"
-    strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <polyline points="20 6 9 17 4 12" />
+const StarIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24" stroke="none" aria-hidden="true">
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
   </svg>
 );
 
@@ -42,7 +39,7 @@ const Hero = () => {
   const navigate = useNavigate();
   const prefersReduced = useReducedMotion();
 
-  const handleStartFreeTrial = () => navigate('/onboarding');
+  const handleGetStarted = () => navigate('/onboarding');
   const handleLiveDemo = (e) => {
     e.preventDefault();
     const target = document.getElementById('product-showcase') || document.getElementById('features');
@@ -74,28 +71,19 @@ const Hero = () => {
       />
       <div className="hero-grid" aria-hidden="true" />
       <div className="hero-radial" aria-hidden="true" />
-      <div className="hero-particles" aria-hidden="true">
-        <span className="hero-particle" style={{ left: '15%', top: '45%' }} />
-        <span className="hero-particle" style={{ left: '20%', top: '30%' }} />
-        <span className="hero-particle" style={{ left: '70%', top: '60%' }} />
-        <span className="hero-particle" style={{ left: '45%', top: '80%' }} />
-        <span className="hero-particle" style={{ left: '85%', top: '20%' }} />
-      </div>
 
       <div className="container hero-layout">
-        {/* LEFT — Hero Content */}
         <div className="hero-content">
           <motion.div
             className="hero-badge"
-            aria-label="Trusted by 5000 plus growing teams worldwide"
             custom={0}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeUp}
           >
-            <span className="badge-emoji">🚀</span>
-            <span>Trusted by 5,000+ growing teams worldwide</span>
+            <span className="badge-sparkle">✨</span>
+            <span>AI Powered Productivity Platform</span>
           </motion.div>
 
           <motion.h1
@@ -122,8 +110,9 @@ const Hero = () => {
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeUp}
           >
-            Streamline projects, automate workflows, collaborate in real time,
-            and make smarter business decisions with a unified productivity platform.
+            FlowSync brings your projects, workflows, and team collaboration into one
+            intelligent workspace. Automate repetitive tasks, track progress in real time,
+            and make data-driven decisions all from a single dashboard.
           </motion.p>
 
           <motion.div
@@ -137,12 +126,12 @@ const Hero = () => {
             <motion.button
               type="button"
               className="btn btn-primary btn-lg hero-btn-primary"
-              onClick={handleStartFreeTrial}
-              whileHover={prefersReduced ? {} : { scale: 1.03 }}
+              onClick={handleGetStarted}
+              whileHover={prefersReduced ? {} : { scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.98 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             >
-              Start Free Trial
+              Get Started
               <ArrowIcon />
             </motion.button>
             <motion.button
@@ -153,29 +142,30 @@ const Hero = () => {
               whileTap={{ scale: 0.98 }}
               transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             >
-              Book a Demo
+              Live Demo
               <ArrowIcon />
             </motion.button>
           </motion.div>
 
           <motion.div
-            className="hero-trust"
+            className="hero-rating"
             custom={4}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeUp}
           >
-            {trustItems.map((item) => (
-              <span className="trust-item" key={item}>
-                <CheckIcon />
-                {item}
-              </span>
-            ))}
+            <div className="hero-stars" aria-label="4.9 out of 5 stars">
+              {[...Array(5)].map((_, i) => (
+                <StarIcon key={i} />
+              ))}
+            </div>
+            <span className="hero-rating-text">
+              <strong>4.9</strong>/5 from <strong>10,000+</strong> teams
+            </span>
           </motion.div>
         </div>
 
-        {/* RIGHT — Dashboard Preview */}
         <ProductOverview prefersReduced={prefersReduced} />
       </div>
     </section>

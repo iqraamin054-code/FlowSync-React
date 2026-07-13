@@ -90,7 +90,6 @@ function useCountUp(target, duration = 1.6, delay = 0.8) {
   return displayVal;
 }
 
-/* ── Floating widget animation variants ── */
 const floatVariants = {
   animate: (custom) => ({
     y: [custom.yStart || -6, custom.yEnd || 6],
@@ -104,7 +103,6 @@ const floatVariants = {
   }),
 };
 
-/* ── Dashboard entrance: staggered sequence ── */
 const containerVariants = {
   hidden: { opacity: 0, y: 40, scale: 0.95 },
   visible: {
@@ -166,7 +164,6 @@ const activityPanelVariants = {
   },
 };
 
-/* ── Floating widget entrance ── */
 const widgetEntrance = {
   hidden: { opacity: 0, scale: 0.8, y: 20 },
   visible: (delay) => ({
@@ -270,7 +267,7 @@ export default function ProductOverview({ prefersReduced }) {
               {dashStats.map(({ label, change, up }, i) => (
                 <motion.div
                   key={label}
-                  className={`dash-stat-card stat-${label.toLowerCase()}`}
+                  className="dash-stat-card"
                   custom={i}
                   variants={statCardVariants}
                   initial="hidden"
@@ -441,7 +438,7 @@ export default function ProductOverview({ prefersReduced }) {
           </div>
         </motion.div>
 
-        {/* ── Floating Widget 3: Satisfaction — Upper Left ── */}
+        {/* ── Floating Widget 3: Tasks Completed — Upper Left ── */}
         <motion.div
           className="float-card float-card-3"
           aria-hidden="true"
@@ -461,14 +458,13 @@ export default function ProductOverview({ prefersReduced }) {
             viewport={{ once: true }}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 9V5a3 3 0 00-6 0v4" />
-              <path d="M18.8 22H5.2a2 2 0 01-2-2V11a2 2 0 012-2h13.6a2 2 0 012 2v9a2 2 0 01-2 2z" />
-              <circle cx="12" cy="16" r="1" fill="currentColor" />
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
           </motion.div>
           <div className="float-card-info">
-            <span className="float-card-label">Satisfaction</span>
-            <span className="float-card-value">98.5%</span>
+            <span className="float-card-label">Tasks Done</span>
+            <span className="float-card-value">1,248</span>
           </div>
         </motion.div>
 
