@@ -159,9 +159,11 @@ export default function Onboarding() {
     setLoadingTasks([0, 0, 0]);
     // Complete each setup task independently so the portal feels like the
     // workspace is being prepared, rather than all actions finishing at once.
-    const t1 = setTimeout(() => setLoadingTasks([2, 1, 0]), 300);
-    const t2 = setTimeout(() => setLoadingTasks([2, 2, 1]), 600);
-    const t3 = setTimeout(() => setLoadingTasks([2, 2, 2]), 900);
+    // Each task fires ~1.2–1.5 s apart so the setup screen feels like
+    // real async work rather than an instant flash.
+    const t1 = setTimeout(() => setLoadingTasks([2, 1, 0]), 1200);
+    const t2 = setTimeout(() => setLoadingTasks([2, 2, 1]), 2700);
+    const t3 = setTimeout(() => setLoadingTasks([2, 2, 2]), 4000);
     const t4 = setTimeout(() => {
       const setupState = stateRef.current;
       localStorage.setItem('flowsync-team-members', setupState.teamMembers.length + 1);
@@ -174,11 +176,11 @@ export default function Onboarding() {
       localStorage.setItem('flowsync-accent', setupState.accentColor);
       localStorage.setItem('flowsync-language', setupState.language);
       localStorage.setItem('isLoggedIn', 'true');
-    }, 1050);
+    }, 4300);
     // The route-level Success page is the only success experience. Keep this
     // setup state as a short handoff so the wizard cannot render a competing
     // success card before navigating.
-    const t5 = setTimeout(() => navigate('/success'), 1150);
+    const t5 = setTimeout(() => navigate('/success'), 4600);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5); };
   }, [currentStep, navigate]);
 
