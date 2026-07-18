@@ -1,7 +1,9 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-const Landing = lazy(() => import('./pages/Landing.jsx'));
+// The landing page has no data dependencies, so keep it in the initial render
+// path instead of making the first screen wait for a route chunk.
+import Landing from './pages/Landing.jsx';
 const Onboarding = lazy(() => import('./pages/Onboarding.jsx'));
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'));
 const Success = lazy(() => import('./pages/Success.jsx'));
