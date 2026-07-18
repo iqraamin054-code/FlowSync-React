@@ -1,0 +1,260 @@
+/* ═══════════════════════════════════════════════════════════════════
+   ANIMATED BACKGROUND — Global Page Background
+   Pure CSS · GPU Accelerated · Elegant Motion
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Container ──────────────────────────────────────────────────── */
+.abg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* ── Layer 1: Deep navy base ────────────────────────────────────── */
+.abg-base {
+    position: absolute;
+    inset: 0;
+    background: #060B16;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYER 2: SOFT AMBIENT GRADIENTS
+   Very large, extremely blurred, barely visible
+   Upper-left blue + Lower-right purple
+   ═══════════════════════════════════════════════════════════════════ */
+.abg-ambient {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+}
+
+.abg-ambient--blue {
+    width: 120vw;
+    height: 120vh;
+    top: -30%;
+    left: -20%;
+    background: radial-gradient(ellipse at center,
+        rgba(37, 99, 235, 0.12) 0%,
+        rgba(37, 99, 235, 0.05) 35%,
+        transparent 70%
+    );
+    filter: blur(100px);
+    animation: abg-breathe-blue 28s ease-in-out infinite alternate;
+}
+
+.abg-ambient--purple {
+    width: 100vw;
+    height: 100vh;
+    bottom: -25%;
+    right: -15%;
+    background: radial-gradient(ellipse at center,
+        rgba(124, 58, 237, 0.10) 0%,
+        rgba(124, 58, 237, 0.04) 35%,
+        transparent 70%
+    );
+    filter: blur(100px);
+    animation: abg-breathe-purple 34s ease-in-out infinite alternate;
+}
+
+@keyframes abg-breathe-blue {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    50%  { transform: translate3d(30px, -20px, 0) scale(1.03); }
+    100% { transform: translate3d(-15px, 15px, 0) scale(0.98); }
+}
+
+@keyframes abg-breathe-purple {
+    0%   { transform: translate3d(0, 0, 0) scale(1); }
+    50%  { transform: translate3d(-25px, 20px, 0) scale(1.04); }
+    100% { transform: translate3d(10px, -10px, 0) scale(0.97); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYER 3: SUBTLE GRID OVERLAY
+   Fixed position, covers entire page
+   Very thin lines at ~4% opacity
+   ═══════════════════════════════════════════════════════════════════ */
+.abg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 72px 72px;
+    background-position: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYER 4: AMBIENT PARTICLES
+   Tiny dots that drift slowly upward
+   Most dense in Hero, calmer elsewhere
+   ═══════════════════════════════════════════════════════════════════ */
+.abg-particle {
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+    opacity: 0;
+}
+
+.abg-p1 {
+    width: 2px; height: 2px;
+    left: 15%; bottom: 0;
+    background: rgba(37, 99, 235, 0.4);
+    animation: abg-rise 24s linear infinite;
+    animation-delay: 0s;
+}
+.abg-p2 {
+    width: 3px; height: 3px;
+    left: 32%; bottom: 0;
+    background: rgba(124, 58, 237, 0.35);
+    animation: abg-rise 30s linear infinite;
+    animation-delay: -4s;
+}
+.abg-p3 {
+    width: 2px; height: 2px;
+    left: 52%; bottom: 0;
+    background: rgba(56, 189, 248, 0.3);
+    animation: abg-rise 28s linear infinite;
+    animation-delay: -9s;
+}
+.abg-p4 {
+    width: 2px; height: 2px;
+    left: 71%; bottom: 0;
+    background: rgba(37, 99, 235, 0.3);
+    animation: abg-rise 32s linear infinite;
+    animation-delay: -15s;
+}
+.abg-p5 {
+    width: 3px; height: 3px;
+    left: 88%; bottom: 0;
+    background: rgba(124, 58, 237, 0.25);
+    animation: abg-rise 26s linear infinite;
+    animation-delay: -20s;
+}
+.abg-p6 {
+    width: 2px; height: 2px;
+    left: 42%; bottom: 0;
+    background: rgba(56, 189, 248, 0.25);
+    animation: abg-rise 35s linear infinite;
+    animation-delay: -6s;
+}
+.abg-p7 {
+    width: 2px; height: 2px;
+    left: 25%; bottom: 0;
+    background: rgba(37, 99, 235, 0.28);
+    animation: abg-rise 29s linear infinite;
+    animation-delay: -12s;
+}
+.abg-p8 {
+    width: 2px; height: 2px;
+    left: 63%; bottom: 0;
+    background: rgba(124, 58, 237, 0.22);
+    animation: abg-rise 33s linear infinite;
+    animation-delay: -18s;
+}
+
+@keyframes abg-rise {
+    0% {
+        transform: translate3d(0, 0, 0);
+        opacity: 0;
+    }
+    3% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 0.4;
+    }
+    97% {
+        opacity: 0;
+    }
+    100% {
+        transform: translate3d(var(--abg-drift, 8px), -100vh, 0);
+        opacity: 0;
+    }
+}
+
+.abg-p1 { --abg-drift: 12px; }
+.abg-p2 { --abg-drift: -10px; }
+.abg-p3 { --abg-drift: 15px; }
+.abg-p4 { --abg-drift: -8px; }
+.abg-p5 { --abg-drift: 10px; }
+.abg-p6 { --abg-drift: -12px; }
+.abg-p7 { --abg-drift: 6px; }
+.abg-p8 { --abg-drift: -14px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYER 5: SOFT VIGNETTE
+   Darkens edges very slightly
+   ═══════════════════════════════════════════════════════════════════ */
+.abg-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse 80% 70% at 50% 50%,
+        transparent 40%,
+        rgba(6, 11, 22, 0.35) 100%
+    );
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYER 6: NOISE TEXTURE
+   Ultra-subtle grain for depth
+   ═══════════════════════════════════════════════════════════════════ */
+.abg-noise {
+    position: absolute;
+    inset: 0;
+    opacity: 0.02;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 128px 128px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LIGHT MODE OVERRIDES
+   ═══════════════════════════════════════════════════════════════════ */
+[data-theme="light"] .abg-base {
+    background: #F8FAFC;
+}
+
+[data-theme="light"] .abg-ambient--blue {
+    background: radial-gradient(ellipse at center,
+        rgba(37, 99, 235, 0.06) 0%,
+        rgba(37, 99, 235, 0.02) 35%,
+        transparent 70%
+    );
+}
+
+[data-theme="light"] .abg-ambient--purple {
+    background: radial-gradient(ellipse at center,
+        rgba(124, 58, 237, 0.05) 0%,
+        rgba(124, 58, 237, 0.02) 35%,
+        transparent 70%
+    );
+}
+
+[data-theme="light"] .abg-grid {
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+}
+
+[data-theme="light"] .abg-p1 { background: rgba(37, 99, 235, 0.15); }
+[data-theme="light"] .abg-p2 { background: rgba(124, 58, 237, 0.12); }
+[data-theme="light"] .abg-p3 { background: rgba(56, 189, 248, 0.10); }
+[data-theme="light"] .abg-p4 { background: rgba(37, 99, 235, 0.10); }
+[data-theme="light"] .abg-p5 { background: rgba(124, 58, 237, 0.08); }
+[data-theme="light"] .abg-p6 { background: rgba(56, 189, 248, 0.08); }
+[data-theme="light"] .abg-p7 { background: rgba(37, 99, 235, 0.10); }
+[data-theme="light"] .abg-p8 { background: rgba(124, 58, 237, 0.08); }
+
+[data-theme="light"] .abg-vignette {
+    background: radial-gradient(
+        ellipse 80% 70% at 50% 50%,
+        transparent 40%,
+        rgba(248, 250, 252, 0.25) 100%
+    );
+}
+
+[data-theme="light"] .abg-noise {
+    opacity: 0.015;
+}
