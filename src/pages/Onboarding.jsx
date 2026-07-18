@@ -135,11 +135,18 @@ export default function Onboarding() {
   const [inviteRole, setInviteRole] = useState('member');
   const [inviteError, setInviteError] = useState('');
   const [loadingTasks, setLoadingTasks] = useState([0, 0, 0]);
-  const [loadingDone, setLoadingDone] = useState(false);
+  // Completion is handed off to the canonical /success route; the wizard's
+  // former inline success card remains unreachable to avoid two success UIs.
+  const [loadingDone] = useState(false);
   const [panelStyle, setPanelStyle] = useState({});
   const loadingRef = useRef(null);
+  const stateRef = useRef(state);
 
   const percentage = (currentStep / TOTAL_STEPS) * 100;
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   const goToStep = useCallback((nextStep) => {
     if (nextStep < 1 || nextStep > TOTAL_STEPS) return;
@@ -150,26 +157,30 @@ export default function Onboarding() {
   useEffect(() => {
     if (currentStep !== 5) return;
     setLoadingTasks([0, 0, 0]);
-    setLoadingDone(false);
-    const t1 = setTimeout(() => setLoadingTasks([1, 0, 0]), 1200);
-    const t2 = setTimeout(() => setLoadingTasks([2, 2, 0]), 2400);
-    const t3 = setTimeout(() => setLoadingTasks([2, 2, 2]), 3600);
+    // Complete each setup task independently so the portal feels like the
+    // workspace is being prepared, rather than all actions finishing at once.
+    const t1 = setTimeout(() => setLoadingTasks([2, 1, 0]), 300);
+    const t2 = setTimeout(() => setLoadingTasks([2, 2, 1]), 600);
+    const t3 = setTimeout(() => setLoadingTasks([2, 2, 2]), 900);
     const t4 = setTimeout(() => {
-      setLoadingDone(true);
-      localStorage.setItem('flowsync-team-members', state.teamMembers.length + 1);
-      localStorage.setItem('flowsync-username', state.fullName);
-      localStorage.setItem('flowsync-email', state.workEmail);
-      localStorage.setItem('flowsync-password', state.password);
-      localStorage.setItem('flowsync-company', state.companyName);
-      localStorage.setItem('flowsync-industry', state.industry);
-      localStorage.setItem('flowsync-role', state.role);
-      localStorage.setItem('flowsync-accent', state.accentColor);
-      localStorage.setItem('flowsync-language', state.language);
+      const setupState = stateRef.current;
+      localStorage.setItem('flowsync-team-members', setupState.teamMembers.length + 1);
+      localStorage.setItem('flowsync-username', setupState.fullName);
+      localStorage.setItem('flowsync-email', setupState.workEmail);
+      localStorage.setItem('flowsync-password', setupState.password);
+      localStorage.setItem('flowsync-company', setupState.companyName);
+      localStorage.setItem('flowsync-industry', setupState.industry);
+      localStorage.setItem('flowsync-role', setupState.role);
+      localStorage.setItem('flowsync-accent', setupState.accentColor);
+      localStorage.setItem('flowsync-language', setupState.language);
       localStorage.setItem('isLoggedIn', 'true');
-    }, 4100);
-    const t5 = setTimeout(() => navigate('/success'), 4500);
+    }, 1050);
+    // The route-level Success page is the only success experience. Keep this
+    // setup state as a short handoff so the wizard cannot render a competing
+    // success card before navigating.
+    const t5 = setTimeout(() => navigate('/success'), 1150);
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5); };
-  }, [currentStep, navigate, state]);
+  }, [currentStep, navigate]);
 
   useEffect(() => {
     const stored = localStorage.getItem('flowsync-theme');
