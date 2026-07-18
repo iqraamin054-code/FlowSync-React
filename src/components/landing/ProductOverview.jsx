@@ -186,8 +186,8 @@ export default function ProductOverview({ prefersReduced }) {
     if (chartLineRef.current) {
       setPathLen(chartLineRef.current.getTotalLength());
     }
-    const t = setTimeout(() => setChartVisible(true), 700);
-    return () => clearTimeout(t);
+    setChartVisible(true);
+
   }, []);
 
   const handleMouseMove = useCallback((e) => {

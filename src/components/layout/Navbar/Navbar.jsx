@@ -135,8 +135,9 @@ const Navbar = ({ onLoginClick }) => {
               <li><a href="#features" className="nav-link">Features</a></li>
               <li><a href="#pricing" className="nav-link">Pricing</a></li>
               <li><a href="#testimonials" className="nav-link">Testimonials</a></li>
+              <li><a href="#blog" className="nav-link">Blog</a></li>
               <li><a href="#faq" className="nav-link">FAQ</a></li>
-              <li><a href="#cta" className="nav-link">Contact</a></li>
+              <li><a href="#contact" className="nav-link">Contact</a></li>
             </ul>
           </div>
 
@@ -256,8 +257,9 @@ const Navbar = ({ onLoginClick }) => {
           <li><a href="#features" className="nav-link" onClick={closeMobileMenu}>Features</a></li>
           <li><a href="#pricing" className="nav-link" onClick={closeMobileMenu}>Pricing</a></li>
           <li><a href="#testimonials" className="nav-link" onClick={closeMobileMenu}>Testimonials</a></li>
+          <li><a href="#blog" className="nav-link" onClick={closeMobileMenu}>Blog</a></li>
           <li><a href="#faq" className="nav-link" onClick={closeMobileMenu}>FAQ</a></li>
-          <li><a href="#cta" className="nav-link" onClick={closeMobileMenu}>Contact</a></li>
+          <li><a href="#contact" className="nav-link" onClick={closeMobileMenu}>Contact</a></li>
         </ul>
 
         <div className="nav-divider"></div>

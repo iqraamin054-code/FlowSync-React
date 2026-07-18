@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { categories, features, previewContent } from '../../../data/productShowcase';
+import { categories, features, previewData } from '../../../data/productShowcase';
 import CategoryTabs from './CategoryTabs';
 import FeatureCard from './FeatureCard';
 import ProductPreview from './ProductPreview';
+import SolutionPreview from './SolutionPreview';
 import './ProductShowcase.css';
 
 const sectionVariants = {
@@ -44,7 +45,11 @@ export default function ProductShowcase() {
   const currentFeatures = features[activeTab] || features.dashboard;
 
   const handleTabChange = (tabId) => {
-    setActiveTab(tabId);
+    if (tabId === 'solution') {
+      setActiveTab(tabId);
+    } else {
+      setActiveTab(tabId);
+    }
   };
 
   return (
@@ -116,10 +121,14 @@ export default function ProductShowcase() {
               <span className="showcase-visual-dot" aria-hidden="true" />
               Live Preview
             </div>
-            <ProductPreview
-              categoryId={activeTab}
-              prefersReduced={prefersReduced}
-            />
+            {activeTab === 'solution' ? (
+              <SolutionPreview prefersReduced={prefersReduced} />
+            ) : (
+              <ProductPreview
+                categoryId={activeTab}
+                prefersReduced={prefersReduced}
+              />
+            )}
             <motion.p
               className="showcase-description"
               key={`desc-${activeTab}`}
@@ -128,7 +137,7 @@ export default function ProductShowcase() {
               animate="animate"
               exit="exit"
             >
-              {previewContent[activeTab]?.description}
+              {previewData[activeTab]?.description}
             </motion.p>
           </div>
         </div>

@@ -1,14 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function BackToTop() {
-  const [visible, setVisible] = useState(false);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setVisible(window.scrollY > 400);
+    let frame = null;
+    const update = () => {
+      frame = null;
+      buttonRef.current?.classList.toggle('is-visible', window.scrollY > 400);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleScroll = () => {
+      if (frame === null) frame = requestAnimationFrame(update);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    update();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
   }, []);
 
   const scrollToTop = () => {
@@ -17,7 +27,8 @@ export default function BackToTop() {
 
   return (
     <button
-      className={`back-to-top${visible ? ' is-visible' : ''}`}
+      ref={buttonRef}
+      className="back-to-top"
       onClick={scrollToTop}
       aria-label="Back to top"
     >

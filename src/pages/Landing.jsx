@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Navbar from '../components/layout/Navbar/Navbar.jsx';
+import AnimatedBackground from '../components/common/AnimatedBackground.jsx';
 import Hero from '../components/landing/Hero/Hero.jsx';
 import TrustedCompanies from '../components/landing/TrustedCompanies.jsx';
 import Problems from '../components/landing/Problems.jsx';
@@ -7,8 +8,8 @@ import Solution from '../components/landing/Solution.jsx';
 import ProductShowcase from '../components/landing/ProductShowcase/ProductShowcase.jsx';
 import Features from '../components/landing/Features.jsx';
 import Statistics from '../components/landing/Statistics.jsx';
-import Pricing from '../components/landing/Pricing.jsx';
 import FeatureComparison from '../components/landing/FeatureComparison.jsx';
+import Pricing from '../components/landing/Pricing.jsx';
 import PricingCalculator from '../components/landing/PricingCalculator.jsx';
 import Testimonials from '../components/landing/Testimonials.jsx';
 import BlogPreview from '../components/landing/BlogPreview.jsx';
@@ -29,9 +30,10 @@ export default function Landing() {
 
   return (
     <>
+      <AnimatedBackground />
       <ScrollProgress />
       <Navbar onLoginClick={() => setLoginOpen(true)} />
-      <main>
+      <main className="landing-main">
         <Hero />
         <TrustedCompanies />
         <Problems onHover={setSolutionState} />
@@ -39,17 +41,19 @@ export default function Landing() {
         <ProductShowcase />
         <Features />
         <Statistics />
-        <Pricing />
         <FeatureComparison />
         <PricingCalculator />
+        <Pricing />
         <Testimonials />
         <BlogPreview />
         <Faq />
         <Contact />
         <CTA />
+        <Footer />
       </main>
-      <Footer />
-      <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+      {loginOpen && (
+        <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
+      )}
       <CursorGlow />
       <BackToTop />
     </>

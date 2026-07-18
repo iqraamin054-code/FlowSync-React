@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const PLANS = {
   starter: { name: 'Starter', monthly: 12, cta: 'Start Free Trial', href: '/onboarding' },
   professional: { name: 'Professional', monthly: 24, cta: 'Start 14-Day Trial', href: '/onboarding' },
-  enterprise: { name: 'Enterprise', monthly: 39, cta: 'Contact Sales', href: '/contact' },
+  enterprise: { name: 'Enterprise', monthly: 39, cta: 'Contact Sales', href: '#contact' },
 };
 
 function getRecommendedPlan(size) {

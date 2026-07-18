@@ -7,29 +7,22 @@ export default function useScrollReveal() {
       return;
     }
 
-    const observer = new IntersectionObserver(
+    const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('reveal-visible');
-            observer.unobserve(entry.target);
+            io.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+      { threshold: 0.15, rootMargin: '0px 0px 80px 0px' }
     );
 
-    const els = document.querySelectorAll('.reveal');
-    els.forEach((el) => observer.observe(el));
-
-    els.forEach((el) => {
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        el.classList.add('reveal-visible');
-        observer.unobserve(el);
-      }
+    document.querySelectorAll('.reveal').forEach((el) => {
+      io.observe(el);
     });
 
-    return () => observer.disconnect();
+    return () => io.disconnect();
   }, []);
 }

@@ -219,3 +219,211 @@ export const analyticsActivityItems = [
   { id: 7, user: 'Emma', action: 'Shared retention dashboard with team', time: '1 hr ago', color: '#EC4899' },
   { id: 8, user: 'Noah', action: 'Configured new alert thresholds', time: '2 hr ago', color: '#8B5CF6' },
 ];
+
+/* ================================
+   AUTOMATION DASHBOARD DATA
+   ================================ */
+
+export const automationKpiCards = [
+  {
+    id: 'activeWorkflows',
+    label: 'Active Workflows',
+    value: 48,
+    prefix: '',
+    suffix: '',
+    change: 12.4,
+    positive: true,
+    gradient: 'linear-gradient(135deg, #7C3AED, #EC4899)',
+    sparkline: [30, 32, 31, 34, 33, 36, 35, 38, 37, 40, 39, 42],
+    incrementRange: [0, 1],
+  },
+  {
+    id: 'tasksAutomated',
+    label: 'Tasks Automated Today',
+    value: 1284,
+    prefix: '',
+    suffix: '',
+    change: 8.2,
+    positive: true,
+    gradient: 'linear-gradient(135deg, #2563EB, #38BDF8)',
+    sparkline: [40, 42, 41, 44, 43, 46, 45, 48, 47, 50, 49, 52],
+    incrementRange: [2, 9],
+  },
+  {
+    id: 'timeSaved',
+    label: 'Time Saved',
+    value: 142,
+    prefix: '',
+    suffix: 'h',
+    change: 15.3,
+    positive: true,
+    gradient: 'linear-gradient(135deg, #10B981, #2563EB)',
+    sparkline: [20, 22, 21, 24, 23, 26, 25, 28, 27, 30, 29, 32],
+    incrementRange: [1, 4],
+  },
+  {
+    id: 'successRate',
+    label: 'Success Rate',
+    value: 98.6,
+    prefix: '',
+    suffix: '%',
+    change: 1.8,
+    positive: true,
+    gradient: 'linear-gradient(135deg, #F59E0B, #EF4444)',
+    sparkline: [96, 97, 96.5, 97.5, 98, 97.8, 98.2, 98.4, 98.3, 98.5, 98.4, 98.6],
+    incrementRange: [0.02, 0.1],
+    decimals: 1,
+  },
+];
+
+export const automationWorkflowNodes = [
+  { id: 'trigger', type: 'Trigger', title: 'New Customer Signup', badge: 'Trigger', tone: 'purple', icon: 'trigger' },
+  { id: 'email', type: 'Action', title: 'Send Welcome Email', badge: 'Active', tone: 'blue', icon: 'mail' },
+  { id: 'crm', type: 'Action', title: 'Create CRM Record', badge: 'Active', tone: 'blue', icon: 'crm' },
+  { id: 'notify', type: 'Action', title: 'Notify Sales Team', badge: 'Queued', tone: 'green', icon: 'bell' },
+  { id: 'sync', type: 'Action', title: 'Sync to Analytics', badge: 'Active', tone: 'purple', icon: 'chart' },
+];
+
+export const automationActivity = [
+  { id: 1, text: 'Welcome Email Sent', time: '2 min ago', tone: 'green' },
+  { id: 2, text: 'Invoice Generated', time: '8 min ago', tone: 'blue' },
+  { id: 3, text: 'CRM Updated', time: '12 min ago', tone: 'purple' },
+  { id: 4, text: 'Slack Notification Delivered', time: '18 min ago', tone: 'green' },
+];
+
+export const automationPerformance = [
+  { day: 'Mon', value: 620 },
+  { day: 'Tue', value: 780 },
+  { day: 'Wed', value: 710 },
+  { day: 'Thu', value: 900 },
+  { day: 'Fri', value: 840 },
+];
+
+export const automationSuggestions = [
+  'Automate invoice approvals',
+  'Add reminder before deadline',
+  'Merge duplicate customer records',
+  'Create follow-up workflow',
+];
+
+export const automationIntegrations = [
+  { name: 'Slack', color: '#E11D48' },
+  { name: 'Google Drive', color: '#2563EB' },
+  { name: 'Gmail', color: '#EA4335' },
+  { name: 'Notion', color: '#7C3AED' },
+  { name: 'Zapier', color: '#F59E0B' },
+];
+
+/* ================================
+   COLLABORATION DASHBOARD DATA
+   ================================ */
+
+export const collaborationKpiCards = [
+  {
+    id: 'teamMembers',
+    label: 'Team Members',
+    value: 48,
+    prefix: '',
+    suffix: '',
+    change: 6.2,
+    positive: true,
+    gradient: 'linear-gradient(135deg, #7C3AED, #EC4899)',
+    sparkline: [20, 22, 21, 24, 23, 26, 25, 28, 27, 30, 29, 32],
+    incrementRange: [0, 1],
+  },
+  {
+    id: 'activeProjects',
+    label: 'Active Projects',
+    value: 12,
+    prefix: '',
+    suffix: '',
+    change: 4.1,
+    positive: true,
+    gradient: 'linear-gradient(135deg, #2563EB, #38BDF8)',
+    sparkline: [8, 9, 8, 10, 9, 11, 10, 12, 11, 12, 12, 12],
+    incrementRange: [0, 1],
+  },
+  {
+    id: 'tasksCompleted',
+    label: 'Tasks Completed',
+    value: 342,
+    prefix: '',
+    suffix: '',
+    change: 9.8,
+    positive: true,
+    gradient: 'linear-gradient(135deg, #10B981, #2563EB)',
+    sparkline: [40, 42, 41, 44, 43, 46, 45, 48, 47, 50, 49, 52],
+    incrementRange: [1, 4],
+  },
+  {
+    id: 'teamProductivity',
+    label: 'Team Productivity',
+    value: 94.3,
+    prefix: '',
+    suffix: '%',
+    change: 3.4,
+    positive: true,
+    gradient: 'linear-gradient(135deg, #F59E0B, #EF4444)',
+    sparkline: [82, 84, 83, 86, 85, 88, 87, 90, 89, 92, 91, 94],
+    incrementRange: [0.1, 0.4],
+    decimals: 1,
+  },
+];
+
+export const collaborationKanban = [
+  {
+    title: 'To Do',
+    cards: [
+      { title: 'Landing Page Review', assignee: 'SA', gradient: 'linear-gradient(135deg, #7C3AED, #EC4899)', priority: 'med', due: 'Mar 12' },
+      { title: 'Mobile UI Testing', assignee: 'EM', gradient: 'linear-gradient(135deg, #EC4899, #F59E0B)', priority: 'low', due: 'Mar 14' },
+    ],
+  },
+  {
+    title: 'In Progress',
+    cards: [
+      { title: 'Dashboard Redesign', assignee: 'AX', gradient: 'linear-gradient(135deg, #2563EB, #7C3AED)', priority: 'high', due: 'Mar 10' },
+      { title: 'API Integration', assignee: 'NO', gradient: 'linear-gradient(135deg, #38BDF8, #2563EB)', priority: 'high', due: 'Mar 11' },
+    ],
+  },
+  {
+    title: 'Review',
+    cards: [
+      { title: 'Marketing Assets', assignee: 'OL', gradient: 'linear-gradient(135deg, #10B981, #2563EB)', priority: 'med', due: 'Mar 13' },
+      { title: 'Documentation', assignee: 'SA', gradient: 'linear-gradient(135deg, #7C3AED, #EC4899)', priority: 'low', due: 'Mar 15' },
+    ],
+  },
+  {
+    title: 'Completed',
+    cards: [
+      { title: 'User Authentication', assignee: 'AX', gradient: 'linear-gradient(135deg, #2563EB, #7C3AED)', priority: 'high', due: 'Mar 8' },
+      { title: 'Landing Page', assignee: 'EM', gradient: 'linear-gradient(135deg, #EC4899, #F59E0B)', priority: 'med', due: 'Mar 7' },
+    ],
+  },
+];
+
+export const collaborationActivity = [
+  { id: 1, user: 'Sarah', action: 'commented on Dashboard Design', time: '2 min ago', gradient: 'linear-gradient(135deg, #7C3AED, #EC4899)' },
+  { id: 2, user: 'Ali', action: 'completed Authentication Module', time: '6 min ago', gradient: 'linear-gradient(135deg, #2563EB, #7C3AED)' },
+  { id: 3, user: 'Emma', action: 'uploaded Marketing Assets', time: '11 min ago', gradient: 'linear-gradient(135deg, #EC4899, #F59E0B)' },
+  { id: 4, user: 'John', action: 'assigned API Task', time: '17 min ago', gradient: 'linear-gradient(135deg, #38BDF8, #2563EB)' },
+];
+
+export const collaborationMembers = [
+  { name: 'Sarah', initials: 'SA', status: 'Online', statusColor: '#10B981', gradient: 'linear-gradient(135deg, #7C3AED, #EC4899)' },
+  { name: 'Ali', initials: 'AL', status: 'In Meeting', statusColor: '#F59E0B', gradient: 'linear-gradient(135deg, #2563EB, #7C3AED)' },
+  { name: 'Emma', initials: 'EM', status: 'Offline', statusColor: '#64748B', gradient: 'linear-gradient(135deg, #EC4899, #F59E0B)' },
+  { name: 'John', initials: 'JO', status: 'Available', statusColor: '#2563EB', gradient: 'linear-gradient(135deg, #38BDF8, #2563EB)' },
+];
+
+export const collaborationProjects = [
+  { label: 'Website Redesign', value: 78, color: '#7C3AED' },
+  { label: 'Mobile App', value: 54, color: '#2563EB' },
+  { label: 'Marketing Campaign', value: 91, color: '#10B981' },
+];
+
+export const collaborationFiles = [
+  { name: 'Dashboard.fig', owner: 'Sarah', modified: '2h ago', color: '#7C3AED' },
+  { name: 'Requirements.pdf', owner: 'Ali', modified: '5h ago', color: '#EF4444' },
+  { name: 'Sprint Notes', owner: 'Emma', modified: '1d ago', color: '#2563EB' },
+  { name: 'Marketing Plan', owner: 'John', modified: '2d ago', color: '#10B981' },
+];

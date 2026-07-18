@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   DashboardHeader,
@@ -17,6 +17,18 @@ import {
   teamMembers,
   floatingWidgets,
   analyticsKpiCards,
+  automationKpiCards,
+  automationWorkflowNodes,
+  automationActivity,
+  automationPerformance,
+  automationSuggestions,
+  automationIntegrations,
+  collaborationKpiCards,
+  collaborationKanban,
+  collaborationActivity,
+  collaborationMembers,
+  collaborationProjects,
+  collaborationFiles,
 } from '../../../data/dashboardData';
 
 const ANALYTICS_SERIES = [
@@ -341,33 +353,404 @@ function AnalyticsPreview({ prefersReduced }) {
   );
 }
 
-export default function ProductPreview({ categoryId, prefersReduced }) {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+/* ── Automation Preview ── */
+const WF_TONE = { purple: '#7C3AED', blue: '#2563EB', green: '#10B981' };
 
-  const handleMouseMove = useCallback(
-    (e) => {
-      if (prefersReduced) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 4;
-      const y = ((e.clientY - rect.top) / rect.height - 0.5) * -4;
-      setTilt({ x, y });
-    },
-    [prefersReduced]
-  );
+const WF_ICONS = {
+  trigger: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
+  ),
+  mail: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M22 7l-10 6L2 7" /></svg>
+  ),
+  crm: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5" /><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3" /></svg>
+  ),
+  bell: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg>
+  ),
+  chart: (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
+  ),
+};
 
-  const handleMouseLeave = useCallback(() => setTilt({ x: 0, y: 0 }), []);
+function AutomationPreview({ prefersReduced }) {
+  const [kpiValues, setKpiValues] = useState(() => automationKpiCards.map((c) => c.value));
+  const [notifCount] = useState(3);
+
+  useEffect(() => {
+    if (prefersReduced) return;
+    const id = setInterval(() => {
+      setKpiValues((prev) =>
+        prev.map((v, i) => {
+          const card = automationKpiCards[i];
+          const [min, max] = card.incrementRange;
+          if (card.id === 'activeWorkflows') return v + (Math.random() < 0.5 ? 1 : 0);
+          if (card.id === 'successRate') return Math.min(99.9, Math.round((v + (Math.random() * (max - min) + min)) * 10) / 10);
+          return Math.round((v + (Math.random() * (max - min) + min)) * 10) / 10;
+        })
+      );
+    }, 4200);
+    return () => clearInterval(id);
+  }, [prefersReduced]);
+
+  const perfMax = Math.max(...automationPerformance.map((p) => p.value));
 
   return (
-    <motion.div
-      className="showcase-preview-wrapper"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        transform: `perspective(800px) rotateY(${tilt.x}deg) rotateX(${tilt.y}deg)`,
-      }}
-    >
-      <div className="showcase-preview-glow" aria-hidden="true" />
-      <div className="showcase-preview-ring" aria-hidden="true" />
+    <div className="dsh-root">
+      <div className="dsh-container automation-container">
+        <header className="dsh-header">
+          <div className="dsh-header-left">
+            <div className="dsh-logo" aria-hidden="true" />
+            <span className="dsh-logo-text">Automation</span>
+          </div>
+          <div className="dsh-header-center">
+            <div className="auto-status-select">
+              <span className="auto-status-dot" aria-hidden="true" />
+              <span>Workflow Status: Active</span>
+              <svg className="auto-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9" /></svg>
+            </div>
+          </div>
+          <div className="dsh-header-right">
+            <button className="auto-create-btn" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+              Create Workflow
+            </button>
+            <button className="dsh-icon-btn" type="button" aria-label="Notifications">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg>
+              <span className="dsh-notif-badge">{notifCount}</span>
+            </button>
+            <div className="dsh-avatar" style={{ background: 'linear-gradient(135deg, #2563EB, #7C3AED)' }} aria-label="User menu">
+              <span>JD</span>
+              <span className="dsh-avatar-status" aria-hidden="true" />
+            </div>
+          </div>
+        </header>
+
+        <section className="dsh-kpi-row" aria-label="Key metrics">
+          {automationKpiCards.map((card, i) => (
+            <KPICard key={card.id} card={card} index={i} value={kpiValues[i]} />
+          ))}
+        </section>
+
+        <section className="dsh-middle">
+          <div className="dsh-chart">
+            <div className="dsh-chart-header">
+              <div>
+                <h3 className="dsh-chart-title">Workflow Builder</h3>
+                <p className="dsh-chart-sub">New Customer Onboarding</p>
+              </div>
+              <div className="dsh-chart-legend">
+                <span className="dsh-legend-dot" style={{ background: '#7C3AED' }} />
+                <span className="dsh-legend-text">5 steps</span>
+              </div>
+            </div>
+            <div className="auto-workflow">
+              {automationWorkflowNodes.map((node, i) => (
+                <Fragment key={node.id}>
+                  <motion.div
+                    className={`auto-wf-node auto-wf-node--${node.tone}`}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.5 + i * 0.12, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <div className="auto-wf-node-icon" style={{ background: WF_TONE[node.tone] }} aria-hidden="true">
+                      {WF_ICONS[node.icon]}
+                    </div>
+                    <div className="auto-wf-node-body">
+                      <span className="auto-wf-node-type">{node.type}</span>
+                      <span className="auto-wf-node-title">{node.title}</span>
+                    </div>
+                    <span className={`auto-wf-badge auto-wf-badge--${node.tone}`}>{node.badge}</span>
+                  </motion.div>
+                  {i < automationWorkflowNodes.length - 1 && (
+                    <div className="auto-wf-connector" aria-hidden="true">
+                      <span className="auto-wf-flow" style={{ animationDelay: `${i * 0.4}s` }} />
+                    </div>
+                  )}
+                </Fragment>
+              ))}
+            </div>
+          </div>
+
+          <div className="dsh-activity">
+            <h3 className="dsh-panel-title">Workflow Activity</h3>
+            <div className="auto-activity-list">
+              {automationActivity.map((item) => (
+                <div className="auto-activity-item" key={item.id}>
+                  <span className={`auto-act-icon auto-act-icon--${item.tone}`} aria-hidden="true">
+                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  </span>
+                  <div className="auto-act-body">
+                    <span className="auto-act-text">{item.text}</span>
+                    <span className="auto-act-time">{item.time}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="dsh-bottom">
+          <div className="dsh-progress-card">
+            <h3 className="dsh-panel-title">Automation Performance</h3>
+            <div className="auto-perf-bars">
+              {automationPerformance.map((p, i) => (
+                <div className="auto-perf-col" key={p.day}>
+                  <span className="auto-perf-val">{p.value}</span>
+                  <div className="auto-perf-track">
+                    <motion.div
+                      className="auto-perf-bar"
+                      initial={{ scaleY: 0 }}
+                      animate={{ scaleY: 1 }}
+                      transition={{ delay: 0.6 + i * 0.1, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                      style={{ transformOrigin: 'bottom', height: `${(p.value / perfMax) * 100}%` }}
+                    />
+                  </div>
+                  <span className="auto-perf-label">{p.day}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="dsh-team-card">
+            <h3 className="dsh-panel-title">AI Suggestions</h3>
+            <div className="auto-suggest-list">
+              {automationSuggestions.map((s, i) => (
+                <div className="auto-suggest-item" key={i}>
+                  <span className="auto-suggest-spark" aria-hidden="true">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.2L19 9l-5.2 1.8L12 16l-1.8-5.2L5 9l5.2-1.8z" /></svg>
+                  </span>
+                  <span className="auto-suggest-text">{s}</span>
+                </div>
+              ))}
+            </div>
+            <h3 className="dsh-panel-title auto-integrations-title">Active Integrations</h3>
+            <div className="auto-integrations">
+              {automationIntegrations.map((it) => (
+                <div className="auto-integration" key={it.name}>
+                  <span className="auto-integration-icon" style={{ background: it.color }} aria-hidden="true">{it.name[0]}</span>
+                  <span className="auto-integration-name">{it.name}</span>
+                  <span className="auto-connected">Connected</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <footer className="automation-footer">
+          Last automation executed 1 minute ago
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+/* ── Collaboration Preview ── */
+function ProgressRing({ value, label, color, delay = 0.6 }) {
+  const radius = 26;
+  const circumference = 2 * Math.PI * radius;
+  return (
+    <div className="collab-ring">
+      <div className="collab-ring-svg-wrap">
+        <svg viewBox="0 0 64 64" className="collab-ring-svg" aria-hidden="true">
+          <circle cx="32" cy="32" r={radius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="6" />
+          <g transform="rotate(-90 32 32)">
+            <motion.circle
+              cx="32"
+              cy="32"
+              r={radius}
+              fill="none"
+              stroke={color}
+              strokeWidth="6"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              initial={{ strokeDashoffset: circumference }}
+              animate={{ strokeDashoffset: circumference * (1 - value / 100) }}
+              transition={{ duration: 1.3, delay, ease: [0.16, 1, 0.3, 1] }}
+            />
+          </g>
+        </svg>
+        <span className="collab-ring-val">{value}%</span>
+      </div>
+      <span className="collab-ring-label">{label}</span>
+    </div>
+  );
+}
+
+function CollaborationPreview({ prefersReduced }) {
+  const [kpiValues, setKpiValues] = useState(() => collaborationKpiCards.map((c) => c.value));
+
+  useEffect(() => {
+    if (prefersReduced) return;
+    const id = setInterval(() => {
+      setKpiValues((prev) =>
+        prev.map((v, i) => {
+          const card = collaborationKpiCards[i];
+          const [min, max] = card.incrementRange;
+          if (card.id === 'teamProductivity') return Math.min(99.9, Math.round((v + (Math.random() * (max - min) + min)) * 10) / 10);
+          if (card.id === 'teamMembers' || card.id === 'activeProjects') return v + (Math.random() < 0.4 ? 1 : 0);
+          return Math.round((v + (Math.random() * (max - min) + min)) * 10) / 10;
+        })
+      );
+    }, 4300);
+    return () => clearInterval(id);
+  }, [prefersReduced]);
+
+  return (
+    <div className="dsh-root">
+      <div className="dsh-container collaboration-container">
+        <header className="dsh-header">
+          <div className="dsh-header-left">
+            <div className="dsh-logo" aria-hidden="true" />
+            <span className="dsh-logo-text">Team Workspace</span>
+          </div>
+          <div className="dsh-header-center">
+            <div className="dsh-search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              <input type="text" className="dsh-search-input" placeholder="Search workspace..." readOnly aria-label="Search workspace" />
+            </div>
+          </div>
+          <div className="dsh-header-right">
+            <button className="collab-invite-btn" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" y1="8" x2="19" y2="14" /><line x1="22" y1="11" x2="16" y2="11" /></svg>
+              Invite Member
+            </button>
+            <button className="dsh-icon-btn" type="button" aria-label="Notifications">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg>
+              <span className="dsh-notif-badge">2</span>
+            </button>
+            <div className="dsh-avatar" style={{ background: 'linear-gradient(135deg, #2563EB, #7C3AED)' }} aria-label="User menu">
+              <span>JD</span>
+              <span className="dsh-avatar-status" aria-hidden="true" />
+            </div>
+          </div>
+        </header>
+
+        <section className="dsh-kpi-row" aria-label="Key metrics">
+          {collaborationKpiCards.map((card, i) => (
+            <KPICard key={card.id} card={card} index={i} value={kpiValues[i]} />
+          ))}
+        </section>
+
+        <section className="dsh-middle">
+          <div className="dsh-chart">
+            <div className="dsh-chart-header">
+              <div>
+                <h3 className="dsh-chart-title">Team Board</h3>
+                <p className="dsh-chart-sub">Sprint 24</p>
+              </div>
+              <div className="dsh-chart-legend">
+                <span className="dsh-legend-dot" style={{ background: '#7C3AED' }} />
+                <span className="dsh-legend-text">8 tasks</span>
+              </div>
+            </div>
+            <div className="collab-kanban">
+              {collaborationKanban.map((col) => (
+                <div className="collab-kanban-col" key={col.title}>
+                  <div className="collab-kanban-col-head">
+                    <span>{col.title}</span>
+                    <span className="collab-kanban-col-count">{col.cards.length}</span>
+                  </div>
+                  {col.cards.map((task) => (
+                    <motion.div
+                      key={task.title}
+                      className="collab-kanban-card"
+                      whileHover={{ y: -3 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+                    >
+                      <div className="collab-kanban-card-head">
+                        <span className="collab-kanban-card-title">{task.title}</span>
+                        <span className={`collab-kanban-priority collab-kanban-priority--${task.priority}`}>
+                          {task.priority === 'high' ? 'High' : task.priority === 'med' ? 'Med' : 'Low'}
+                        </span>
+                      </div>
+                      <div className="collab-kanban-card-foot">
+                        <span className="collab-kanban-avatar" style={{ background: task.gradient }} aria-hidden="true">{task.assignee}</span>
+                        <span className="collab-kanban-due">{task.due}</span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="dsh-activity">
+            <h3 className="dsh-panel-title">Team Activity</h3>
+            <div className="collab-act-list">
+              {collaborationActivity.map((item, i) => (
+                <motion.div
+                  key={item.id}
+                  className="collab-act-item"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.5 + i * 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <span className="collab-act-avatar" style={{ background: item.gradient }} aria-hidden="true">{item.user[0]}</span>
+                  <div className="collab-act-body">
+                    <span className="collab-act-text"><strong>{item.user}</strong> {item.action}</span>
+                    <span className="collab-act-time">{item.time}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <h3 className="dsh-panel-title collab-avail-title">Team Availability</h3>
+            <div className="collab-avail-list">
+              {collaborationMembers.map((m) => (
+                <div className="collab-avail-item" key={m.name}>
+                  <span className="collab-avail-avatar" style={{ background: m.gradient }} aria-hidden="true">{m.initials}</span>
+                  <div className="collab-avail-info">
+                    <span className="collab-avail-name">{m.name}</span>
+                    <span className="collab-avail-status" style={{ color: m.statusColor }}>{m.status}</span>
+                  </div>
+                  <span className="collab-avail-dot" style={{ background: m.statusColor }} aria-hidden="true" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="dsh-bottom">
+          <div className="dsh-progress-card">
+            <h3 className="dsh-panel-title">Project Progress</h3>
+            <div className="collab-rings">
+              {collaborationProjects.map((p, i) => (
+                <ProgressRing key={p.label} value={p.value} label={p.label} color={p.color} delay={0.6 + i * 0.15} />
+              ))}
+            </div>
+          </div>
+
+          <div className="dsh-team-card">
+            <h3 className="dsh-panel-title">Shared Files</h3>
+            <div className="collab-files">
+              {collaborationFiles.map((f) => (
+                <div className="collab-file-item" key={f.name}>
+                  <span className="collab-file-icon" style={{ background: `${f.color}22`, color: f.color }} aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+                  </span>
+                  <div className="collab-file-body">
+                    <span className="collab-file-name">{f.name}</span>
+                    <span className="collab-file-meta">{f.owner} · {f.modified}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <footer className="collaboration-footer">
+          12 teammates currently online
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+export default function ProductPreview({ categoryId, prefersReduced }) {
+  return (
+    <motion.div className="showcase-preview-wrapper">
       <div
         className="showcase-preview"
         role="tabpanel"
@@ -385,6 +768,10 @@ export default function ProductPreview({ categoryId, prefersReduced }) {
           >
             {categoryId === 'analytics' ? (
               <AnalyticsPreview prefersReduced={prefersReduced} />
+            ) : categoryId === 'automation' ? (
+              <AutomationPreview prefersReduced={prefersReduced} />
+            ) : categoryId === 'collaboration' ? (
+              <CollaborationPreview prefersReduced={prefersReduced} />
             ) : (
               <DashboardPreview prefersReduced={prefersReduced} />
             )}

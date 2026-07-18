@@ -181,7 +181,7 @@ export default function FeatureComparison() {
                   <span className="cmp-period">/mo</span>
                 </div>
                 <p className="cmp-plan-desc">For large organizations</p>
-                <Link to="/contact" className="cmp-btn cmp-btn-outline">Contact Sales</Link>
+                <a href="#contact" className="cmp-btn cmp-btn-outline">Contact Sales</a>
               </div>
             </div>
 

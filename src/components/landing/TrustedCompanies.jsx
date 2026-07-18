@@ -66,7 +66,7 @@ export default function TrustedCompanies() {
   const repeated = [...trustedCompanies, ...trustedCompanies];
 
   return (
-    <section className="trusted reveal">
+    <section className="trusted">
       <div className="container">
         <div className="trusted-divider" />
         <p className="trusted-label">Trusted by innovative teams at</p>
