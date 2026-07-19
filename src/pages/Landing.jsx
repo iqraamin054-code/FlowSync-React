@@ -5,17 +5,14 @@ import Hero from '../components/landing/Hero/Hero.jsx';
 import TrustedCompanies from '../components/landing/TrustedCompanies.jsx';
 import Problems from '../components/landing/Problems.jsx';
 import Solution from '../components/landing/Solution.jsx';
-import ProductShowcase from '../components/landing/ProductShowcase/ProductShowcase.jsx';
 import Features from '../components/landing/Features.jsx';
 import Statistics from '../components/landing/Statistics.jsx';
 import FeatureComparison from '../components/landing/FeatureComparison.jsx';
 import Pricing from '../components/landing/Pricing.jsx';
 import PricingCalculator from '../components/landing/PricingCalculator.jsx';
 import Testimonials from '../components/landing/Testimonials.jsx';
-import BlogPreview from '../components/landing/BlogPreview.jsx';
 import Faq from '../components/landing/Faq.jsx';
 import Contact from '../components/landing/Contact.jsx';
-import CTA from '../components/landing/CTA.jsx';
 import Footer from '../components/layout/Footer.jsx';
 import LoginModal from '../components/common/LoginModal.jsx';
 import CursorGlow from '../components/common/CursorGlow.jsx';
@@ -38,17 +35,14 @@ export default function Landing() {
         <TrustedCompanies />
         <Problems onHover={setSolutionState} />
         <Solution activeState={solutionState} />
-        <ProductShowcase />
         <Features />
         <Statistics />
         <FeatureComparison />
         <PricingCalculator />
         <Pricing />
         <Testimonials />
-        <BlogPreview />
         <Faq />
         <Contact />
-        <CTA />
         <Footer />
       </main>
       {loginOpen && (

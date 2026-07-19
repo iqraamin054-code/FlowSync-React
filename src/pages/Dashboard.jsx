@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+﻿import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useScrollReveal from '../hooks/useScrollReveal.js';
 import WorkflowWorkspace from '../components/dashboard/WorkflowWorkspace.jsx';
 import useWorkflowProject from '../hooks/useWorkflowProject.js';
 import { getProjectProgress } from '../utils/workflowGenerator.js';
+import { getActiveEmail, getUser, getWorkspace, setWorkspaceTheme, updateWorkspaceProfile } from '../utils/workspaceStorage.js';
 
 const TRANSLATIONS = {
   en: { dashboard:'Dashboard',analytics:'Analytics',projects:'Projects',team:'Team',messages:'Messages',settings:'Settings',active:'active',activeUsers:'Active Users',monthlyRevenue:'Monthly Revenue',conversionRate:'Conversion Rate',growth:'Growth',growthTrends:'Phase Completion Progress',projectStatus:'Project Status',ongoingCount:'ongoing projects',activityFeed:'Team Activity Feed',global:'Global',act1:'completed UK Sync',act2:'pushed code to main now',act3:'created report' },
@@ -63,20 +64,27 @@ export default function Dashboard() {
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [newMemberRole, setNewMemberRole] = useState('member');
   const [inviteSuccess, setInviteSuccess] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [newProjectRequest, setNewProjectRequest] = useState(0);
 
   const pdRef = useRef(null);
 
   useEffect(() => {
     if (localStorage.getItem('isLoggedIn') !== 'true') { navigate('/'); return; }
-    const t = localStorage.getItem('flowsync-theme') || '';
+    const activeEmail = getActiveEmail();
+    const workspace = getWorkspace(activeEmail);
+    const account = getUser(activeEmail);
+    const profile = account?.profile || workspace.profile || {};
+    const t = workspace.theme === 'light' ? 'light' : '';
     const a = localStorage.getItem('flowsync-accent') || 'blue';
     const l = localStorage.getItem('flowsync-language') || 'en';
-    const u = localStorage.getItem('flowsync-username') || 'Alex R.';
-    const c = localStorage.getItem('flowsync-company') || 'Synergy Analytics';
-    const e = localStorage.getItem('flowsync-email') || 'alex@example.com';
-    const m = parseInt(localStorage.getItem('flowsync-team-members'), 10) || 1;
-    const ind = localStorage.getItem('flowsync-industry') || 'Technology';
-    const r = localStorage.getItem('flowsync-role') || 'Team Lead';
+    const u = profile.fullName || localStorage.getItem('flowsync-username') || 'Alex R.';
+    const c = profile.companyName || localStorage.getItem('flowsync-company') || 'My Workspace';
+    const e = activeEmail || 'alex@example.com';
+    const onboardedTeam = Array.isArray(profile.teamMembers) ? profile.teamMembers : [];
+    const m = onboardedTeam.length + 1;
+    const ind = profile.industry || 'Technology';
+    const r = profile.role || 'Team Lead';
     const n = localStorage.getItem('flowsync-notif') !== 'false';
     setTheme(t === 'light' ? 'light' : 'dark');
     setAccent(a);
@@ -95,13 +103,14 @@ export default function Dashboard() {
     document.documentElement.style.setProperty('--shadow-glow-primary', ac.glow);
     document.documentElement.style.setProperty('--color-primary-rgb', ac.rgb);
 
-    // Initialize mock team members
-    const staticTeam = [
-      { name: 'Emma', email: 'emma@flowsync.co', role: 'Admin', status: 'Online', bg: 'rgba(236,72,153,0.15)', color: '#EC4899' },
-      { name: 'Alex', email: 'alex.k@flowsync.co', role: 'Collaborator', status: 'Online', bg: 'rgba(16,185,129,0.15)', color: '#10B981' },
-      { name: 'Olivia', email: 'olivia@flowsync.co', role: 'Viewer', status: 'Offline', bg: 'rgba(245,158,11,0.15)', color: '#F59E0B' },
-    ];
-    setTeamList(staticTeam.slice(0, Math.max(1, m - 1)));
+    const memberColors = ['#7C3AED', '#10B981', '#EC4899', '#F59E0B'];
+    setTeamList(onboardedTeam.map((member, index) => ({
+      ...member,
+      name: member.name || member.email.split('@')[0],
+      status: 'Invited',
+      color: memberColors[index % memberColors.length],
+      bg: `${memberColors[index % memberColors.length]}22`,
+    })));
   }, [navigate]);
 
   const toggleTheme = () => {
@@ -109,9 +118,17 @@ export default function Dashboard() {
     setTheme(next);
     document.documentElement.setAttribute('data-theme', next === 'light' ? 'light' : '');
     localStorage.setItem('flowsync-theme', next === 'light' ? 'light' : '');
+    setWorkspaceTheme(next, getActiveEmail());
   };
 
   const t = (key) => (TRANSLATIONS[lang] || TRANSLATIONS.en)[key] || key;
+  const searchResults = searchQuery.trim() ? projects.flatMap((item) => {
+    const query = searchQuery.trim().toLowerCase();
+    const matchesProject = item.name.toLowerCase().includes(query) || item.goal.toLowerCase().includes(query);
+    const matchingTasks = item.tasks.filter((task) => task.title.toLowerCase().includes(query));
+    return matchesProject || matchingTasks.length ? [{ project: item, matchingTasks }] : [];
+  }) : [];
+  const openSearchResult = (projectId) => { selectProject(projectId); setActiveNav('dashboard'); setSearchQuery(''); };
 
   useEffect(() => {
     if (!pdOpen) return;
@@ -238,7 +255,7 @@ export default function Dashboard() {
   }, [project, activeNav]);
 
   const logout = () => {
-    ['isLoggedIn','flowsync-username','flowsync-email','flowsync-company','flowsync-industry','flowsync-role','flowsync-team-members','flowsync-notif', 'flowsync-projects-list', 'flowsync-current-project-id'].forEach(k => localStorage.removeItem(k));
+    ['isLoggedIn','flowsync-active-email','flowsync-username','flowsync-email','flowsync-company','flowsync-industry','flowsync-role','flowsync-team-members','flowsync-notif'].forEach(k => localStorage.removeItem(k));
     navigate('/');
   };
 
@@ -264,6 +281,7 @@ export default function Dashboard() {
     };
     const updatedList = [...teamList, newTeammate];
     setTeamList(updatedList);
+    updateWorkspaceProfile({ teamMembers: updatedList.map(({ email: memberEmail, role: memberRole, name }) => ({ email: memberEmail, role: memberRole, name })) });
     setMembers(updatedList.length + 1);
     localStorage.setItem('flowsync-team-members', updatedList.length + 1);
     setNewMemberEmail('');
@@ -318,9 +336,10 @@ export default function Dashboard() {
   };
 
   // Real Project Calculations
-  const completed = project ? project.tasks.filter(t => t.status === 'done').length : 0;
-  const inProgress = project ? project.tasks.filter(t => t.status === 'in-progress').length : 0;
-  const progress = project ? getProjectProgress(project.tasks) : 0;
+  const totalTasks = projects.reduce((sum, item) => sum + item.tasks.length, 0);
+  const totalCompleted = projects.reduce((sum, item) => sum + item.tasks.filter((task) => task.status === 'done').length, 0);
+  const totalInProgress = projects.reduce((sum, item) => sum + item.tasks.filter((task) => task.status === 'in-progress').length, 0);
+  const workspaceProgress = totalTasks ? Math.round((totalCompleted / totalTasks) * 100) : 0;
 
   // Chart coordinates calculation (Phase Completion Progress)
   const xCoords = [50, 154, 258, 362, 466, 570];
@@ -461,7 +480,10 @@ export default function Dashboard() {
             </button>
             <div className="header-search">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="search" placeholder="Search..." aria-label="Search dashboard" />
+              <input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search projects and tasks..." aria-label="Search projects and tasks" />
+              {searchQuery.trim() && <div className="workspace-search-results" role="listbox" aria-label="Search results">
+                {searchResults.length ? searchResults.map(({ project: result, matchingTasks }) => <button type="button" key={result.id} className="workspace-search-result" onClick={() => openSearchResult(result.id)}><strong>{result.name}</strong><span>{matchingTasks.length ? `${matchingTasks.length} matching task${matchingTasks.length === 1 ? '' : 's'}` : result.goal}</span></button>) : <span className="workspace-search-empty">No projects or tasks in this workspace match “{searchQuery}”.</span>}
+              </div>}
             </div>
             <div className="header-actions">
               <button className="header-btn" aria-label="Notifications" onClick={(e) => { e.stopPropagation(); setNotifOpen(!notifOpen); }}>
@@ -494,7 +516,7 @@ export default function Dashboard() {
             
             {activeNav === 'dashboard' && (
               <>
-                <WorkflowWorkspace />
+                <WorkflowWorkspace createRequest={newProjectRequest} onCreateRequestHandled={() => setNewProjectRequest(0)} />
                 
                 {project && (
                   <>
@@ -505,8 +527,8 @@ export default function Dashboard() {
 
                     <div className="metrics-grid reveal-stagger">
                       <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">Completed Tasks</span><span className="m-badge m-badge--success">Real-Time</span></div>
-                        <div className="m-card__value">{completed} / {project.tasks.length}</div>
+                        <div className="m-card__header"><span className="m-card__title">Completed Tasks</span><span className="m-badge m-badge--success">Workspace</span></div>
+                        <div className="m-card__value">{totalCompleted} / {totalTasks}</div>
                         <div className="m-card__chart">
                           <svg className="sparkline-svg" viewBox="0 0 120 40">
                             <defs>
@@ -522,8 +544,8 @@ export default function Dashboard() {
                       </div>
 
                       <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">Project Progress</span><span className="m-badge m-badge--blue">Active</span></div>
-                        <div className="m-card__value">{progress}%</div>
+                        <div className="m-card__header"><span className="m-card__title">Workspace Progress</span><span className="m-badge m-badge--blue">All Projects</span></div>
+                        <div className="m-card__value">{workspaceProgress}%</div>
                         <div className="m-card__chart">
                           <svg className="sparkline-svg" viewBox="0 0 120 40">
                             <g fill="var(--color-primary, #2563EB)" opacity="0.85">
@@ -541,9 +563,9 @@ export default function Dashboard() {
                       </div>
 
                       <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">In Progress Tasks</span><span className="m-badge m-badge--purple">Priority</span></div>
+                        <div className="m-card__header"><span className="m-card__title">In Progress Tasks</span><span className="m-badge m-badge--purple">Workspace</span></div>
                         <div className="m-card__content-row">
-                          <div className="m-card__value">{inProgress} Tasks</div>
+                          <div className="m-card__value">{totalInProgress} Tasks</div>
                           <div className="m-card__circular">
                             <svg width="44" height="44" viewBox="0 0 36 36">
                               <circle className="donut-track" cx="18" cy="18" r="15.915" fill="transparent" stroke="var(--border-strong)" strokeWidth="3"/>
@@ -555,7 +577,7 @@ export default function Dashboard() {
                                 fill="transparent" 
                                 stroke="#7C3AED" 
                                 strokeWidth="3.5" 
-                                strokeDasharray={`${Math.round((inProgress / project.tasks.length) * 100)} ${100 - Math.round((inProgress / project.tasks.length) * 100)}`} 
+                                strokeDasharray={`${totalTasks ? Math.round((totalInProgress / totalTasks) * 100) : 0} ${totalTasks ? 100 - Math.round((totalInProgress / totalTasks) * 100) : 100}`}
                                 strokeDashoffset="25"
                               />
                             </svg>
@@ -564,9 +586,9 @@ export default function Dashboard() {
                       </div>
 
                       <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">Target Deadline</span><span className="m-badge m-badge--yellow">Timeline</span></div>
+                        <div className="m-card__header"><span className="m-card__title">Total Projects</span><span className="m-badge m-badge--yellow">Workspace</span></div>
                         <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>
-                          {project.targetDate ? new Date(project.targetDate).toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'}) : 'Flexible Schedule'}
+                          {projects.length} project{projects.length === 1 ? '' : 's'}
                         </div>
                         <div className="m-card__chart">
                           <svg className="sparkline-svg" viewBox="0 0 120 40">
@@ -721,7 +743,7 @@ export default function Dashboard() {
               <div className="projects-tab-view glass-card" style={{ padding: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                   <h2>Manage Workflow Projects</h2>
-                  <button className="workflow-primary ripple" onClick={() => setActiveNav('dashboard')}>
+                  <button className="workflow-primary ripple" onClick={() => { setActiveNav('dashboard'); setNewProjectRequest((value) => value + 1); }}>
                     + Create New Project
                   </button>
                 </div>
@@ -735,7 +757,8 @@ export default function Dashboard() {
                       return (
                         <div key={proj.id} className="project-detail-card glass-card" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)', position: 'relative' }}>
                           <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{proj.name}</h3>
-                          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', minHeight: '40px', marginBottom: '1.5rem' }}>{proj.goal}</p>
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', minHeight: '40px', marginBottom: '.65rem' }}>{proj.goal}</p>
+                          <p className="project-last-updated">Last updated {new Date(proj.updatedAt || proj.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
                             <span>{doneTasks} of {proj.tasks.length} Completed</span>
                             <span>{pct}%</span>
@@ -955,7 +978,7 @@ export default function Dashboard() {
             </>)}
             {modal === 'appearance' && (<div className="pd-theme-options">
               {[{v:'light',icon:<><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,label:'Light'},{v:'dark',icon:<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>,label:'Dark'},{v:'system',icon:<><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></>,label:'System'}].map(o => (
-                <label key={o.v} className={`pd-theme-opt${theme === o.v ? ' is-active' : ''}`} onClick={() => { const resolved = o.v === 'system' ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : o.v; setTheme(resolved); document.documentElement.setAttribute('data-theme', resolved === 'light' ? 'light' : ''); localStorage.setItem('flowsync-theme', resolved === 'light' ? 'light' : ''); }}>
+                <label key={o.v} className={`pd-theme-opt${theme === o.v ? ' is-active' : ''}`} onClick={() => { const resolved = o.v === 'system' ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : o.v; setTheme(resolved); document.documentElement.setAttribute('data-theme', resolved === 'light' ? 'light' : ''); setWorkspaceTheme(resolved, getActiveEmail()); }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{o.icon}</svg><span>{o.label}</span><span className="pd-theme-opt-indicator"></span>
                 </label>
               ))}

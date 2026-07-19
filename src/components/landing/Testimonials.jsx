@@ -149,7 +149,7 @@ export default function Testimonials() {
   return (
     <section
       ref={sectionRef}
-      className="tst-section"
+      className="tst-section reveal"
       id="testimonials"
       aria-label="Testimonials"
     >

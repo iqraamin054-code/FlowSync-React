@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import useWorkflowProject from '../../hooks/useWorkflowProject.js';
-import { getProjectProgress } from '../../utils/workflowGenerator.js';
+import { getAvailableDays, getProjectProgress } from '../../utils/workflowGenerator.js';
 
 const STATUS_OPTIONS = [
   { value: 'todo', label: 'To do' },
@@ -16,12 +16,13 @@ const PRIORITY_OPTIONS = [
 
 const PHASES = ['Planning', 'Design', 'Development', 'Content', 'Testing', 'Launch'];
 
-export default function WorkflowWorkspace() {
+export default function WorkflowWorkspace({ createRequest = 0, onCreateRequestHandled }) {
   const { project, startProject, updateTask, deleteProject } = useWorkflowProject();
   const [name, setName] = useState('');
   const [goal, setGoal] = useState('');
   const [targetDate, setTargetDate] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [dateError, setDateError] = useState('');
   const [projectToDelete, setProjectToDelete] = useState(null);
   
   const [expandedPhases, setExpandedPhases] = useState({
@@ -42,9 +43,21 @@ export default function WorkflowWorkspace() {
     }
   }, [showCreateForm]);
 
+  useEffect(() => {
+    if (createRequest > 0) {
+      setShowCreateForm(true);
+      onCreateRequestHandled?.();
+    }
+  }, [createRequest, onCreateRequestHandled]);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!goal.trim()) return;
+    const daysAvailable = getAvailableDays(targetDate);
+    if (daysAvailable !== null && daysAvailable < 0) {
+      setDateError('Choose today or a future target date. A workflow cannot be scheduled in the past.');
+      return;
+    }
     startProject({ name, goal, targetDate });
     // Reset form fields
     setName('');
@@ -63,13 +76,13 @@ export default function WorkflowWorkspace() {
   // If there is no active project OR the user clicked "+ New Project"
   if (!project || showCreateForm) {
     return (
-      <section className="workflow-empty" aria-labelledby="workflow-title">
+      <section className={`workflow-empty${showCreateForm ? ' workflow-empty--create' : ''}`} aria-labelledby="workflow-title">
         {!project && !showCreateForm ? (
           <div className="workflow-empty__intro">
-            <span className="workflow-kicker">Start your journey</span>
-            <h1 id="workflow-title">Ready to turn an idea into a plan?</h1>
+            <span className="workflow-kicker">Your FlowSync workspace</span>
+            <h1 id="workflow-title">Turn your next goal into an organized workflow.</h1>
             <p className="workflow-empty-desc">
-              Enter a project goal and FlowSync will help structure the work into actionable tasks.
+              Describe what you want to accomplish, choose an optional target date, and FlowSync will break the goal into practical tasks you can manage and complete.
             </p>
             <button 
               className="workflow-primary create-project-btn ripple" 
@@ -81,9 +94,9 @@ export default function WorkflowWorkspace() {
         ) : (
           <div className="workflow-create-container">
             <div className="workflow-empty__copy">
-              <span className="workflow-kicker">New Project Setup</span>
-              <h2>Describe your objective</h2>
-              <p>FlowSync will generate a structured checklist of tasks mapped across 6 production phases.</p>
+              <span className="workflow-kicker">New project</span>
+              <h2>Describe the outcome you want to achieve.</h2>
+              <p>Your goal and target date shape the workflow. Short deadlines produce a smaller, focused plan.</p>
             </div>
             <form className="workflow-create" onSubmit={handleSubmit}>
               <div className="form-group full-width">
@@ -120,10 +133,14 @@ export default function WorkflowWorkspace() {
                     id="proj-date"
                     type="date"
                     value={targetDate} 
-                    onChange={(event) => setTargetDate(event.target.value)} 
+                    onChange={(event) => { setTargetDate(event.target.value); setDateError(''); }}
                     className="ob-input has-value"
                   />
                 </label>
+                {targetDate && getAvailableDays(targetDate) !== null && getAvailableDays(targetDate) >= 0 && (
+                  <p className="workflow-date-hint">{getAvailableDays(targetDate) === 0 ? 'Due today — FlowSync will create a same-day focus list.' : `${getAvailableDays(targetDate)} day${getAvailableDays(targetDate) === 1 ? '' : 's'} available for this workflow.`}</p>
+                )}
+                {dateError && <p className="workflow-date-error" role="alert">{dateError}</p>}
               </div>
               <div className="form-actions">
                 <button type="button" className="workflow-secondary ripple" onClick={() => setShowCreateForm(false)}>

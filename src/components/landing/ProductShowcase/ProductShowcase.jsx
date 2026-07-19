@@ -53,7 +53,7 @@ export default function ProductShowcase() {
   };
 
   return (
-    <section className="showcase-section" id="product-showcase" aria-label="Product showcase">
+    <section className="showcase-section reveal" id="product-showcase" aria-label="Product showcase">
       {/* Decorative elements */}
       <div className="showcase-bg-glow showcase-bg-glow-1" aria-hidden="true" />
       <div className="showcase-bg-glow showcase-bg-glow-2" aria-hidden="true" />

@@ -5649,8 +5649,8 @@ html {
 /* ── Scroll Reveal ── */
 .reveal {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.42s ease-out, transform 0.42s ease-out;
+    transform: translateY(22px);
+    transition: opacity 560ms cubic-bezier(0.22, 1, 0.36, 1), transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
     will-change: opacity, transform;
 }
 
@@ -5664,13 +5664,13 @@ html {
 }
 
 .reveal-stagger > .reveal:nth-child(1) { transition-delay: 0ms; }
-.reveal-stagger > .reveal:nth-child(2) { transition-delay: 50ms; }
-.reveal-stagger > .reveal:nth-child(3) { transition-delay: 100ms; }
-.reveal-stagger > .reveal:nth-child(4) { transition-delay: 150ms; }
-.reveal-stagger > .reveal:nth-child(5) { transition-delay: 200ms; }
-.reveal-stagger > .reveal:nth-child(6) { transition-delay: 250ms; }
-.reveal-stagger > .reveal:nth-child(7) { transition-delay: 300ms; }
-.reveal-stagger > .reveal:nth-child(8) { transition-delay: 350ms; }
+.reveal-stagger > .reveal:nth-child(2) { transition-delay: 35ms; }
+.reveal-stagger > .reveal:nth-child(3) { transition-delay: 70ms; }
+.reveal-stagger > .reveal:nth-child(4) { transition-delay: 105ms; }
+.reveal-stagger > .reveal:nth-child(5),
+.reveal-stagger > .reveal:nth-child(6),
+.reveal-stagger > .reveal:nth-child(7),
+.reveal-stagger > .reveal:nth-child(8) { transition-delay: 120ms; }
 
 @media (prefers-reduced-motion: reduce) {
     .reveal {
@@ -6638,6 +6638,59 @@ html {
     font-size: 0.9rem;
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
+}
+
+/* Final CTA belongs to Contact, leaving Footer as a distinct page section. */
+.contact-final-cta {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    margin-top: clamp(3rem, 6vw, 5rem);
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    overflow: hidden;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(125deg, rgba(37, 99, 235, 0.12), rgba(124, 58, 237, 0.08));
+}
+
+.contact-final-cta__glow {
+    position: absolute;
+    inset: auto -8% -90% auto;
+    width: 240px;
+    height: 240px;
+    z-index: -1;
+    border-radius: 50%;
+    background: rgba(124, 58, 237, 0.2);
+    filter: blur(54px);
+    pointer-events: none;
+}
+
+.contact-final-cta h3 {
+    margin: 0.6rem 0 0.45rem;
+    color: var(--text);
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    letter-spacing: -0.02em;
+}
+
+.contact-final-cta p {
+    max-width: 580px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+    .contact-final-cta {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .contact-final-cta .btn {
+        width: 100%;
+    }
 }
 
 /* Light mode */

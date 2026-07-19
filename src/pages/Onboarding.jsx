@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { registerWorkspaceUser, setWorkspaceTheme } from '../utils/workspaceStorage.js';
 
 const TOTAL_STEPS = 5;
 const STEP_LABELS = ['Welcome', 'Company', 'Team', 'Preferences', 'Complete'];
@@ -166,6 +167,20 @@ export default function Onboarding() {
     const t3 = setTimeout(() => setLoadingTasks([2, 2, 2]), 4000);
     const t4 = setTimeout(() => {
       const setupState = stateRef.current;
+      registerWorkspaceUser({
+        email: setupState.workEmail,
+        password: setupState.password,
+        theme: setupState.theme,
+        profile: {
+          fullName: setupState.fullName,
+          companyName: setupState.companyName,
+          industry: setupState.industry,
+          role: setupState.role,
+          teamMembers: setupState.teamMembers,
+          language: setupState.language,
+        },
+      });
+      setWorkspaceTheme(setupState.theme, setupState.workEmail);
       localStorage.setItem('flowsync-team-members', setupState.teamMembers.length + 1);
       localStorage.setItem('flowsync-username', setupState.fullName);
       localStorage.setItem('flowsync-email', setupState.workEmail);

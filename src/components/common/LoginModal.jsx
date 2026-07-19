@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getUser, setActiveEmail } from '../../utils/workspaceStorage.js';
 
 export default function LoginModal({ isOpen, onClose }) {
   const navigate = useNavigate();
@@ -51,10 +52,9 @@ export default function LoginModal({ isOpen, onClose }) {
       return;
     }
 
-    const storedEmail = localStorage.getItem('flowsync-email');
-    const storedPassword = localStorage.getItem('flowsync-password');
+    const account = getUser(emailVal);
 
-    if (!storedEmail || emailVal.toLowerCase() !== storedEmail.toLowerCase()) {
+    if (!account) {
       setError('No account found. Please start your free trial.');
       if (modal) modal.classList.add('shake');
       setLoading(true);
@@ -62,7 +62,7 @@ export default function LoginModal({ isOpen, onClose }) {
       return;
     }
 
-    if (passwordVal !== storedPassword) {
+    if (passwordVal !== account.password) {
       setError('Incorrect password.');
       if (modal) modal.classList.add('shake');
       setLoading(true);
@@ -71,6 +71,7 @@ export default function LoginModal({ isOpen, onClose }) {
     }
 
     setLoading(true);
+    setActiveEmail(account.email);
     localStorage.setItem('isLoggedIn', 'true');
     setTimeout(() => {
       onClose();

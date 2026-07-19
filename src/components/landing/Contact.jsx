@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const MAX_MESSAGE = 1000;
 const MIN_MESSAGE = 10;
@@ -137,7 +138,7 @@ export default function Contact() {
   };
 
   return (
-    <section className="contact-section" id="contact" aria-labelledby="contact-heading">
+    <section className="contact-section reveal" id="contact" aria-labelledby="contact-heading">
       <div className="container">
         <div className="section-header">
           <motion.span className="badge badge-primary" {...fadeUp} transition={{ duration: 0.4 }}>Contact</motion.span>
@@ -268,6 +269,22 @@ export default function Contact() {
             </AnimatePresence>
           </motion.div>
         </div>
+
+        <motion.div
+          className="contact-final-cta"
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="contact-final-cta__glow" aria-hidden="true" />
+          <div>
+            <span className="badge badge-primary">Get Started</span>
+            <h3>Ready to transform your workflow?</h3>
+            <p>Bring projects, people, and automation into one focused workspace.</p>
+          </div>
+          <Link to="/onboarding" className="btn btn-primary btn-lg">Start Free Trial</Link>
+        </motion.div>
       </div>
     </section>
   );

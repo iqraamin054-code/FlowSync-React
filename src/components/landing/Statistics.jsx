@@ -44,7 +44,7 @@ export default function Statistics() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.01, rootMargin: '0px 0px 140px 0px' }
     );
     observer.observe(grid);
 

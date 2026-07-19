@@ -398,8 +398,8 @@ export default function Solution({ activeState: propState = 'default' }) {
                     </div>
                   </div>
 
-                  <div className="dash-stats-container">
-                    {dashboardStates.map((state) => (
+                  <div className={`dash-stats-container${animating ? ' is-changing' : ''}`}>
+                    {dashboardStates.filter((state) => state === activeState).map((state) => (
                       <div key={state} className={`dash-stats dash-stats-${state}`} style={{ pointerEvents: state === activeState ? 'auto' : 'none' }}>
                         {statData[state].map((stat) => (
                           <StatCard key={`${state}-${stat.label}`} stat={stat} animating={state === activeState && animating} />
@@ -408,9 +408,9 @@ export default function Solution({ activeState: propState = 'default' }) {
                     ))}
                   </div>
 
-                  <div className="dash-panels-container">
-                    {dashboardStates.map((state) => (
-                      <div key={state} className={`dash-chart-panel dash-panel-${state}`} style={{ pointerEvents: state === activeState ? 'auto' : 'none' }}>
+                  <div className={`dash-panels-container${animating ? ' is-changing' : ''}`}>
+                    {dashboardStates.filter((state) => state === activeState).map((state) => (
+                      <div key={state} className={`dash-chart-panel dash-panel-${state}${animating ? ' is-changing' : ''}`} style={{ pointerEvents: state === activeState ? 'auto' : 'none' }}>
                         <ChartPanel state={state} />
                         <ActivityPanel state={state} />
                       </div>
@@ -437,7 +437,7 @@ export default function Solution({ activeState: propState = 'default' }) {
             <span className="badge badge-primary section-badge">THE SOLUTION</span>
             <h2 className="section-title">One platform. Zero compromises.</h2>
             <p className="section-desc" style={{ maxWidth: '100%' }}>
-              FlowSync replaces 6+ tools with a single, unified workspace. No more switching between apps. No more data scattered across spreadsheets. No more guessing what your team is working on.
+              Turn goals and natural-language instructions into structured workflows, actionable tasks, and clear progress. FlowSync replaces scattered tools with one unified workspace, so every team knows what to do next.
             </p>
             <ul className="solution-features" ref={featuresRef}>
               {solutionFeatures.map((item, i) => (

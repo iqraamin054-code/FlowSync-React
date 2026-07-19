@@ -114,7 +114,7 @@ export default function PricingCalculator() {
   const animatedSavings = useCountUp(Math.round(savings), 400);
 
   return (
-    <section className="calculator-section" id="calculator" aria-labelledby="calc-heading">
+    <section className="calculator-section reveal" id="calculator" aria-labelledby="calc-heading">
       <div className="container">
         <div className="section-header">
           <motion.span

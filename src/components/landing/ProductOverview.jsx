@@ -200,9 +200,11 @@ export default function ProductOverview({ prefersReduced }) {
 
   const handleMouseLeave = useCallback(() => setTilt({ x: 0, y: 0 }), []);
 
-  const revenue = useCountUp(54200, 1.8, 0.7);
-  const users = useCountUp(12430, 1.6, 0.9);
-  const growth = useCountUp(18, 1.4, 1.1);
+  // Begin just after the short app intro starts fading, so the values feel
+  // live when the prepared landing page becomes visible.
+  const revenue = useCountUp(54200, 1.35, 0.78);
+  const users = useCountUp(12430, 1.25, 0.9);
+  const growth = useCountUp(18, 1.1, 1.02);
 
   const kpiValues = [
     { formatted: `$${revenue}` },

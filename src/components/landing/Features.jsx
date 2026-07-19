@@ -69,7 +69,7 @@ export default function Features() {
   };
 
   return (
-    <section className="features-section" id="features" aria-labelledby="features-heading">
+    <section className="features-section reveal" id="features" aria-labelledby="features-heading">
       <div className="features-bg-glow" />
       <div className="features-bg-grid" />
       <div className="features-particle features-particle-1" />

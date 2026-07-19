@@ -3754,6 +3754,20 @@
   visibility: visible;
 }
 
+/* The interactive Solution preview keeps only the selected state mounted.
+   These selectors intentionally come after the base preview rules so the
+   active KPI and chart panels remain visible for every hover state. */
+.solution-dash-wrapper[data-dash-state="workspaces"] .dash-stats-workspaces,
+.solution-dash-wrapper[data-dash-state="workspaces"] .dash-panel-workspaces,
+.solution-dash-wrapper[data-dash-state="automation"] .dash-stats-automation,
+.solution-dash-wrapper[data-dash-state="automation"] .dash-panel-automation,
+.solution-dash-wrapper[data-dash-state="analytics"] .dash-stats-analytics,
+.solution-dash-wrapper[data-dash-state="analytics"] .dash-panel-analytics {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
 .solution-dash .dash-chart-panel {
   display: flex;
   flex-direction: row;
@@ -3826,6 +3840,18 @@
   stroke-dasharray: 400;
   stroke-dashoffset: 400;
   animation: draw-line 1.2s ease-out 0.4s forwards;
+}
+
+.solution-dash .dash-chart-panel.is-changing .chart-line {
+  animation: draw-line 0.75s ease-out forwards;
+}
+
+.solution-dash .dash-chart-panel.is-changing .chart-fill-glow {
+  animation: glow-in 0.55s ease-out forwards;
+}
+
+.solution-dash .dash-chart-panel.is-changing .chart-end-dot {
+  animation: dot-appear 0.25s ease-out 0.5s forwards;
 }
 
 .solution-dash .chart-fill-glow {

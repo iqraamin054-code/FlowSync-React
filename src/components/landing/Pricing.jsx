@@ -35,7 +35,7 @@ export default function Pricing() {
   };
 
   return (
-    <section className="pricing-section" id="pricing">
+    <section className="pricing-section reveal" id="pricing">
       <div className="container">
         <div className="section-header">
           <span className="pricing-section-badge">Pricing</span>

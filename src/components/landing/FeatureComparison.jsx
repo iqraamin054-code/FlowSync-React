@@ -126,7 +126,7 @@ const tableVariants = {
 
 export default function FeatureComparison() {
   return (
-    <section className="cmp-section" id="compare">
+    <section className="cmp-section reveal" id="compare">
       <div className="cmp-inner">
         <motion.div
           className="cmp-header"

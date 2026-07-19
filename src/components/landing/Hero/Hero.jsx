@@ -42,7 +42,7 @@ const Hero = () => {
   const handleGetStarted = () => navigate('/onboarding');
   const handleLiveDemo = (e) => {
     e.preventDefault();
-    const target = document.getElementById('product-showcase') || document.getElementById('features');
+    const target = document.getElementById('solution') || document.getElementById('features');
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
