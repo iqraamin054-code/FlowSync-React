@@ -602,3 +602,14 @@ img {
 .max-w-lg {
     max-width: 800px;
 }
+
+/* Ensure dropdown options are readable in both dark and light themes */
+select option {
+    background-color: #0b1220 !important;
+    color: #ffffff !important;
+}
+
+[data-theme="light"] select option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}

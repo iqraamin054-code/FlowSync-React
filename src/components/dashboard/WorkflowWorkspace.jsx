@@ -22,6 +22,8 @@ export default function WorkflowWorkspace() {
   const [goal, setGoal] = useState('');
   const [targetDate, setTargetDate] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState(null);
+  
   const [expandedPhases, setExpandedPhases] = useState({
     Planning: true,
     Design: true,
@@ -58,10 +60,11 @@ export default function WorkflowWorkspace() {
     }));
   };
 
-  if (!project) {
+  // If there is no active project OR the user clicked "+ New Project"
+  if (!project || showCreateForm) {
     return (
       <section className="workflow-empty" aria-labelledby="workflow-title">
-        {!showCreateForm ? (
+        {!project && !showCreateForm ? (
           <div className="workflow-empty__intro">
             <span className="workflow-kicker">Start your journey</span>
             <h1 id="workflow-title">Ready to turn an idea into a plan?</h1>
@@ -159,18 +162,14 @@ export default function WorkflowWorkspace() {
             </span>
           )}
         </div>
-        <div className="workflow-header-actions">
+        <div className="workflow-header-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <button type="button" className="workflow-secondary ripple" onClick={() => setShowCreateForm(true)}>
             + New Project
           </button>
           <button 
             type="button" 
             className="workflow-danger-btn ripple" 
-            onClick={() => {
-              if (confirm('Are you sure you want to delete this project?')) {
-                deleteProject(project.id);
-              }
-            }}
+            onClick={() => setProjectToDelete(project)}
             title="Delete active project"
           >
             Delete Project
@@ -221,69 +220,153 @@ export default function WorkflowWorkspace() {
 
               {isExpanded && (
                 <div className="workflow-task-list">
-                  {phaseTasks.map((item) => (
-                    <article className={`workflow-task workflow-task--${item.status}`} key={item.id}>
-                      <div className="workflow-task__topline">
-                        <div className="task-status-selector">
-                          <select 
-                            value={item.status} 
-                            onChange={(event) => updateTask(item.id, { status: event.target.value })} 
-                            aria-label={`Status for ${item.title}`}
-                          >
-                            {STATUS_OPTIONS.map((option) => (
-                              <option key={option.value} value={option.value}>{option.label}</option>
-                            ))}
-                          </select>
+                  {phaseTasks.map((item) => {
+                    const isDone = item.status === 'done';
+                    return (
+                      <article className={`workflow-task workflow-task--${item.status}`} key={item.id}>
+                        <div className="workflow-task__topline">
+                          <div className="task-status-selector">
+                            <select 
+                              value={item.status} 
+                              onChange={(event) => updateTask(item.id, { status: event.target.value })} 
+                              aria-label={`Status for ${item.title}`}
+                            >
+                              {STATUS_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>{option.label}</option>
+                              ))}
+                            </select>
+                          </div>
+                          <span className={`workflow-priority workflow-priority--${item.priority}`}>
+                            {item.priority}
+                          </span>
+                          <span className="workflow-timeline">{item.timeline}</span>
                         </div>
-                        <span className={`workflow-priority workflow-priority--${item.priority}`}>
-                          {item.priority}
-                        </span>
-                        <span className="workflow-timeline">{item.timeline}</span>
-                      </div>
-                      
-                      <input 
-                        className="workflow-task__title" 
-                        value={item.title} 
-                        onChange={(event) => updateTask(item.id, { title: event.target.value })} 
-                        aria-label="Task title" 
-                      />
-                      
-                      <textarea 
-                        className="workflow-task__description" 
-                        value={item.description} 
-                        onChange={(event) => updateTask(item.id, { description: event.target.value })} 
-                        rows="2" 
-                        aria-label={`Description for ${item.title}`} 
-                      />
-                      
-                      <div className="workflow-task__details">
-                        <label>
-                          Priority
-                          <select 
-                            value={item.priority} 
-                            onChange={(event) => updateTask(item.id, { priority: event.target.value })}
+                        
+                        {/* Circular Checkbox Row to quick-tick complete/incomplete */}
+                        <div className="workflow-task__main-row" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem' }}>
+                          <button
+                            type="button"
+                            className={`task-tick-btn ${isDone ? 'is-done' : ''}`}
+                            onClick={() => updateTask(item.id, { status: isDone ? 'todo' : 'done' })}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '22px',
+                              height: '22px',
+                              borderRadius: '50%',
+                              border: isDone ? '2px solid #10B981' : '2px solid rgba(255,255,255,0.2)',
+                              background: isDone ? '#10B981' : 'transparent',
+                              color: 'white',
+                              cursor: 'pointer',
+                              flexShrink: 0,
+                              transition: 'all 0.2s ease',
+                              padding: 0
+                            }}
+                            title={isDone ? 'Mark as Incomplete' : 'Mark as Complete'}
                           >
-                            {PRIORITY_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            ))}
-                          </select>
-                        </label>
-                        <label>
-                          Timeline / Day
+                            {isDone && (
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                              </svg>
+                            )}
+                          </button>
+
                           <input 
-                            value={item.timeline} 
-                            onChange={(event) => updateTask(item.id, { timeline: event.target.value })} 
+                            className="workflow-task__title" 
+                            value={item.title} 
+                            onChange={(event) => updateTask(item.id, { title: event.target.value })} 
+                            aria-label="Task title"
+                            style={{
+                              marginTop: 0,
+                              textDecoration: isDone ? 'line-through' : 'none',
+                              opacity: isDone ? 0.6 : 1,
+                              flexGrow: 1
+                            }}
                           />
-                        </label>
-                      </div>
-                    </article>
-                  ))}
+                        </div>
+                        
+                        <textarea 
+                          className="workflow-task__description" 
+                          value={item.description} 
+                          onChange={(event) => updateTask(item.id, { description: event.target.value })} 
+                          rows="2" 
+                          aria-label={`Description for ${item.title}`} 
+                          style={{
+                            opacity: isDone ? 0.6 : 1
+                          }}
+                        />
+                        
+                        <div className="workflow-task__details">
+                          <label>
+                            Priority
+                            <select 
+                              value={item.priority} 
+                              onChange={(event) => updateTask(item.id, { priority: event.target.value })}
+                            >
+                              {PRIORITY_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            Timeline / Day
+                            <input 
+                              value={item.timeline} 
+                              onChange={(event) => updateTask(item.id, { timeline: event.target.value })} 
+                            />
+                          </label>
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </div>
           );
         })}
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      {projectToDelete && (
+        <div className="pd-overlay is-open" onClick={() => setProjectToDelete(null)} style={{ zIndex: 9999 }}>
+          <div className="pd-modal" role="dialog" onClick={e => e.stopPropagation()}>
+            <div className="pd-modal-header">
+              <span className="pd-modal-title">Delete Project?</span>
+              <button className="pd-modal-close" onClick={() => setProjectToDelete(null)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className="pd-confirm" style={{ padding: '1rem 0' }}>
+              <div className="pd-confirm-icon" style={{ borderColor: '#EF4444', color: '#EF4444' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                  <line x1="10" y1="11" x2="10" y2="17"/>
+                  <line x1="14" y1="11" x2="14" y2="17"/>
+                </svg>
+              </div>
+              <div className="pd-confirm-title" style={{ color: 'var(--text-primary)' }}>Are you sure?</div>
+              <p className="pd-confirm-msg" style={{ color: 'var(--text-secondary)' }}>
+                This will permanently delete the project "{projectToDelete.name}" and all of its tasks. This cannot be undone.
+              </p>
+              <div className="pd-confirm-actions">
+                <button className="pd-confirm-cancel" onClick={() => setProjectToDelete(null)}>Cancel</button>
+                <button 
+                  className="pd-confirm-logout" 
+                  style={{ backgroundColor: '#EF4444', borderColor: '#EF4444', color: 'white' }} 
+                  onClick={() => {
+                    deleteProject(projectToDelete.id);
+                    setProjectToDelete(null);
+                  }}
+                >
+                  Delete Project
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
