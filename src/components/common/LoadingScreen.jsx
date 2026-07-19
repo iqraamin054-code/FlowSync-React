@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import './LoadingScreen.css';
 
-const LOADER_DURATION = 600;
-const FADE_DURATION = 220;
+const LOADER_DURATION = 620;
+const FADE_DURATION = 200;
 
 export default function LoadingScreen({ onComplete }) {
   const [progress, setProgress] = useState(0);

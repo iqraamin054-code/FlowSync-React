@@ -31,30 +31,30 @@
 }
 
 .abg-ambient--blue {
-    width: 120vw;
-    height: 120vh;
-    top: -30%;
-    left: -20%;
+    width: min(42vw, 520px);
+    height: min(42vw, 520px);
+    top: -10%;
+    left: -8%;
     background: radial-gradient(ellipse at center,
-        rgba(37, 99, 235, 0.12) 0%,
-        rgba(37, 99, 235, 0.05) 35%,
+        rgba(37, 99, 235, 0.07) 0%,
+        rgba(37, 99, 235, 0.025) 35%,
         transparent 70%
     );
-    filter: blur(100px);
+    filter: blur(80px);
     animation: abg-breathe-blue 28s ease-in-out infinite alternate;
 }
 
 .abg-ambient--purple {
-    width: 100vw;
-    height: 100vh;
-    bottom: -25%;
-    right: -15%;
+    width: min(36vw, 460px);
+    height: min(36vw, 460px);
+    bottom: -10%;
+    right: -6%;
     background: radial-gradient(ellipse at center,
-        rgba(124, 58, 237, 0.10) 0%,
-        rgba(124, 58, 237, 0.04) 35%,
+        rgba(124, 58, 237, 0.06) 0%,
+        rgba(124, 58, 237, 0.02) 35%,
         transparent 70%
     );
-    filter: blur(100px);
+    filter: blur(80px);
     animation: abg-breathe-purple 34s ease-in-out infinite alternate;
 }
 
@@ -79,9 +79,9 @@
     position: fixed;
     inset: 0;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    background-size: 72px 72px;
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 80px 80px;
     background-position: center;
 }
 

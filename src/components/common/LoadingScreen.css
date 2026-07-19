@@ -6,7 +6,36 @@
     align-items: center;
     justify-content: center;
     background: #060B16;
+    overflow: hidden;
     transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.ls-root::before,
+.ls-root::after {
+    content: '';
+    position: absolute;
+    width: 28vw;
+    height: 28vw;
+    max-width: 360px;
+    max-height: 360px;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.16;
+    pointer-events: none;
+}
+
+.ls-root::before {
+    top: 18%;
+    left: 26%;
+    background: #2563EB;
+    animation: ls-ambient-blue 4s ease-in-out infinite alternate;
+}
+
+.ls-root::after {
+    right: 24%;
+    bottom: 16%;
+    background: #7C3AED;
+    animation: ls-ambient-purple 4.5s ease-in-out infinite alternate;
 }
 
 .ls-root.ls-fade-out {
@@ -16,10 +45,12 @@
 }
 
 .ls-content {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
+    gap: clamp(0.9rem, 2vw, 1.5rem);
 }
 
 .ls-logo-pulse {
@@ -32,7 +63,9 @@
 .ls-logo {
     position: relative;
     z-index: 2;
-    animation: ls-logoBreathe 2s ease-in-out infinite;
+    animation: ls-logoBreathe 2.8s ease-in-out infinite;
+    width: clamp(72px, 9vw, 112px);
+    height: clamp(72px, 9vw, 112px);
 }
 
 @keyframes ls-logoBreathe {
@@ -42,8 +75,8 @@
 
 .ls-pulse-ring {
     position: absolute;
-    width: 64px;
-    height: 64px;
+    width: clamp(92px, 11vw, 132px);
+    height: clamp(92px, 11vw, 132px);
     border-radius: 50%;
     border: 1px solid rgba(37, 99, 235, 0.25);
     animation: ls-pulseExpand 2s ease-out infinite;
@@ -67,18 +100,35 @@
 
 .ls-brand {
     font-family: 'Outfit', sans-serif;
-    font-size: 1.25rem;
+    font-size: clamp(2.25rem, 5vw, 4rem);
     font-weight: 700;
     letter-spacing: -0.01em;
     color: #fff;
+    animation: ls-wordmark-in 0.7s ease-out both;
 }
 
 .ls-status {
     font-family: 'Inter', sans-serif;
-    font-size: 0.8rem;
+    font-size: clamp(0.75rem, 1.3vw, 0.95rem);
     font-weight: 400;
     color: rgba(255, 255, 255, 0.4);
     letter-spacing: 0.02em;
+    animation: ls-wordmark-in 0.7s ease-out 0.08s both;
+}
+
+@keyframes ls-wordmark-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ls-ambient-blue {
+    from { transform: translate(-12px, 8px) scale(0.96); opacity: 0.12; }
+    to { transform: translate(12px, -8px) scale(1.04); opacity: 0.18; }
+}
+
+@keyframes ls-ambient-purple {
+    from { transform: translate(10px, -8px) scale(1.02); opacity: 0.12; }
+    to { transform: translate(-10px, 8px) scale(0.96); opacity: 0.18; }
 }
 
 .ls-progress-track {
