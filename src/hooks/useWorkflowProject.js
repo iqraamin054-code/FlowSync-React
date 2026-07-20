@@ -3,7 +3,15 @@ import { createProject } from '../utils/workflowGenerator.js';
 import { getActiveEmail, getWorkspace, saveWorkspace } from '../utils/workspaceStorage.js';
 
 export default function useWorkflowProject() {
-  const [workspace, setWorkspace] = useState(() => getWorkspace());
+  const [workspace, setWorkspace] = useState(() => {
+    const ws = getWorkspace();
+    if (ws.activeProjectId) {
+      const cleared = { ...ws, activeProjectId: null };
+      saveWorkspace(getActiveEmail(), cleared);
+      return cleared;
+    }
+    return ws;
+  });
   const userEmail = getActiveEmail();
   const activeProject = workspace.projects.find((p) => p.id === workspace.activeProjectId) || null;
 

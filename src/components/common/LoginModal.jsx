@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUser, setActiveEmail } from '../../utils/workspaceStorage.js';
+import { getUser, setActiveEmail, getWorkspace, saveWorkspace } from '../../utils/workspaceStorage.js';
 
 export default function LoginModal({ isOpen, onClose }) {
   const navigate = useNavigate();
@@ -73,6 +73,18 @@ export default function LoginModal({ isOpen, onClose }) {
     setLoading(true);
     setActiveEmail(account.email);
     localStorage.setItem('isLoggedIn', 'true');
+    // Start at the project-selection screen, not inside a previous project
+    const ws = getWorkspace(account.email);
+    if (ws.activeProjectId) {
+      ws.activeProjectId = null;
+      saveWorkspace(account.email, ws);
+    }
+    // Restore this user's saved theme and language preferences
+    const savedTheme = ws.theme || 'dark';
+    const savedLang = (ws.profile && ws.profile.language) || 'en';
+    localStorage.setItem('flowsync-theme', savedTheme === 'light' ? 'light' : '');
+    localStorage.setItem('flowsync-language', savedLang);
+    document.documentElement.setAttribute('data-theme', savedTheme === 'light' ? 'light' : '');
     setTimeout(() => {
       onClose();
       navigate('/dashboard');

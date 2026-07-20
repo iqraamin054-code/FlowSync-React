@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useScrollReveal from '../hooks/useScrollReveal.js';
@@ -6,18 +6,7 @@ import WorkflowWorkspace from '../components/dashboard/WorkflowWorkspace.jsx';
 import useWorkflowProject from '../hooks/useWorkflowProject.js';
 import { getProjectProgress } from '../utils/workflowGenerator.js';
 import { getActiveEmail, getUser, getWorkspace, setWorkspaceTheme, updateWorkspaceProfile } from '../utils/workspaceStorage.js';
-
-const TRANSLATIONS = {
-  en: { dashboard:'Dashboard',analytics:'Analytics',projects:'Projects',team:'Team',messages:'Messages',settings:'Settings',active:'active',activeUsers:'Active Users',monthlyRevenue:'Monthly Revenue',conversionRate:'Conversion Rate',growth:'Growth',growthTrends:'Phase Completion Progress',projectStatus:'Project Status',ongoingCount:'ongoing projects',activityFeed:'Team Activity Feed',global:'Global',act1:'completed UK Sync',act2:'pushed code to main now',act3:'created report' },
-  de: { dashboard:'Übersicht',analytics:'Analysen',projects:'Projekte',team:'Team',messages:'Nachrichten',settings:'Einstellungen',active:'aktiv',activeUsers:'Aktive Benutzer',monthlyRevenue:'Monatlicher Umsatz',conversionRate:'Konversionsrate',growth:'Wachstum',growthTrends:'Phasenfortschritt',projectStatus:'Projektstatus',ongoingCount:'laufende Projekte',activityFeed:'Aktivitäts-Feed',global:'Global',act1:'hat UK-Sync abgeschlossen',act2:'hat Code in Main gepusht',act3:'hat Bericht erstellt' },
-  fr: { dashboard:'Tableau de Bord',analytics:'Analyses',projects:'Projets',team:'Équipe',messages:'Messages',settings:'Paramètres',active:'actif',activeUsers:'Utilisateurs Actifs',monthlyRevenue:'Revenu Mensuel',conversionRate:'Taux de Conversion',growth:'Croissance',growthTrends:'Progrès des Phases',projectStatus:'Statut des Projets',ongoingCount:'projets en cours',activityFeed:"Flux d'Activité",global:'Global',act1:'a terminé la synchro UK',act2:'a déployé le code sur main',act3:'a créé un rapport' },
-  es: { dashboard:'Tablero',analytics:'Analítica',projects:'Proyectos',team:'Equipo',messages:'Mensajes',settings:'Ajustes',active:'activo',activeUsers:'Usuarios Activos',monthlyRevenue:'Ingresos Mensuales',conversionRate:'Tasa de Conversión',growth:'Crecimiento',growthTrends:'Progreso de Fases',projectStatus:'Estado de Proyectos',ongoingCount:'proyectos en curso',activityFeed:'Feed de Actividad',global:'Global',act1:'completó la sincronización UK',act2:'subió código a main ahora',act3:'creó un reporte' },
-  ja: { dashboard:'ダッシュボード',analytics:'分析',projects:'プロジェクト',team:'チーム',messages:'メッセージ',settings:'設定',active:'アクティブ',activeUsers:'アクティブユーザー',monthlyRevenue:'月次収益',conversionRate:'コンバージョン率',growth:'成長率',growthTrends:'フェーズの進行状況',projectStatus:'プロジェクト状況',ongoingCount:'進行中プロジェクト',activityFeed:'チーム活動フィード',global:'グローバル',act1:'がUK同期を完了しました',act2:'がコードをメインに反映しました',act3:'がレポートを作成しました' },
-  zh: { dashboard:'仪表板',analytics:'数据分析',projects:'项目',team:'团队',messages:'消息',settings:'设置',active:'在线',activeUsers:'活跃用户',monthlyRevenue:'月收入',conversionRate:'转化率',growth:'增长率',growthTrends:'阶段完成度',projectStatus:'项目状态',ongoingCount:'进行中的项目',activityFeed:'团队动态列表',global:'全局',act1:'完成了英国节点同步',act2:'刚刚推送代码到主分支',act3:'创建了新报告' },
-  ar: { dashboard:'لوحة التحكم',analytics:'التحليلات',projects:'المشاريع',team:'الفريق',messages:'الرسائل',settings:'الإعدادات',active:'نشط',activeUsers:'المستخدمين النشطين',monthlyRevenue:'الإيرادات الشهرية',conversionRate:'معدل التحويل',growth:'النمو',growthTrends:'تقدم مراحل المشروع',projectStatus:'حالة المشاريع',ongoingCount:'مشاريع مستمرة',activityFeed:'آخر نشاط للفريق',global:'عالمي',act1:'أكمل مزامنة المملكة المتحدة',act2:'قام برفع الكود إلى الفرع الرئيسي',act3:'أنشأ تقريرًا جديدًا' },
-  ur: { dashboard:'ڈیش بورڈ',analytics:'تجزیات',projects:'پروجیکٹس',team:'ٹیم',messages:'پیغامات',settings:'ترتیبات',active:'آن لائن',activeUsers:'فعال صارفین',monthlyRevenue:'ماہانہ آمدنی',conversionRate:'کنورژن ریٹ',growth:'ترقی',growthTrends:'مراحل کی تکمیل',projectStatus:'منصوبوں کی صورتحال',ongoingCount:'جاری منصوبے',activityFeed:'ٹیم کی سرگرمیاں',global:'عالمی',act1:'نے یوکے سنک مکمل کر لیا',act2:'نے کوڈ مین برانچ میں پش کر دیا',act3:'نے نئی رپورٹ تیار کی' },
-  'en-gb': { dashboard:'Dashboard',analytics:'Analytics',projects:'Projects',team:'Team',messages:'Messages',settings:'Settings',active:'active',activeUsers:'Active Users',monthlyRevenue:'Monthly Revenue',conversionRate:'Conversion Rate',growth:'Growth',growthTrends:'Phase Completion Progress',projectStatus:'Project Status',ongoingCount:'ongoing projects',activityFeed:'Team Activity Feed',global:'Global',act1:'completed UK Sync',act2:'pushed code to main now',act3:'created report' },
-};
+import { TRANSLATIONS } from '../data/translations.js';
 
 const ACCENT_MAP = {
   blue:{primary:'#2563EB',hover:'#1D4ED8',glow:'rgba(37,99,235,0.15)',rgb:'37,99,235'},
@@ -40,24 +29,141 @@ function getInitials(name) {
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  useScrollReveal();
-  const { project, projects, selectProject, deleteProject } = useWorkflowProject();
+  const fmtDate = (dateStr) => { const d = new Date(dateStr); return `${String(d.getDate()).padStart(2, '0')} / ${String(d.getMonth() + 1).padStart(2, '0')} / ${d.getFullYear()}`; };
+  const { project, projects, selectProject, startProject, updateTask, deleteProject } = useWorkflowProject();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pdOpen, setPdOpen] = useState(false);
-  const [theme, setTheme] = useState('dark');
-  const [lang, setLang] = useState('en');
-  const [accent, setAccent] = useState('blue');
-  const [username, setUsername] = useState('Alex R.');
-  const [company, setCompany] = useState('Synergy Analytics');
-  const [email, setEmail] = useState('alex@example.com');
-  const [members, setMembers] = useState(1);
+  const [theme, setTheme] = useState(() => {
+    try {
+      const activeEmail = localStorage.getItem('flowsync-active-email') || localStorage.getItem('flowsync-email') || '';
+      if (activeEmail) {
+        const workspaceKey = `flowsync-workspace:${encodeURIComponent(activeEmail.trim().toLowerCase())}`;
+        const wsStr = localStorage.getItem(workspaceKey);
+        if (wsStr) {
+          const ws = JSON.parse(wsStr);
+          if (ws && ws.theme) return ws.theme;
+        }
+      }
+    } catch (e) {}
+    return localStorage.getItem('flowsync-theme') === 'light' ? 'light' : 'dark';
+  });
+  const [lang, setLang] = useState(() => {
+    try {
+      const activeEmail = localStorage.getItem('flowsync-active-email') || localStorage.getItem('flowsync-email') || '';
+      if (activeEmail) {
+        const workspaceKey = `flowsync-workspace:${encodeURIComponent(activeEmail.trim().toLowerCase())}`;
+        const wsStr = localStorage.getItem(workspaceKey);
+        if (wsStr) {
+          const ws = JSON.parse(wsStr);
+          if (ws && ws.profile && ws.profile.language) return ws.profile.language;
+        }
+        const usersStr = localStorage.getItem('flowsync-users');
+        if (usersStr) {
+          const users = JSON.parse(usersStr);
+          const user = users[activeEmail.trim().toLowerCase()];
+          if (user && user.profile && user.profile.language) return user.profile.language;
+        }
+      }
+    } catch (e) {}
+    return localStorage.getItem('flowsync-language') || 'en';
+  });
+  const [accent, setAccent] = useState(() => {
+    return localStorage.getItem('flowsync-accent') || 'blue';
+  });
+  const [username, setUsername] = useState(() => {
+    try {
+      const activeEmail = localStorage.getItem('flowsync-active-email') || localStorage.getItem('flowsync-email') || '';
+      if (activeEmail) {
+        const workspaceKey = `flowsync-workspace:${encodeURIComponent(activeEmail.trim().toLowerCase())}`;
+        const wsStr = localStorage.getItem(workspaceKey);
+        if (wsStr) {
+          const ws = JSON.parse(wsStr);
+          if (ws && ws.profile && ws.profile.fullName) return ws.profile.fullName;
+        }
+        const usersStr = localStorage.getItem('flowsync-users');
+        if (usersStr) {
+          const users = JSON.parse(usersStr);
+          const user = users[activeEmail.trim().toLowerCase()];
+          if (user && user.profile && user.profile.fullName) return user.profile.fullName;
+        }
+      }
+    } catch (e) {}
+    return localStorage.getItem('flowsync-username') || 'Alex R.';
+  });
+  const [company, setCompany] = useState(() => {
+    try {
+      const activeEmail = localStorage.getItem('flowsync-active-email') || localStorage.getItem('flowsync-email') || '';
+      if (activeEmail) {
+        const workspaceKey = `flowsync-workspace:${encodeURIComponent(activeEmail.trim().toLowerCase())}`;
+        const wsStr = localStorage.getItem(workspaceKey);
+        if (wsStr) {
+          const ws = JSON.parse(wsStr);
+          if (ws && ws.profile && ws.profile.companyName) return ws.profile.companyName;
+        }
+        const usersStr = localStorage.getItem('flowsync-users');
+        if (usersStr) {
+          const users = JSON.parse(usersStr);
+          const user = users[activeEmail.trim().toLowerCase()];
+          if (user && user.profile && user.profile.companyName) return user.profile.companyName;
+        }
+      }
+    } catch (e) {}
+    return localStorage.getItem('flowsync-company') || 'My Workspace';
+  });
+  const [email, setEmail] = useState(() => {
+    return localStorage.getItem('flowsync-active-email') || localStorage.getItem('flowsync-email') || 'alex@example.com';
+  });
+  const [members, setMembers] = useState(() => {
+    try {
+      const activeEmail = localStorage.getItem('flowsync-active-email') || localStorage.getItem('flowsync-email') || '';
+      if (activeEmail) {
+        const workspaceKey = `flowsync-workspace:${encodeURIComponent(activeEmail.trim().toLowerCase())}`;
+        const wsStr = localStorage.getItem(workspaceKey);
+        if (wsStr) {
+          const ws = JSON.parse(wsStr);
+          if (ws && ws.profile && Array.isArray(ws.profile.teamMembers)) {
+            return ws.profile.teamMembers.length + 1;
+          }
+        }
+      }
+    } catch (e) {}
+    const stored = parseInt(localStorage.getItem('flowsync-team-members'), 10);
+    return Number.isNaN(stored) || stored < 1 ? 1 : stored;
+  });
   const [activeNav, setActiveNav] = useState('dashboard');
+  useScrollReveal(activeNav);
   const [modal, setModal] = useState(null);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(true);
-  const [industry, setIndustry] = useState('Technology');
-  const [role, setRole] = useState('Team Lead');
+  const [industry, setIndustry] = useState(() => {
+    try {
+      const activeEmail = localStorage.getItem('flowsync-active-email') || localStorage.getItem('flowsync-email') || '';
+      if (activeEmail) {
+        const workspaceKey = `flowsync-workspace:${encodeURIComponent(activeEmail.trim().toLowerCase())}`;
+        const wsStr = localStorage.getItem(workspaceKey);
+        if (wsStr) {
+          const ws = JSON.parse(wsStr);
+          if (ws && ws.profile && ws.profile.industry) return ws.profile.industry;
+        }
+      }
+    } catch (e) {}
+    return localStorage.getItem('flowsync-industry') || 'Technology';
+  });
+  const [role, setRole] = useState(() => {
+    try {
+      const activeEmail = localStorage.getItem('flowsync-active-email') || localStorage.getItem('flowsync-email') || '';
+      if (activeEmail) {
+        const workspaceKey = `flowsync-workspace:${encodeURIComponent(activeEmail.trim().toLowerCase())}`;
+        const wsStr = localStorage.getItem(workspaceKey);
+        if (wsStr) {
+          const ws = JSON.parse(wsStr);
+          if (ws && ws.profile && ws.profile.role) return ws.profile.role;
+        }
+      }
+    } catch (e) {}
+    return localStorage.getItem('flowsync-role') || 'Team Lead';
+  });
   
   // Custom states for Team Tab
   const [teamList, setTeamList] = useState([]);
@@ -66,6 +172,7 @@ export default function Dashboard() {
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [newProjectRequest, setNewProjectRequest] = useState(0);
+  const [creatingNew, setCreatingNew] = useState(false);
 
   const pdRef = useRef(null);
 
@@ -77,7 +184,9 @@ export default function Dashboard() {
     const profile = account?.profile || workspace.profile || {};
     const t = workspace.theme === 'light' ? 'light' : '';
     const a = localStorage.getItem('flowsync-accent') || 'blue';
-    const l = localStorage.getItem('flowsync-language') || 'en';
+    // Language: workspace profile is authoritative; localStorage is a fast-access cache
+    const l = profile.language || localStorage.getItem('flowsync-language') || 'en';
+    localStorage.setItem('flowsync-language', l);
     const u = profile.fullName || localStorage.getItem('flowsync-username') || 'Alex R.';
     const c = profile.companyName || localStorage.getItem('flowsync-company') || 'My Workspace';
     const e = activeEmail || 'alex@example.com';
@@ -121,7 +230,19 @@ export default function Dashboard() {
     setWorkspaceTheme(next, getActiveEmail());
   };
 
-  const t = (key) => (TRANSLATIONS[lang] || TRANSLATIONS.en)[key] || key;
+  const t = (key, interpolations = {}) => {
+    let text = (TRANSLATIONS[lang] || TRANSLATIONS.en)[key] || key;
+    Object.entries(interpolations).forEach(([k, v]) => {
+      text = text.split('{' + k + '}').join(v);
+    });
+    return text;
+  };
+
+  const updateLanguage = (newLang) => {
+    setLang(newLang);
+    localStorage.setItem('flowsync-language', newLang);
+    updateWorkspaceProfile({ language: newLang }, getActiveEmail());
+  };
   const searchResults = searchQuery.trim() ? projects.flatMap((item) => {
     const query = searchQuery.trim().toLowerCase();
     const matchesProject = item.name.toLowerCase().includes(query) || item.goal.toLowerCase().includes(query);
@@ -255,7 +376,12 @@ export default function Dashboard() {
   }, [project, activeNav]);
 
   const logout = () => {
-    ['isLoggedIn','flowsync-active-email','flowsync-username','flowsync-email','flowsync-company','flowsync-industry','flowsync-role','flowsync-team-members','flowsync-notif'].forEach(k => localStorage.removeItem(k));
+    ['isLoggedIn','flowsync-active-email','flowsync-username','flowsync-email','flowsync-company','flowsync-industry','flowsync-role','flowsync-team-members','flowsync-notif','flowsync-theme','flowsync-language','flowsync-accent'].forEach(k => localStorage.removeItem(k));
+    document.documentElement.removeAttribute('data-theme');
+    document.documentElement.style.removeProperty('--color-primary');
+    document.documentElement.style.removeProperty('--color-primary-hover');
+    document.documentElement.style.removeProperty('--shadow-glow-primary');
+    document.documentElement.style.removeProperty('--color-primary-rgb');
     navigate('/');
   };
 
@@ -478,6 +604,15 @@ export default function Dashboard() {
             <button className="hamburger-btn" aria-label="Open sidebar" aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(true)}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
+            <Link to="/" className="db-header-logo" aria-label="FlowSync Home">
+              <svg width="20" height="20" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                <rect x="2" y="2" width="24" height="24" rx="6" fill="url(#hdrLogoGrad)" />
+                <path d="M9 14L13 10L19 16" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M14 9V19" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+                <defs><linearGradient id="hdrLogoGrad" x1="2" y1="2" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop stopColor="var(--color-primary, #2563EB)" /><stop offset="1" stopColor="var(--color-secondary, #7C3AED)" /></linearGradient></defs>
+              </svg>
+              <span className="db-header-logo__text">FlowSync</span>
+            </Link>
             <div className="header-search">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search projects and tasks..." aria-label="Search projects and tasks" />
@@ -501,7 +636,7 @@ export default function Dashboard() {
               <button className="header-date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>{new Date().toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}</span></button>
               <div className="header-dropdown-wrap lang-dropdown-wrap">
                 <svg className="lang-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                <select className="header-dropdown" value={lang} onChange={e => { setLang(e.target.value); localStorage.setItem('flowsync-language', e.target.value); }} aria-label="Language selector">
+                <select className="header-dropdown" value={lang} onChange={e => updateLanguage(e.target.value)} aria-label="Language selector">
                   {Object.keys(LANG_NAMES).map(k => <option key={k} value={k}>{LANG_NAMES[k]}</option>)}
                 </select>
               </div>
@@ -516,19 +651,100 @@ export default function Dashboard() {
             
             {activeNav === 'dashboard' && (
               <>
-                <WorkflowWorkspace createRequest={newProjectRequest} onCreateRequestHandled={() => setNewProjectRequest(0)} />
-                
-                {project && (
+                {/* Case 1: No projects at all — show new-user workspace (create form) */}
+                {projects.length === 0 ? (
+                  <WorkflowWorkspace
+                    lang={lang}
+                    createRequest={creatingNew ? 1 : newProjectRequest}
+                    onCreateRequestHandled={() => { setNewProjectRequest(0); setCreatingNew(false); }}
+                    project={project}
+                    startProject={(vals) => { startProject(vals); setCreatingNew(false); }}
+                    updateTask={updateTask}
+                    deleteProject={deleteProject}
+                    onCancel={() => setCreatingNew(false)}
+                  />
+                ) : creatingNew ? (
+                  /* Case 2: User clicked "Create New Project" — show creation form */
+                  <WorkflowWorkspace
+                    lang={lang}
+                    createRequest={1}
+                    onCreateRequestHandled={() => {}}
+                    project={null}
+                    startProject={(vals) => { startProject(vals); setCreatingNew(false); }}
+                    updateTask={updateTask}
+                    deleteProject={deleteProject}
+                    onCancel={() => setCreatingNew(false)}
+                  />
+                ) : project ? (
+                  /* Case 3: A project is actively selected — show its workspace */
+                  <WorkflowWorkspace
+                    lang={lang}
+                    createRequest={newProjectRequest}
+                    onCreateRequestHandled={() => setNewProjectRequest(0)}
+                    project={project}
+                    startProject={startProject}
+                    updateTask={updateTask}
+                    deleteProject={deleteProject}
+                  />
+                ) : (
+                  /* Case 4: Returning user — project overview dashboard */
                   <>
-                    <div className="db-title-row" style={{ marginTop: '2.5rem' }}>
-                      <h2 className="db-title">FLOWSYNC • {company.toUpperCase()} OVERVIEW</h2>
-                      <div className="db-badge-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>{t('global')}</span></div>
+                    <div className="db-title-row">
+                      <h2 className="db-title">{t('overviewTitle', { company: company.toUpperCase() })}</h2>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div className="db-badge-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>{t('global')}</span></div>
+                        <button className="workflow-primary ripple" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => setCreatingNew(true)}>
+                          + {t('createNewProjectBtn').replace('+ ', '')}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="metrics-grid reveal-stagger">
                       <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">Completed Tasks</span><span className="m-badge m-badge--success">Workspace</span></div>
-                        <div className="m-card__value">{totalCompleted} / {totalTasks}</div>
+                        <div className="m-card__header"><span className="m-card__title">{t('totalProjectsCard')}</span><span className="m-badge m-badge--yellow">{t('workspaceLabel')}</span></div>
+                        <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>
+                          {projects.length} {projects.length === 1 ? t('projectSuffix') : t('projectsSuffix')}
+                        </div>
+                        <div className="m-card__chart">
+                          <svg className="sparkline-svg" viewBox="0 0 120 40">
+                            <defs>
+                              <linearGradient id="sparkGradYellow" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.3"/>
+                                <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0"/>
+                              </linearGradient>
+                            </defs>
+                            <path d="M 0 34 Q 30 28 60 20 T 100 10 T 120 6 L 120 40 L 0 40 Z" fill="url(#sparkGradYellow)"/>
+                            <path d="M 0 34 Q 30 28 60 20 T 100 10 T 120 6" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                        </div>
+                      </div>
+
+                      <div className="metric-card glass-card ripple reveal">
+                        <div className="m-card__header"><span className="m-card__title">{t('totalTasksCard')}</span><span className="m-badge m-badge--purple">{t('workspaceLabel')}</span></div>
+                        <div className="m-card__content-row">
+                          <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>{totalTasks} {t('tasksSuffix')}</div>
+                          <div className="m-card__circular">
+                            <svg width="44" height="44" viewBox="0 0 36 36">
+                              <circle className="donut-track" cx="18" cy="18" r="15.915" fill="transparent" stroke="var(--border-strong)" strokeWidth="3"/>
+                              <circle 
+                                className="donut-segment" 
+                                cx="18" 
+                                cy="18" 
+                                r="15.915" 
+                                fill="transparent" 
+                                stroke="#7C3AED" 
+                                strokeWidth="3.5" 
+                                strokeDasharray={`${totalTasks ? Math.round((totalCompleted / totalTasks) * 100) : 0} ${totalTasks ? 100 - Math.round((totalCompleted / totalTasks) * 100) : 100}`}
+                                strokeDashoffset="25"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="metric-card glass-card ripple reveal">
+                        <div className="m-card__header"><span className="m-card__title">{t('completedTasksCard')}</span><span className="m-badge m-badge--success">{t('workspaceLabel')}</span></div>
+                        <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>{totalCompleted} {t('tasksSuffix').toLowerCase()}</div>
                         <div className="m-card__chart">
                           <svg className="sparkline-svg" viewBox="0 0 120 40">
                             <defs>
@@ -544,8 +760,8 @@ export default function Dashboard() {
                       </div>
 
                       <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">Workspace Progress</span><span className="m-badge m-badge--blue">All Projects</span></div>
-                        <div className="m-card__value">{workspaceProgress}%</div>
+                        <div className="m-card__header"><span className="m-card__title">{t('workspaceProgressCard')}</span><span className="m-badge m-badge--blue">{t('allProjectsLabel')}</span></div>
+                        <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>{workspaceProgress}%</div>
                         <div className="m-card__chart">
                           <svg className="sparkline-svg" viewBox="0 0 120 40">
                             <g fill="var(--color-primary, #2563EB)" opacity="0.85">
@@ -561,178 +777,81 @@ export default function Dashboard() {
                           </svg>
                         </div>
                       </div>
-
-                      <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">In Progress Tasks</span><span className="m-badge m-badge--purple">Workspace</span></div>
-                        <div className="m-card__content-row">
-                          <div className="m-card__value">{totalInProgress} Tasks</div>
-                          <div className="m-card__circular">
-                            <svg width="44" height="44" viewBox="0 0 36 36">
-                              <circle className="donut-track" cx="18" cy="18" r="15.915" fill="transparent" stroke="var(--border-strong)" strokeWidth="3"/>
-                              <circle 
-                                className="donut-segment" 
-                                cx="18" 
-                                cy="18" 
-                                r="15.915" 
-                                fill="transparent" 
-                                stroke="#7C3AED" 
-                                strokeWidth="3.5" 
-                                strokeDasharray={`${totalTasks ? Math.round((totalInProgress / totalTasks) * 100) : 0} ${totalTasks ? 100 - Math.round((totalInProgress / totalTasks) * 100) : 100}`}
-                                strokeDashoffset="25"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">Total Projects</span><span className="m-badge m-badge--yellow">Workspace</span></div>
-                        <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>
-                          {projects.length} project{projects.length === 1 ? '' : 's'}
-                        </div>
-                        <div className="m-card__chart">
-                          <svg className="sparkline-svg" viewBox="0 0 120 40">
-                            <defs>
-                              <linearGradient id="sparkGradYellow" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.3"/>
-                                <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0"/>
-                              </linearGradient>
-                            </defs>
-                            <path d="M 0 34 Q 30 28 60 20 T 100 10 T 120 6 L 120 40 L 0 40 Z" fill="url(#sparkGradYellow)"/>
-                            <path d="M 0 34 Q 30 28 60 20 T 100 10 T 120 6" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
-                        </div>
-                      </div>
                     </div>
 
-                    <div className="content-grid reveal-stagger">
-                      <section className="grid-panel main-chart glass-card reveal" aria-labelledby="chart-heading">
-                        <header className="panel-header">
-                          <h2 className="panel-title" id="chart-heading">Workflow Phase Completion Rates</h2>
-                          <div className="chart-legend">
-                            <span className="legend-item"><span className="legend-dot" style={{background:'var(--color-primary, #2563EB)'}}></span>Completion %</span>
-                          </div>
-                        </header>
-                        <div className="chart-container" id="trends-chart-container">
-                          <svg className="main-chart-svg" viewBox="0 0 600 320" preserveAspectRatio="none">
-                            <defs>
-                              <linearGradient id="chartBlueGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="var(--color-primary, #2563EB)" stopOpacity="0.25"/>
-                                <stop offset="100%" stopColor="var(--color-primary, #2563EB)" stopOpacity="0.0"/>
-                              </linearGradient>
-                            </defs>
-                            {/* Grid lines */}
-                            <g stroke="var(--border-subtle)" strokeWidth="1" opacity="0.7">
-                              <line x1="50" y1="70" x2="570" y2="70"/>
-                              <line x1="50" y1="120" x2="570" y2="120"/>
-                              <line x1="50" y1="170" x2="570" y2="170"/>
-                              <line x1="50" y1="220" x2="570" y2="220"/>
-                              <line x1="50" y1="270" x2="570" y2="270"/>
-                              
-                              <line x1="50" y1="70" x2="50" y2="270"/>
-                              <line x1="154" y1="70" x2="154" y2="270"/>
-                              <line x1="258" y1="70" x2="258" y2="270"/>
-                              <line x1="362" y1="70" x2="362" y2="270"/>
-                              <line x1="466" y1="70" x2="466" y2="270"/>
-                              <line x1="570" y1="70" x2="570" y2="270"/>
-                            </g>
-                            {/* Y axis labels */}
-                            <g fill="var(--text-secondary)" fontSize="10" fontFamily="var(--font-num)" textAnchor="end">
-                              <text x="40" y="74">100%</text>
-                              <text x="40" y="124">75%</text>
-                              <text x="40" y="174">50%</text>
-                              <text x="40" y="224">25%</text>
-                              <text x="40" y="274">0%</text>
-                            </g>
-                            {/* Dynamic SVG paths */}
-                            <path d={fillD} fill="url(#chartBlueGrad)"/>
-                            <path className="glow-line" d={pathD} fill="none" stroke="var(--color-primary, #2563EB)" strokeWidth="3" strokeLinecap="round"/>
-                            {/* X axis labels */}
-                            <g fill="var(--text-secondary)" fontSize="10" textAnchor="middle">
-                              <text x="50" y="295">Planning</text>
-                              <text x="154" y="295">Design</text>
-                              <text x="258" y="295">Dev</text>
-                              <text x="362" y="295">Content</text>
-                              <text x="466" y="295">Testing</text>
-                              <text x="570" y="295">Launch</text>
-                            </g>
-                            {/* Hotspots */}
-                            {PHASES.map((phase, idx) => (
-                              <circle 
-                                key={phase}
-                                cx={xCoords[idx]} 
-                                cy={yCoords[idx]} 
-                                r="6" 
-                                fill="var(--color-primary, #2563EB)" 
-                                stroke="white" 
-                                strokeWidth="2" 
-                                className="chart-hotspot"
-                                data-phase={phase}
-                                data-pct={Math.round(((270 - yCoords[idx]) / 200) * 100)}
-                                style={{ cursor: 'pointer' }}
-                              />
-                            ))}
-                          </svg>
-                          <div className="chart-tooltip" id="chart-tooltip">
-                            <div className="tooltip-header">Planning</div>
-                            <div className="tooltip-row">
-                              <span className="tooltip-dot" style={{background:'var(--color-primary, #2563EB)'}}></span>
-                              <span className="tooltip-label">Progress:</span>
-                              <span className="tooltip-val">0% Complete</span>
-                            </div>
-                          </div>
+                    <div className="db-project-list-section glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('myWorkspaces')}</h3>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{projects.length} {t('activeTag')}</span>
+                      </div>
+                      {projects.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '2.5rem 1rem' }}>
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                          <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>No projects yet</p>
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Create your first project to get started.</p>
                         </div>
-                      </section>
-
-                      <div className="right-column reveal">
-                        <section className="grid-panel project-status glass-card" aria-labelledby="project-heading">
-                          <header className="panel-header">
-                            <h2 className="panel-title" id="project-heading">My Workspaces</h2>
-                            <span className="panel-sub">{projects.length} Active</span>
-                          </header>
-                          <div className="project-list reveal-stagger">
-                            {projects.map((proj, idx) => {
-                              const pct = getProjectProgress(proj.tasks);
-                              const colors = ['#2563EB', '#7C3AED', '#10B981', '#EC4899', '#F59E0B'];
-                              const color = colors[idx % colors.length];
-                              const isActive = proj.id === project.id;
-                              return (
-                                <div 
-                                  key={proj.id} 
-                                  className={`project-item reveal ${isActive ? 'project-item--active' : ''}`}
-                                  style={{ cursor: 'pointer', padding: '1rem', borderBottom: '1px solid var(--border-subtle)' }}
-                                  onClick={() => selectProject(proj.id)}
-                                >
-                                  <div className="project-info" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                                    <span className="project-name" style={{ fontWeight: isActive ? '700' : '400', color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
-                                      {proj.name} {isActive && ' (Active)'}
-                                    </span>
-                                    <span className="project-progress-val" style={{ color }}>{pct}%</span>
+                      ) : (
+                        <div className="db-overview-projects" style={{ display: 'grid', gap: '1rem' }}>
+                          {projects.map((proj, idx) => {
+                            const pct = getProjectProgress(proj.tasks);
+                            const doneTasks = proj.tasks.filter((task) => task.status === 'done').length;
+                            const totalProjTasks = proj.tasks.length;
+                            const colors = ['#2563EB', '#7C3AED', '#10B981', '#EC4899', '#F59E0B'];
+                            const color = colors[idx % colors.length];
+                            const lastUpdated = proj.updatedAt || proj.createdAt;
+                            return (
+                              <div key={proj.id} className="db-project-card glass-card reveal" style={{ padding: '1.25rem', border: `1px solid ${color}22`, cursor: 'default', borderRadius: '12px' }}>
+                                {/* Header Row */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0, display: 'inline-block' }} />
+                                      <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{proj.name}</h4>
+                                    </div>
+                                    <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 0 1.1rem', lineHeight: 1.45 }}>{proj.goal}</p>
                                   </div>
-                                  <div className="project-progress-bar" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '3px', overflow: 'hidden' }}>
-                                    <div className="project-progress-fill" style={{ width: `${pct}%`, height: '100%', background: color }} />
-                                  </div>
+                                  <span style={{ fontSize: '1rem', fontWeight: 800, color, flexShrink: 0, marginLeft: '1rem', letterSpacing: '-0.5px' }}>{pct}%</span>
                                 </div>
-                              );
-                            })}
-                          </div>
-                        </section>
 
-                        <section className="grid-panel team-activity glass-card reveal" aria-labelledby="activity-heading">
-                          <header className="panel-header"><h2 className="panel-title" id="activity-heading">{t('activityFeed')}</h2></header>
-                          <div className="feed-list reveal-stagger">
-                            {getActivityFeed().map((item, i) => (
-                              <div key={i} className="feed-item reveal">
-                                <div className="feed-avatar" style={{backgroundColor:item.bg,color:item.color}}>{item.initials}</div>
-                                <div className="feed-content">
-                                  <p className="feed-text"><strong className="feed-author">{item.author}</strong> <span>{item.text}</span></p>
-                                  <span className="feed-time">{item.time}</span>
+                                {/* Progress Bar */}
+                                <div style={{ height: '6px', background: 'var(--border-subtle)', borderRadius: '999px', overflow: 'hidden', margin: '0.75rem 0' }}>
+                                  <div style={{ width: `${pct}%`, height: '100%', background: `linear-gradient(90deg, ${color}, ${color}bb)`, borderRadius: '999px', transition: 'width 0.6s cubic-bezier(0.16,1,0.3,1)' }} />
+                                </div>
+
+                                {/* Stats Row */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                                    {doneTasks} of {totalProjTasks} tasks completed
+                                  </span>
+                                  {lastUpdated && (
+                                    <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                                      Updated {new Date(lastUpdated).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Action Row */}
+                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                  <button
+                                    className="workflow-primary ripple"
+                                    style={{ flex: 1, padding: '0.45rem 0.9rem', fontSize: '0.82rem' }}
+                                    onClick={() => selectProject(proj.id)}
+                                  >
+                                    {t('openWorkspace')}
+                                  </button>
+                                  <button
+                                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.35)', color: '#EF4444', background: 'rgba(239,68,68,0.06)', cursor: 'pointer', transition: 'all 0.2s ease' }}
+                                    onClick={() => { if (window.confirm(`Delete "${proj.name}"? This cannot be undone.`)) deleteProject(proj.id); }}
+                                    title="Delete project"
+                                  >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                                  </button>
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        </section>
-                      </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
@@ -742,13 +861,21 @@ export default function Dashboard() {
             {activeNav === 'projects' && (
               <div className="projects-tab-view glass-card" style={{ padding: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                  <h2>Manage Workflow Projects</h2>
-                  <button className="workflow-primary ripple" onClick={() => { setActiveNav('dashboard'); setNewProjectRequest((value) => value + 1); }}>
-                    + Create New Project
-                  </button>
+                  <h2>{t('manageProjects')}</h2>
+                  {projects.length > 0 && (
+                    <button className="workflow-primary ripple" onClick={() => { setActiveNav('dashboard'); setCreatingNew(true); }}>
+                      {t('createNewProjectBtn')}
+                    </button>
+                  )}
                 </div>
                 {projects.length === 0 ? (
-                  <p style={{ color: 'var(--text-secondary)' }}>No projects found. Go back to the Dashboard to create one.</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', minHeight: '400px', padding: '2rem 1rem' }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', fontWeight: 600, marginBottom: '0.5rem' }}>{t('createFirstProjectTitle')}</p>
+                    <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>{t('createFirstProjectDesc')}</p>
+                    <button className="workflow-primary ripple" style={{ padding: '0.7rem 1.8rem', fontSize: '1rem', display: 'inline-block' }} onClick={() => { setActiveNav('dashboard'); setCreatingNew(true); }}>
+                      {t('createProjectCTA')}
+                    </button>
+                  </div>
                 ) : (
                   <div className="projects-grid-layout" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
                     {projects.map((proj) => {
@@ -758,9 +885,14 @@ export default function Dashboard() {
                         <div key={proj.id} className="project-detail-card glass-card" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)', position: 'relative' }}>
                           <h3 style={{ marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{proj.name}</h3>
                           <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', minHeight: '40px', marginBottom: '.65rem' }}>{proj.goal}</p>
-                          <p className="project-last-updated">Last updated {new Date(proj.updatedAt || proj.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                          <p className="project-last-updated">{t('lastUpdated')} {new Date(proj.updatedAt || proj.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                          {proj.targetDate && (
+                            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '.65rem' }}>
+                              {t('targetDateLabel')}: {fmtDate(proj.targetDate)}
+                            </p>
+                          )}
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                            <span>{doneTasks} of {proj.tasks.length} Completed</span>
+                            <span>{doneTasks} / {proj.tasks.length} {t('completedTasksCard')}</span>
                             <span>{pct}%</span>
                           </div>
                           <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden', marginBottom: '1.5rem' }}>
@@ -772,14 +904,14 @@ export default function Dashboard() {
                               style={{ flex: 1, padding: '0.5rem' }} 
                               onClick={() => { selectProject(proj.id); setActiveNav('dashboard'); }}
                             >
-                              Open Workspace
+                              {t('openWorkspace')}
                             </button>
                             <button 
                               className="workflow-secondary ripple" 
                               style={{ padding: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#EF4444' }} 
                               onClick={() => { if (confirm('Delete this project?')) deleteProject(proj.id); }}
                             >
-                              Delete
+                              {t('deleteBtn')}
                             </button>
                           </div>
                         </div>
@@ -792,26 +924,26 @@ export default function Dashboard() {
 
             {activeNav === 'team' && (
               <div className="team-tab-view glass-card" style={{ padding: '2rem' }}>
-                <h2>Workspace Team Members</h2>
+                <h2>{t('teamTitle')}</h2>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-                  Manage access and collaborate with teammates on your active project workflows.
+                  {t('teamDesc')}
                 </p>
 
                 <div className="team-grid-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '2rem' }}>
                   <div className="members-list-container">
-                    <h3>Teammates ({teamList.length + 1})</h3>
+                    <h3>{t('teammatesHeader')} ({teamList.length + 1})</h3>
                     <div style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
                       {/* You (the user) */}
                       <div className="member-row glass-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                           <div className="feed-avatar" style={{ backgroundColor: 'rgba(37,99,235,0.15)', color: 'var(--color-primary)' }}>{getInitials(username)}</div>
                           <div>
-                            <h4 style={{ margin: 0 }}>{username} (You)</h4>
+                            <h4 style={{ margin: 0 }}>{username} {t('youOwner')}</h4>
                             <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{email}</span>
                           </div>
                         </div>
                         <span className="badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem' }}>
-                          {role} (Owner)
+                          {role} ({t('ownerTag')})
                         </span>
                       </div>
 
@@ -850,7 +982,8 @@ export default function Dashboard() {
                             placeholder="teammate@company.com" 
                             value={newMemberEmail}
                             onChange={(e) => setNewMemberEmail(e.target.value)}
-                            style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', color: 'white', marginTop: '0.4rem' }}
+                            className="ob-input"
+                            style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', marginTop: '0.4rem' }}
                           />
                         </label>
                       </div>
@@ -860,7 +993,8 @@ export default function Dashboard() {
                           <select 
                             value={newMemberRole}
                             onChange={(e) => setNewMemberRole(e.target.value)}
-                            style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', color: 'white', marginTop: '0.4rem' }}
+                            className="ob-input"
+                            style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', marginTop: '0.4rem' }}
                           >
                             <option value="member">Member</option>
                             <option value="admin">Admin</option>
@@ -894,7 +1028,8 @@ export default function Dashboard() {
                           type="text" 
                           value={company} 
                           onChange={(e) => { setCompany(e.target.value); localStorage.setItem('flowsync-company', e.target.value); }}
-                          style={{ padding: '0.6rem', borderRadius: '6px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)', color: 'white' }}
+                          className="ob-input"
+                          style={{ padding: '0.6rem', borderRadius: '6px', width: '100%' }}
                         />
                       </label>
                       <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -903,7 +1038,8 @@ export default function Dashboard() {
                           type="text" 
                           value={industry} 
                           disabled
-                          style={{ padding: '0.6rem', borderRadius: '6px', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-subtle)', color: 'var(--text-secondary)' }}
+                          className="ob-input"
+                          style={{ padding: '0.6rem', borderRadius: '6px', width: '100%', opacity: 0.7 }}
                         />
                       </label>
                     </div>
@@ -984,8 +1120,8 @@ export default function Dashboard() {
               ))}
             </div>)}
             {modal === 'language' && (<div className="pd-lang-options">
-              {Object.entries(LANG_NAMES).slice(0, 4).map(([code, label]) => (
-                <label key={code} className={`pd-lang-opt${lang === code ? ' is-active' : ''}`} onClick={() => { setLang(code); localStorage.setItem('flowsync-language', code); }}>
+              {Object.entries(LANG_NAMES).map(([code, label]) => (
+                <label key={code} className={`pd-lang-opt${lang === code ? ' is-active' : ''}`} onClick={() => { updateLanguage(code); }}>
                   <span>{label}</span><span className="pd-lang-opt-check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                 </label>
               ))}

@@ -340,6 +340,80 @@
     color: var(--text-secondary);
 }
 
+/* Product explanation loop */
+.workflow-loop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.4rem, 1vw, 0.75rem);
+    margin-top: 2rem;
+    padding: clamp(1rem, 2vw, 1.5rem);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid var(--border-subtle, rgba(148, 163, 184, 0.12));
+}
+
+.workflow-loop__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.workflow-loop__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary, #2563EB);
+    transition: background 0.2s ease;
+}
+
+.workflow-loop__label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.workflow-loop__arrow {
+    display: flex;
+    align-items: center;
+    color: rgba(148, 163, 184, 0.3);
+    margin-top: -1rem;
+}
+
+[data-theme="light"] .workflow-loop {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(148, 163, 184, 0.18);
+}
+
+@media (max-width: 600px) {
+    .workflow-loop {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    .workflow-loop__arrow {
+        display: none;
+    }
+    .workflow-loop__item {
+        flex: 1 1 40%;
+        min-width: 0;
+    }
+    .workflow-loop__icon {
+        width: 36px;
+        height: 36px;
+    }
+    .workflow-loop__label {
+        font-size: 0.68rem;
+    }
+}
+
 .workflow-create-container {
     width: min(100%, 780px);
     margin-inline: auto;
@@ -1715,6 +1789,20 @@
     background: rgba(0, 0, 0, 0.05);
 }
 
+[data-theme="light"] .db-project-list-section {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(124, 58, 237, 0.08);
+}
+
+[data-theme="light"] .db-project-card {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(124, 58, 237, 0.08) !important;
+}
+
+[data-theme="light"] .db-project-card:hover {
+    border-color: var(--color-primary, #7C3AED) !important;
+}
+
 /* ────────────────────────────────────────────────────────────
    12. GLASS CARD — Premium Glassmorphism
    ──────────────────────────────────────────────────────────── */
@@ -1759,6 +1847,85 @@
 
 [data-theme="light"] .glass-card:hover {
     border-color: var(--color-primary, #2563EB);
+    box-shadow: 0 12px 48px rgba(124, 58, 237, 0.08), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
+}
+
+/* ── Light Theme: Workspace & Settings Fixes ── */
+[data-theme="light"] .workflow-phase-section {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(71, 85, 105, 0.15);
+}
+
+[data-theme="light"] .workflow-phase-header {
+    background: rgba(248, 250, 252, 0.8);
+    border-bottom-color: rgba(71, 85, 105, 0.1);
+}
+
+[data-theme="light"] .workflow-progress {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(71, 85, 105, 0.15);
+}
+
+[data-theme="light"] .workflow-progress__track {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .workflow-task {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(71, 85, 105, 0.15);
+}
+
+[data-theme="light"] .metric-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(71, 85, 105, 0.12);
+}
+
+[data-theme="light"] .m-badge--success {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+[data-theme="light"] .m-badge--blue {
+    background: rgba(37, 99, 235, 0.12);
+    color: #2563EB;
+}
+
+[data-theme="light"] .m-badge--purple {
+    background: rgba(124, 58, 237, 0.12);
+    color: #7C3AED;
+}
+
+[data-theme="light"] .m-badge--yellow {
+    background: rgba(245, 158, 11, 0.12);
+    color: #D97706;
+}
+
+[data-theme="light"] .settings-section {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(71, 85, 105, 0.15);
+}
+
+[data-theme="light"] .settings-section h3 {
+    color: #0f172a;
+}
+
+[data-theme="light"] .settings-section label {
+    color: #334155;
+}
+
+[data-theme="light"] .settings-tab-view h2 {
+    color: #0f172a;
+}
+
+[data-theme="light"] .settings-tab-view > p {
+    color: #475569;
+}
+
+[data-theme="light"] .task-tick-btn {
+    --tick-border: rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="light"] .glass-card:hover {
     box-shadow: 0 12px 48px rgba(var(--color-primary-rgb, 37, 99, 235), 0.15), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
 }
 

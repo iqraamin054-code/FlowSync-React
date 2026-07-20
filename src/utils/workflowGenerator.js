@@ -21,7 +21,16 @@ export function getAvailableDays(targetDate, today = new Date()) {
   return Math.round((atStartOfDay(targetDate) - atStartOfDay(today)) / 86400000);
 }
 
-const template = (kind, compact) => {
+const detectCategory = (text) => {
+  if (/mobile|ios|android|fitness.*app|app|application/.test(text)) return 'mobile';
+  if (/campaign|marketing|social media|ads?|brand|promotion|advertisement|instagram|facebook|twitter|tiktok|youtube|content marketing/.test(text)) return 'marketing';
+  if (/website|site|landing page|web app|webapp|e-?commerce|online store|blog|portal/.test(text)) return 'website';
+  if (/event|conference|seminar|workshop|meetup|fest|ceremony|gala|expo|fair|university event|tech event|summit/.test(text)) return 'event';
+  if (/product launch|launch.*product|release.*product|new product|go live|market launch|debut/.test(text)) return 'product_launch';
+  return 'general';
+};
+
+const template = (kind, compact, goal = '') => {
   const templates = {
     website: compact ? [
       ['Define essential website requirements', 'Confirm the essential pages, audience, call to action, and launch criteria.', 'Planning', 'high'],
@@ -67,6 +76,39 @@ const template = (kind, compact) => {
       ['Schedule and quality-check the campaign', 'Verify links, timing, tracking, and all campaign assets.', 'Testing', 'high'],
       ['Launch and optimize the campaign', 'Publish, monitor results, and record the first improvement opportunities.', 'Launch', 'high'],
     ],
+    event: compact ? [
+      ['Define event format and objectives', 'Confirm the event type, goals, audience size, and key success criteria.', 'Planning', 'high'],
+      ['Confirm venue and logistics', 'Book the location, confirm capacity, and arrange basic technical requirements.', 'Planning', 'high'],
+      ['Create event schedule', 'Build the agenda, time slots, and speaker or activity plan.', 'Design', 'high'],
+      ['Promote and open registration', 'Set up registration, promote to the target audience, and track sign-ups.', 'Content', 'high'],
+      ['Run the event', 'Manage check-in, logistics, technical setup, and the live event experience.', 'Launch', 'high'],
+    ] : [
+      ['Define event format and objectives', 'Clarify the event type, goals, target audience, and success measures.', 'Planning', 'high'],
+      ['Confirm date, venue, and logistics', 'Book the location, confirm capacity, and plan the room setup and equipment.', 'Planning', 'high'],
+      ['Create event schedule and program', 'Build the agenda, time slots, speaker plan, and activity flow.', 'Design', 'high'],
+      ['Confirm speakers and presenters', 'Invite speakers, confirm topics, and collect presentation materials.', 'Content', 'medium'],
+      ['Set up registration and promotion', 'Create the registration process, promotional materials, and outreach plan.', 'Content', 'high'],
+      ['Prepare equipment and technical requirements', 'Arrange AV equipment, projectors, Wi-Fi, and technical support.', 'Development', 'high'],
+      ['Promote the event to attendees', 'Execute the promotion plan, manage sign-ups, and send reminders.', 'Content', 'medium'],
+      ['Finalize event logistics', 'Confirm volunteers, catering, signage, and day-of schedule.', 'Testing', 'high'],
+      ['Run the event', 'Manage check-in, logistics, technical setup, and the live experience.', 'Launch', 'high'],
+      ['Collect feedback and wrap up', 'Gather attendee feedback, document lessons learned, and send thank-yous.', 'Testing', 'medium'],
+    ],
+    product_launch: compact ? [
+      ['Define launch objectives', 'Confirm the target audience, key message, and launch success criteria.', 'Planning', 'high'],
+      ['Prepare product messaging', 'Create the core positioning, value proposition, and key talking points.', 'Content', 'high'],
+      ['Prepare marketing materials', 'Build the launch assets, landing page, and promotional content.', 'Design', 'high'],
+      ['Finalize launch checklist', 'Confirm all technical, marketing, and communication readiness.', 'Testing', 'high'],
+      ['Launch the product', 'Execute the launch plan and publish or release the product.', 'Launch', 'high'],
+    ] : [
+      ['Define launch objectives and audience', 'Clarify the product positioning, target customer, and launch success metrics.', 'Planning', 'high'],
+      ['Prepare product messaging and story', 'Create the core value proposition, key messages, and customer-facing narrative.', 'Content', 'high'],
+      ['Prepare marketing and sales materials', 'Build launch assets, presentations, landing pages, and promotional content.', 'Design', 'high'],
+      ['Set up customer communication channels', 'Prepare email sequences, support docs, and announcement distribution.', 'Development', 'high'],
+      ['Finalize launch checklist and testing', 'Verify all technical, marketing, and communication readiness.', 'Testing', 'high'],
+      ['Execute the product launch', 'Publish, announce, and release the product to customers.', 'Launch', 'high'],
+      ['Monitor initial results and feedback', 'Track early adoption, customer feedback, and key performance indicators.', 'Testing', 'medium'],
+    ],
     general: compact ? [
       ['Define the essential outcome', 'Clarify the smallest practical result, audience, and completion criteria.', 'Planning', 'high'],
       ['Prepare the required materials', 'Collect the information, people, tools, and assets needed to deliver.', 'Design', 'high'],
@@ -91,6 +133,14 @@ const scheduleTasks = (items, targetDate) => {
   if (availableDays === null) return items.map((item, index) => ({ ...item, timeline: `Suggested step ${index + 1}` }));
   const start = atStartOfDay(new Date());
   return items.map((item, index) => {
+    const isLast = index === items.length - 1;
+    if (isLast && targetDate) {
+      const d = atStartOfDay(targetDate);
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      return { ...item, timeline: `Target: ${dd} / ${mm} / ${yyyy}` };
+    }
     const offset = items.length === 1 ? availableDays : Math.round((index / (items.length - 1)) * availableDays);
     const scheduled = new Date(start);
     scheduled.setDate(start.getDate() + offset);
@@ -101,12 +151,10 @@ const scheduleTasks = (items, targetDate) => {
 
 export function generateWorkflow(goal, targetDate = '', projectName = '') {
   const text = `${projectName} ${goal}`.toLowerCase();
-  const kind = /mobile|ios|android|fitness.*app|app/.test(text) ? 'mobile'
-    : /campaign|marketing|social media|ads|brand/.test(text) ? 'marketing'
-      : /website|site|landing|web/.test(text) ? 'website' : 'general';
+  const kind = detectCategory(text);
   const availableDays = getAvailableDays(targetDate);
   const compact = availableDays !== null && availableDays <= 2;
-  return scheduleTasks(template(kind, compact).map(([title, description, phase, priority]) => ({ title, description, phase, priority })), targetDate)
+  return scheduleTasks(template(kind, compact, goal).map(([title, description, phase, priority]) => ({ title, description, phase, priority })), targetDate)
     .map((item) => createTask(item.title, item.description, item.phase, item.priority, item.timeline));
 }
 
