@@ -1,23 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './LoadingScreen.css';
 
-const LOADER_DURATION = 620;
-const FADE_DURATION = 200;
+const LOADER_DURATION = 1500;
+const FADE_DURATION = 300;
 
 export default function LoadingScreen({ onComplete }) {
   const [progress, setProgress] = useState(0);
   const [fadeOut, setFadeOut] = useState(false);
+  const rafRef = useRef();
 
   useEffect(() => {
-    const fadeTimer = setTimeout(() => {
-      setProgress(100);
-      setFadeOut(true);
-    }, LOADER_DURATION);
-    const completeTimer = setTimeout(() => onComplete?.(), LOADER_DURATION + FADE_DURATION);
+    const start = performance.now();
+
+    function tick(now) {
+      const elapsed = now - start;
+      const pct = Math.min((elapsed / LOADER_DURATION) * 100, 100);
+      setProgress(pct);
+
+      if (pct < 100) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        setFadeOut(true);
+        setTimeout(() => onComplete?.(), FADE_DURATION);
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(tick);
 
     return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(completeTimer);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [onComplete]);
 

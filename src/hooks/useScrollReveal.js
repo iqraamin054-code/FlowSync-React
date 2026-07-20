@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 
-export default function useScrollReveal() {
+export default function useScrollReveal(ready) {
   useEffect(() => {
+    if (!ready) return;
     const revealElements = document.querySelectorAll('.reveal');
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       revealElements.forEach((el) => el.classList.add('reveal-visible'));

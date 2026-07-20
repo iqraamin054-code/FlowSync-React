@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import LoadingScreen from '../components/common/LoadingScreen.jsx';
 import Navbar from '../components/layout/Navbar/Navbar.jsx';
 import AnimatedBackground from '../components/common/AnimatedBackground.jsx';
 import Hero from '../components/landing/Hero/Hero.jsx';
@@ -21,9 +22,12 @@ import ScrollProgress from '../components/common/ScrollProgress.jsx';
 import useScrollReveal from '../hooks/useScrollReveal.js';
 
 export default function Landing() {
+  const [loaded, setLoaded] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [solutionState, setSolutionState] = useState('default');
-  useScrollReveal();
+  useScrollReveal(loaded);
+
+  if (!loaded) return <LoadingScreen onComplete={() => setLoaded(true)} />;
 
   return (
     <>
