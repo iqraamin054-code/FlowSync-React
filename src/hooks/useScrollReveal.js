@@ -26,5 +26,5 @@ export default function useScrollReveal(ready) {
     });
 
     return () => io.disconnect();
-  }, []);
+  }, [ready]);
 }
