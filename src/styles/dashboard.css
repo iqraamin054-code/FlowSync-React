@@ -2486,8 +2486,8 @@
 .pd {
     position: absolute;
     top: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%) translateY(8px) scale(0.96);
+    left: 0;
+    transform: translateY(8px) scale(0.96);
     width: 280px;
     background: rgba(15, 23, 42, 0.96);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -2505,7 +2505,7 @@
 .pd.is-open {
     opacity: 1;
     pointer-events: auto;
-    transform: translateX(-50%) translateY(0) scale(1);
+    transform: translateY(0) scale(1);
 }
 
 [data-theme="light"] .pd {
