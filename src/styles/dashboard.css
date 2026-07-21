@@ -1919,7 +1919,7 @@
     color: #0f172a;
 }
 
-[data-theme="light"] .settings-tab-view > p {
+[data-theme="light"] .settings-header p {
     color: #475569;
 }
 
@@ -1929,6 +1929,140 @@
 
 [data-theme="light"] .glass-card:hover {
     box-shadow: 0 12px 48px rgba(var(--color-primary-rgb, 37, 99, 235), 0.15), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
+}
+
+/* ── Settings Section Styles ── */
+.settings-tab-view {
+    padding: 2rem;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.settings-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.settings-section {
+    padding: 1.5rem;
+}
+
+.settings-section-title {
+    margin: 0 0 1.25rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.settings-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.settings-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.settings-label-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.settings-input {
+    padding: 0.65rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.settings-input--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-toggle {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+}
+
+.settings-accent-grid {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.settings-accent-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.settings-accent-swatch:hover {
+    transform: scale(1.1);
+}
+
+.settings-accent-swatch--active {
+    border-color: var(--text-primary);
+}
+
+.settings-account-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.settings-account-field:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.settings-account-field:first-child {
+    padding-top: 0;
+}
+
+.settings-account-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.settings-account-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* ── Settings Responsive ── */
+@media (max-width: 768px) {
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .settings-tab-view {
+        padding: 1.25rem;
+    }
 }
 
 [data-theme="light"] .grid-panel.main-chart.glass-card:hover {

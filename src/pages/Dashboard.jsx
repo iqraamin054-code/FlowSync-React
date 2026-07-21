@@ -554,20 +554,20 @@ export default function Dashboard() {
               <div className="pd is-open" role="menu" aria-label="User menu" onClick={e => e.stopPropagation()}>
                 <div className="pd-header">
                   <div className="pd-avatar-wrap"><div className="pd-avatar">{getInitials(username)}</div><span className="pd-dot" aria-label="Online"></span></div>
-                  <div className="pd-info"><span className="pd-name">{username}</span><span className="pd-email">{email}</span><span className="pd-status">Online</span></div>
+                  <div className="pd-info"><span className="pd-name">{username}</span><span className="pd-email">{email}</span><span className="pd-status">{t('onlineStatus')}</span></div>
                 </div>
                 <div className="pd-divider"></div>
                 <div className="pd-body">
-                  <button className="pd-item" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('profile'); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Profile</span></button>
-                  <button className="pd-item pd-item--between" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('appearance'); }}><div className="pd-item-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Appearance</span></div><span className="pd-hint">{theme === 'light' ? 'Light' : 'Dark'}</span></button>
-                  <button className="pd-item pd-item--between" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('language'); }}><div className="pd-item-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Language</span></div><span className="pd-hint">{LANG_NAMES[lang] || 'English'}</span></button>
-                  <div className="pd-item pd-item--between" role="menuitem" tabIndex={pdOpen ? 0 : -1}><div className="pd-item-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>Notifications</span></div><label className="pd-toggle" aria-label="Toggle notifications"><input type="checkbox" checked={notifEnabled} onChange={(e) => { setNotifEnabled(e.target.checked); localStorage.setItem('flowsync-notif', e.target.checked); }} /><span className="pd-toggle-track"></span></label></div>
-                  <button className="pd-item" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setActiveNav('settings'); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Settings</span></button>
-                  <button className="pd-item" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('help'); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>Help Center</span></button>
+                  <button className="pd-item" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('profile'); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>{t('profileHeader')}</span></button>
+                  <button className="pd-item pd-item--between" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('appearance'); }}><div className="pd-item-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>{t('appearanceHeader')}</span></div><span className="pd-hint">{theme === 'light' ? t('lightMode') : t('darkMode')}</span></button>
+                  <button className="pd-item pd-item--between" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('language'); }}><div className="pd-item-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>{t('languageHeader')}</span></div><span className="pd-hint">{LANG_NAMES[lang] || 'English'}</span></button>
+                  <div className="pd-item pd-item--between" role="menuitem" tabIndex={pdOpen ? 0 : -1}><div className="pd-item-left"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span>{t('notifications')}</span></div><label className="pd-toggle" aria-label={t('notifications')}><input type="checkbox" checked={notifEnabled} onChange={(e) => { setNotifEnabled(e.target.checked); localStorage.setItem('flowsync-notif', e.target.checked); }} /><span className="pd-toggle-track"></span></label></div>
+                  <button className="pd-item" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setActiveNav('settings'); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>{t('settings')}</span></button>
+                  <button className="pd-item" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('help'); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span>{t('helpHeader')}</span></button>
                 </div>
                 <div className="pd-divider"></div>
                 <div className="pd-footer">
-                  <button className="pd-item pd-item--danger" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('logout'); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Logout</span></button>
+                  <button className="pd-item pd-item--danger" role="menuitem" tabIndex={pdOpen ? 0 : -1} onClick={() => { setPdOpen(false); setModal('logout'); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>{t('logoutHeader')}</span></button>
                 </div>
               </div>
             )}
@@ -615,9 +615,9 @@ export default function Dashboard() {
             </Link>
             <div className="header-search">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search projects and tasks..." aria-label="Search projects and tasks" />
-              {searchQuery.trim() && <div className="workspace-search-results" role="listbox" aria-label="Search results">
-                {searchResults.length ? searchResults.map(({ project: result, matchingTasks }) => <button type="button" key={result.id} className="workspace-search-result" onClick={() => openSearchResult(result.id)}><strong>{result.name}</strong><span>{matchingTasks.length ? `${matchingTasks.length} matching task${matchingTasks.length === 1 ? '' : 's'}` : result.goal}</span></button>) : <span className="workspace-search-empty">No projects or tasks in this workspace match “{searchQuery}”.</span>}
+              <input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={t('searchPlaceholder')} aria-label={t('searchPlaceholder')} />
+              {searchQuery.trim() && <div className="workspace-search-results" role="listbox" aria-label={t('searchPlaceholder')}>
+                {searchResults.length ? searchResults.map(({ project: result, matchingTasks }) => <button type="button" key={result.id} className="workspace-search-result" onClick={() => openSearchResult(result.id)}><strong>{result.name}</strong><span>{matchingTasks.length ? `${matchingTasks.length} ${matchingTasks.length === 1 ? t('matchingTask') : t('matchingTasks')}` : result.goal}</span></button>) : <span className="workspace-search-empty">{t('noSearchResults')} "{searchQuery}".</span>}
               </div>}
             </div>
             <div className="header-actions">
@@ -843,8 +843,8 @@ export default function Dashboard() {
                                   </button>
                                   <button
                                     style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.35)', color: '#EF4444', background: 'rgba(239,68,68,0.06)', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                                    onClick={() => { if (window.confirm(`Delete "${proj.name}"? This cannot be undone.`)) deleteProject(proj.id); }}
-                                    title="Delete project"
+                                    onClick={() => { if (window.confirm(t('deleteConfirmMsg', { name: proj.name }))) deleteProject(proj.id); }}
+                                    title={t('deleteBtn')}
                                   >
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                                   </button>
@@ -911,7 +911,7 @@ export default function Dashboard() {
                             <button 
                               className="workflow-secondary ripple" 
                               style={{ padding: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#EF4444' }} 
-                              onClick={() => { if (confirm('Delete this project?')) deleteProject(proj.id); }}
+                              onClick={() => { if (confirm(t('deleteProjectTitle'))) deleteProject(proj.id); }}
                             >
                               {t('deleteBtn')}
                             </button>
@@ -968,16 +968,16 @@ export default function Dashboard() {
                   </div>
 
                   <div className="invite-member-card glass-card" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)', height: 'fit-content' }}>
-                    <h3>Invite Teammate</h3>
+                    <h3>{t('inviteHeader')}</h3>
                     {inviteSuccess && (
                       <div className="alert-success" style={{ color: '#10B981', fontSize: '0.85rem', margin: '0.5rem 0' }}>
-                        ✓ Invitation sent successfully!
+                        {t('inviteSuccessMsg')}
                       </div>
                     )}
                     <form onSubmit={handleInviteMember} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                       <div>
                         <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                          Email Address
+                          {t('emailLabel')}
                           <input 
                             type="email" 
                             required
@@ -991,21 +991,21 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                          Role
+                          {t('roleLabel')}
                           <select 
                             value={newMemberRole}
                             onChange={(e) => setNewMemberRole(e.target.value)}
                             className="ob-input"
                             style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', marginTop: '0.4rem' }}
                           >
-                            <option value="member">Member</option>
-                            <option value="admin">Admin</option>
-                            <option value="viewer">Viewer</option>
+                            <option value="member">{t('roleMember')}</option>
+                            <option value="admin">{t('roleAdmin')}</option>
+                            <option value="viewer">{t('roleViewer')}</option>
                           </select>
                         </label>
                       </div>
                       <button type="submit" className="workflow-primary ripple" style={{ width: '100%', padding: '0.6rem', marginTop: '0.5rem' }}>
-                        Send Invitation
+                        {t('sendInviteBtn')}
                       </button>
                     </form>
                   </div>
@@ -1014,76 +1014,113 @@ export default function Dashboard() {
             )}
 
             {activeNav === 'settings' && (
-              <div className="settings-tab-view glass-card" style={{ padding: '2rem' }}>
-                <h2>Workspace & Account Settings</h2>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-                  Customize your workspace settings, accent colors, and preferences.
-                </p>
+              <div className="settings-tab-view">
+                <div className="settings-header" style={{ marginBottom: '2rem' }}>
+                  <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('settingsTitle')}</h2>
+                  <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '0.95rem' }}>
+                    {t('settingsDesc')}
+                  </p>
+                </div>
 
-                <div className="settings-grid" style={{ display: 'grid', gap: '2rem', maxWidth: '600px' }}>
-                  <div className="settings-section glass-card" style={{ padding: '1.5rem' }}>
-                    <h3 style={{ marginBottom: '1rem' }}>Workspace Details</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        Company / Workspace Name
-                        <input 
-                          type="text" 
-                          value={company} 
-                          onChange={(e) => { setCompany(e.target.value); localStorage.setItem('flowsync-company', e.target.value); }}
-                          className="ob-input"
-                          style={{ padding: '0.6rem', borderRadius: '6px', width: '100%' }}
-                        />
-                      </label>
-                      <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        Industry
-                        <input 
-                          type="text" 
-                          value={industry} 
-                          disabled
-                          className="ob-input"
-                          style={{ padding: '0.6rem', borderRadius: '6px', width: '100%', opacity: 0.7 }}
-                        />
-                      </label>
+                <div className="settings-grid">
+                  {/* Left Column */}
+                  <div className="settings-column">
+                    <div className="settings-section glass-card">
+                      <h3 className="settings-section-title">{t('workspaceDetails')}</h3>
+                      <div className="settings-fields">
+                        <label className="settings-label">
+                          {t('companyNameLabel')}
+                          <input 
+                            type="text" 
+                            value={company} 
+                            onChange={(e) => { setCompany(e.target.value); localStorage.setItem('flowsync-company', e.target.value); }}
+                            className="ob-input settings-input"
+                          />
+                        </label>
+                        <label className="settings-label">
+                          {t('industryLabel')}
+                          <input 
+                            type="text" 
+                            value={industry} 
+                            disabled
+                            className="ob-input settings-input settings-input--disabled"
+                          />
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="settings-section glass-card">
+                      <h3 className="settings-section-title">{t('languageHeader')}</h3>
+                      <div className="settings-fields">
+                        <label className="settings-label">
+                          {t('languageSelection')}
+                          <select 
+                            value={lang} 
+                            onChange={(e) => updateLanguage(e.target.value)}
+                            className="ob-input settings-input"
+                          >
+                            <option value="en">English (US)</option>
+                            <option value="en-gb">English (UK)</option>
+                            <option value="de">Deutsch</option>
+                            <option value="fr">Français</option>
+                            <option value="es">Español</option>
+                            <option value="ja">日本語</option>
+                            <option value="zh">中文</option>
+                            <option value="ar">العربية</option>
+                            <option value="ur">اردو</option>
+                          </select>
+                        </label>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="settings-section glass-card" style={{ padding: '1.5rem' }}>
-                    <h3 style={{ marginBottom: '1rem' }}>Appearance Preferences</h3>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span>Interface Theme</span>
-                        <button className="workflow-secondary ripple" onClick={toggleTheme} style={{ padding: '0.5rem 1rem' }}>
-                          Toggle to {theme === 'light' ? 'Dark' : 'Light'} Mode
-                        </button>
+                  {/* Right Column */}
+                  <div className="settings-column">
+                    <div className="settings-section glass-card">
+                      <h3 className="settings-section-title">{t('appearanceHeader')}</h3>
+                      <div className="settings-fields">
+                        <div className="settings-row">
+                          <span className="settings-label-text">{t('themeSelection')}</span>
+                          <button className="workflow-secondary ripple settings-toggle" onClick={toggleTheme}>
+                            {theme === 'light' ? t('lightModeLabel') : t('darkModeLabel')}
+                          </button>
+                        </div>
+                        
+                        <div className="settings-label">
+                          <span className="settings-label-text">{t('accentColor')}</span>
+                          <div className="settings-accent-grid">
+                            {Object.keys(ACCENT_MAP).map((cKey) => (
+                              <button 
+                                key={cKey} 
+                                onClick={() => {
+                                  setAccent(cKey);
+                                  localStorage.setItem('flowsync-accent', cKey);
+                                  const ac = ACCENT_MAP[cKey];
+                                  document.documentElement.style.setProperty('--color-primary', ac.primary);
+                                  document.documentElement.style.setProperty('--color-primary-hover', ac.hover);
+                                  document.documentElement.style.setProperty('--shadow-glow-primary', ac.glow);
+                                  document.documentElement.style.setProperty('--color-primary-rgb', ac.rgb);
+                                }}
+                                className={`settings-accent-swatch ${accent === cKey ? 'settings-accent-swatch--active' : ''}`}
+                                style={{ background: ACCENT_MAP[cKey].primary }}
+                                title={cKey}
+                              />
+                            ))}
+                          </div>
+                        </div>
                       </div>
-                      
-                      <div>
-                        <span style={{ display: 'block', marginBottom: '0.5rem' }}>Accent Palette</span>
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                          {Object.keys(ACCENT_MAP).map((cKey) => (
-                            <button 
-                              key={cKey} 
-                              onClick={() => {
-                                setAccent(cKey);
-                                localStorage.setItem('flowsync-accent', cKey);
-                                const ac = ACCENT_MAP[cKey];
-                                document.documentElement.style.setProperty('--color-primary', ac.primary);
-                                document.documentElement.style.setProperty('--color-primary-hover', ac.hover);
-                                document.documentElement.style.setProperty('--shadow-glow-primary', ac.glow);
-                                document.documentElement.style.setProperty('--color-primary-rgb', ac.rgb);
-                              }}
-                              style={{
-                                width: '28px',
-                                height: '28px',
-                                borderRadius: '50%',
-                                background: ACCENT_MAP[cKey].primary,
-                                border: accent === cKey ? '3px solid white' : 'none',
-                                cursor: 'pointer',
-                                transition: 'transform 0.2s'
-                              }}
-                              className="accent-swatch"
-                            />
-                          ))}
+                    </div>
+
+                    <div className="settings-section glass-card">
+                      <h3 className="settings-section-title">{t('accountSection')}</h3>
+                      <div className="settings-fields">
+                        <div className="settings-account-field">
+                          <span className="settings-account-label">{t('fullNameLabel')}</span>
+                          <span className="settings-account-value">{username || t('notSet')}</span>
+                        </div>
+                        <div className="settings-account-field">
+                          <span className="settings-account-label">{t('registeredEmail')}</span>
+                          <span className="settings-account-value">{email}</span>
                         </div>
                       </div>
                     </div>
@@ -1103,19 +1140,19 @@ export default function Dashboard() {
       {modal && (
         <div className="pd-overlay is-open" onClick={() => setModal(null)}>
           <div className="pd-modal" role="dialog" onClick={e => e.stopPropagation()}>
-            <div className="pd-modal-header"><span className="pd-modal-title">{modal === 'profile' ? 'Profile' : modal === 'appearance' ? 'Appearance' : modal === 'language' ? 'Language' : modal === 'help' ? 'Help Center' : 'Logout'}</span><button className="pd-modal-close" aria-label="Close" onClick={() => setModal(null)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+            <div className="pd-modal-header"><span className="pd-modal-title">{modal === 'profile' ? t('profileHeader') : modal === 'appearance' ? t('appearanceHeader') : modal === 'language' ? t('languageHeader') : modal === 'help' ? t('helpHeader') : t('logoutHeader')}</span><button className="pd-modal-close" aria-label="Close" onClick={() => setModal(null)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
             {modal === 'profile' && (<>
-              <div className="pd-field"><span className="pd-field-label">Full Name</span><span className="pd-field-value">{username}</span></div>
-              <div className="pd-field"><span className="pd-field-label">Email</span><span className="pd-field-value">{email}</span></div>
-              <div className="pd-field"><span className="pd-field-label">Company</span><span className="pd-field-value">{company}</span></div>
-              <div className="pd-field"><span className="pd-field-label">Industry</span><span className="pd-field-value">{industry}</span></div>
-              <div className="pd-field"><span className="pd-field-label">Team Size</span><span className="pd-field-value">{members} members</span></div>
-              <div className="pd-field"><span className="pd-field-label">Role</span><span className="pd-field-value">{role}</span></div>
-              <div className="pd-field"><span className="pd-field-label">Theme</span><span className="pd-field-value">{theme === 'light' ? 'Light' : 'Dark'}</span></div>
-              <div className="pd-field"><span className="pd-field-label">Language</span><span className="pd-field-value">{LANG_NAMES[lang] || 'English'}</span></div>
+              <div className="pd-field"><span className="pd-field-label">{t('fullNameLabel')}</span><span className="pd-field-value">{username}</span></div>
+              <div className="pd-field"><span className="pd-field-label">{t('emailLabelField')}</span><span className="pd-field-value">{email}</span></div>
+              <div className="pd-field"><span className="pd-field-label">{t('companyLabelField')}</span><span className="pd-field-value">{company}</span></div>
+              <div className="pd-field"><span className="pd-field-label">{t('industryLabel')}</span><span className="pd-field-value">{industry}</span></div>
+              <div className="pd-field"><span className="pd-field-label">{t('teamSizeLabel')}</span><span className="pd-field-value">{members} {t('membersSuffix')}</span></div>
+              <div className="pd-field"><span className="pd-field-label">{t('roleLabel')}</span><span className="pd-field-value">{role}</span></div>
+              <div className="pd-field"><span className="pd-field-label">{t('themeLabel')}</span><span className="pd-field-value">{theme === 'light' ? t('lightMode') : t('darkMode')}</span></div>
+              <div className="pd-field"><span className="pd-field-label">{t('languageLabel')}</span><span className="pd-field-value">{LANG_NAMES[lang] || 'English'}</span></div>
             </>)}
             {modal === 'appearance' && (<div className="pd-theme-options">
-              {[{v:'light',icon:<><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,label:'Light'},{v:'dark',icon:<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>,label:'Dark'},{v:'system',icon:<><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></>,label:'System'}].map(o => (
+              {[{v:'light',icon:<><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></>,label:t('lightMode')},{v:'dark',icon:<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>,label:t('darkMode')},{v:'system',icon:<><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></>,label:t('systemMode')}].map(o => (
                 <label key={o.v} className={`pd-theme-opt${theme === o.v ? ' is-active' : ''}`} onClick={() => { const resolved = o.v === 'system' ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark') : o.v; setTheme(resolved); document.documentElement.setAttribute('data-theme', resolved === 'light' ? 'light' : ''); setWorkspaceTheme(resolved, getActiveEmail()); }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{o.icon}</svg><span>{o.label}</span><span className="pd-theme-opt-indicator"></span>
                 </label>
@@ -1128,8 +1165,8 @@ export default function Dashboard() {
                 </label>
               ))}
             </div>)}
-            {modal === 'help' && (<div className="pd-help-content"><p className="pd-help-text">Need help with FlowSync? Browse our resources or reach out to our support team.</p><div className="pd-help-links"><a href="#" className="pd-help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Documentation</a><a href="#" className="pd-help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Contact Support</a><a href="#" className="pd-help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy & Security</a></div></div>)}
-            {modal === 'logout' && (<div className="pd-confirm"><div className="pd-confirm-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div><div className="pd-confirm-title">Logout?</div><p className="pd-confirm-msg">Are you sure you want to logout from FlowSync?</p><div className="pd-confirm-actions"><button className="pd-confirm-cancel" onClick={() => setModal(null)}>Cancel</button><button className="pd-confirm-logout" onClick={logout}>Logout</button></div></div>)}
+            {modal === 'help' && (<div className="pd-help-content"><p className="pd-help-text">{t('helpText')}</p><div className="pd-help-links"><a href="#" className="pd-help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>{t('helpDoc')}</a><a href="#" className="pd-help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>{t('helpSupport')}</a><a href="#" className="pd-help-link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>{t('helpPrivacy')}</a></div></div>)}
+            {modal === 'logout' && (<div className="pd-confirm"><div className="pd-confirm-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div><div className="pd-confirm-title">{t('logoutConfirmTitle')}</div><p className="pd-confirm-msg">{t('logoutConfirmMsg')}</p><div className="pd-confirm-actions"><button className="pd-confirm-cancel" onClick={() => setModal(null)}>{t('cancelBtn')}</button><button className="pd-confirm-logout" onClick={logout}>{t('logoutBtn')}</button></div></div>)}
           </div>
         </div>
       )}
