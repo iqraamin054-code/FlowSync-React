@@ -165,7 +165,14 @@ export const TRANSLATIONS = {
     loopGoal: 'Project Goal',
     loopWorkflow: 'Structured Workflow',
     loopTasks: 'Actionable Tasks',
-    loopProgress: 'Real Progress'
+    loopProgress: 'Real Progress',
+    // Dashboard welcome & new UI keys
+    welcomeBack: 'Welcome back, {name}',
+    welcomeSubtext: "Here's what's happening with your workspaces today.",
+    progressSuffix: 'Progress',
+    recentWorkspaces: 'Recent Workspaces',
+    recentWorkspacesDesc: 'Quick glance at your 3 most recently updated workspaces',
+    viewAllProjects: 'View All Projects'
   },
   'en-gb': {
     dashboard: 'Dashboard',
@@ -335,7 +342,19 @@ export const TRANSLATIONS = {
     markComplete: 'Mark as Complete',
     markIncomplete: 'Mark as Incomplete',
     readyToTurn: 'Ready to turn an idea into a plan?',
-    readyDesc: 'Create a project, describe your goal, and FlowSync will turn it into actionable tasks.'
+    readyDesc: 'Create a project, describe your goal, and FlowSync will turn it into actionable tasks.',
+    workflowLoopLabel: 'How FlowSync works',
+    loopGoal: 'Project Goal',
+    loopWorkflow: 'Structured Workflow',
+    loopTasks: 'Actionable Tasks',
+    loopProgress: 'Real Progress',
+    // Dashboard welcome & new UI keys
+    welcomeBack: 'Welcome back, {name}',
+    welcomeSubtext: "Here's what's happening with your workspaces today.",
+    progressSuffix: 'Progress',
+    recentWorkspaces: 'Recent Workspaces',
+    recentWorkspacesDesc: 'Quick glance at your 3 most recently updated workspaces',
+    viewAllProjects: 'View All Projects'
   },
   de: {
     dashboard: 'Übersicht',
@@ -505,7 +524,19 @@ export const TRANSLATIONS = {
     markComplete: 'Als abgeschlossen markieren',
     markIncomplete: 'Als unvollständig markieren',
     readyToTurn: 'Bereit, eine Idee in einen Plan zu verwandeln?',
-    readyDesc: 'Erstellen Sie ein Projekt, beschreiben Sie Ihr Ziel, und FlowSync verwandelt es in umsetzbare Aufgaben.'
+    readyDesc: 'Erstellen Sie ein Projekt, beschreiben Sie Ihr Ziel, und FlowSync verwandelt es in umsetzbare Aufgaben.',
+    workflowLoopLabel: 'Wie FlowSync funktioniert',
+    loopGoal: 'Projektziel',
+    loopWorkflow: 'Strukturierter Workflow',
+    loopTasks: 'Umsetzbare Aufgaben',
+    loopProgress: 'Echter Fortschritt',
+    // Dashboard welcome & new UI keys
+    welcomeBack: 'Willkommen zurück, {name}',
+    welcomeSubtext: 'Hier ist, was heute in Ihren Arbeitsbereichen passiert.',
+    progressSuffix: 'Fortschritt',
+    recentWorkspaces: 'Aktuelle Arbeitsbereiche',
+    recentWorkspacesDesc: 'Schnellübersicht Ihrer 3 zuletzt aktualisierten Arbeitsbereiche',
+    viewAllProjects: 'Alle Projekte anzeigen'
   },
   fr: {
     dashboard: 'Tableau de Bord',
@@ -571,6 +602,7 @@ export const TRANSLATIONS = {
     manageProjects: 'Gérer les projets de flux',
     createNewProjectBtn: '+ Créer un nouveau projet',
     noProjectsText: 'Aucun projet trouvé. Retournez au tableau de bord pour en créer un.',
+    backToDashboard: 'Retour au tableau de bord',
     createFirstProjectTitle: 'Créez votre premier projet',
     createFirstProjectDesc: 'Décrivez votre objectif et FlowSync le transformera en un flux de travail organisé.',
     createProjectCTA: 'Créer un projet',
@@ -674,7 +706,19 @@ export const TRANSLATIONS = {
     markComplete: 'Marquer comme terminée',
     markIncomplete: 'Marquer comme incomplète',
     readyToTurn: 'Prêt à transformer une idée en projet ?',
-    readyDesc: 'Créez un projet, décrivez votre objectif et FlowSync le transformera en tâches concrètes.'
+    readyDesc: 'Créez un projet, décrivez votre objectif et FlowSync le transformera en tâches concrètes.',
+    workflowLoopLabel: 'Comment fonctionne FlowSync',
+    loopGoal: 'Objectif du projet',
+    loopWorkflow: 'Flux de travail structuré',
+    loopTasks: 'Tâches concrètes',
+    loopProgress: 'Progrès réels',
+    // Dashboard welcome & new UI keys
+    welcomeBack: 'Bon retour, {name}',
+    welcomeSubtext: "Voici ce qui se passe dans vos espaces de travail aujourd'hui.",
+    progressSuffix: 'Progression',
+    recentWorkspaces: 'Espaces récents',
+    recentWorkspacesDesc: 'Aperçu de vos 3 espaces de travail les plus récemment mis à jour',
+    viewAllProjects: 'Voir tous les projets'
   },
   es: {
     dashboard: 'Tablero',
@@ -740,6 +784,7 @@ export const TRANSLATIONS = {
     manageProjects: 'Gestionar proyectos de flujo',
     createNewProjectBtn: '+ Crear nuevo proyecto',
     noProjectsText: 'No se encontraron proyectos. Vuelve al panel para crear uno.',
+    backToDashboard: 'Volver al panel',
     createFirstProjectTitle: 'Crea tu primer proyecto',
     createFirstProjectDesc: 'Describe tu objetivo y FlowSync lo convertirá en un flujo de trabajo organizado.',
     createProjectCTA: 'Crear proyecto',
@@ -843,7 +888,19 @@ export const TRANSLATIONS = {
     markComplete: 'Marcar como completada',
     markIncomplete: 'Marcar como incompleta',
     readyToTurn: '¿Listo para convertir una idea en un plan?',
-    readyDesc: 'Crea un proyecto, describe tu objetivo y FlowSync lo convertirá en tareas prácticas.'
+    readyDesc: 'Crea un proyecto, describe tu objetivo y FlowSync lo convertirá en tareas prácticas.',
+    workflowLoopLabel: 'Cómo funciona FlowSync',
+    loopGoal: 'Objetivo del proyecto',
+    loopWorkflow: 'Flujo de trabajo estructurado',
+    loopTasks: 'Tareas accionables',
+    loopProgress: 'Progreso real',
+    // Dashboard welcome & new UI keys
+    welcomeBack: 'Bienvenido de nuevo, {name}',
+    welcomeSubtext: 'Esto es lo que está pasando en tus espacios de trabajo hoy.',
+    progressSuffix: 'Progreso',
+    recentWorkspaces: 'Espacios recientes',
+    recentWorkspacesDesc: 'Vistazo rápido a tus 3 espacios de trabajo actualizados más recientemente',
+    viewAllProjects: 'Ver todos los proyectos'
   },
   ja: {
     dashboard: 'ダッシュボード',
@@ -909,6 +966,7 @@ export const TRANSLATIONS = {
     manageProjects: 'プロジェクト管理',
     createNewProjectBtn: '+ 新規プロジェクト作成',
     noProjectsText: 'プロジェクトが見つかりません。ダッシュボードに戻って作成してください。',
+    backToDashboard: 'ダッシュボードに戻る',
     createFirstProjectTitle: '最初のプロジェクトを作成しましょう',
     createFirstProjectDesc: '目標を設定すると、FlowSyncが整理されたワークフローを自動生成します。',
     createProjectCTA: 'プロジェクトを作成',
@@ -1078,6 +1136,7 @@ export const TRANSLATIONS = {
     manageProjects: '管理工作流项目',
     createNewProjectBtn: '+ 创建新项目',
     noProjectsText: '未找到项目。请返回仪表板创建项目。',
+    backToDashboard: '返回仪表板',
     createFirstProjectTitle: '创建您的第一个项目',
     createFirstProjectDesc: '描述您的目标，FlowSync 将为您生成一个条理分明的工作流。',
     createProjectCTA: '创建项目',
@@ -1181,7 +1240,19 @@ export const TRANSLATIONS = {
     markComplete: '标记为已完成',
     markIncomplete: '标记为未完成',
     readyToTurn: '准备好将想法转化为计划了吗？',
-    readyDesc: '创建一个项目，描述您的目标，FlowSync 将为您生成可执行的任务。'
+    readyDesc: '创建一个项目，描述您的目标，FlowSync 将为您生成可执行的任务。',
+    workflowLoopLabel: 'FlowSync 如何运作',
+    loopGoal: '项目目标',
+    loopWorkflow: '结构化工作流',
+    loopTasks: '可执行任务',
+    loopProgress: '实际进展',
+    // Dashboard welcome & new UI keys
+    welcomeBack: '欢迎回来，{name}',
+    welcomeSubtext: '以下是您的工作区今天发生的情况。',
+    progressSuffix: '进度',
+    recentWorkspaces: '最近工作区',
+    recentWorkspacesDesc: '快速查看您最近更新的 3 个工作区',
+    viewAllProjects: '查看所有项目'
   },
   ar: {
     dashboard: 'لوحة التحكم',
@@ -1247,6 +1318,7 @@ export const TRANSLATIONS = {
     manageProjects: 'إدارة مشاريع سير العمل',
     createNewProjectBtn: '+ إنشاء مشروع جديد',
     noProjectsText: 'لم يتم العثور على مشاريع. عد إلى لوحة التحكم لإنشاء مشروع.',
+    backToDashboard: 'العودة إلى لوحة التحكم',
     createFirstProjectTitle: 'أنشئ مشروعك الأول',
     createFirstProjectDesc: 'صف هدفك وسيقوم FlowSync بتحويله إلى سير عمل منظم.',
     createProjectCTA: 'إنشاء المشروع',
@@ -1350,7 +1422,19 @@ export const TRANSLATIONS = {
     markComplete: 'تحديد كمكتمل',
     markIncomplete: 'تحديد كغير مكتمل',
     readyToTurn: 'جاهز لتحويل الفكرة إلى خطة؟',
-    readyDesc: 'أنشئ مشروعًا، وصف هدفك، وسيقوم FlowSync بتحويله إلى مهام قابلة للتنفيذ.'
+    readyDesc: 'أنشئ مشروعًا، وصف هدفك، وسيقوم FlowSync بتحويله إلى مهام قابلة للتنفيذ.',
+    workflowLoopLabel: 'كيف يعمل FlowSync',
+    loopGoal: 'هدف المشروع',
+    loopWorkflow: 'سير عمل منظم',
+    loopTasks: 'مهام قابلة للتنفيذ',
+    loopProgress: 'تقدم حقيقي',
+    // Dashboard welcome & new UI keys
+    welcomeBack: 'مرحبًا بعودتك، {name}',
+    welcomeSubtext: 'إليك ما يحدث في مساحات عملك اليوم.',
+    progressSuffix: 'تقدم',
+    recentWorkspaces: 'مساحات العمل الأخيرة',
+    recentWorkspacesDesc: 'نظرة سريعة على أحدث 3 مساحات عمل تم تحديثها',
+    viewAllProjects: 'عرض جميع المشاريع'
   },
   ur: {
     dashboard: 'ڈیش بورڈ',
@@ -1416,6 +1500,7 @@ export const TRANSLATIONS = {
     manageProjects: 'ورک فلو پروجیکٹس کا انتظام',
     createNewProjectBtn: '+ نیا پروجیکٹ بنائیں',
     noProjectsText: 'کوئی پروجیکٹ نہیں ملا۔ پروجیکٹ بنانے کے لیے ڈیش بورڈ پر واپس جائیں۔',
+    backToDashboard: 'ڈیش بورڈ پر واپس جائیں',
     createFirstProjectTitle: 'اپنا پہلا پروجیکٹ بنائیں',
     createFirstProjectDesc: 'اپنے مقصد کی وضاحت کریں اور FlowSync اسے منظم ورک فلو میں تبدیل کر دے گا۔',
     createProjectCTA: 'پروجیکٹ بنائیں',
@@ -1519,6 +1604,18 @@ export const TRANSLATIONS = {
     markComplete: 'مکمل نشان زد کریں',
     markIncomplete: 'نامکمل نشان زد کریں',
     readyToTurn: 'کیا آپ کسی خیال کو منصوبے میں تبدیل کرنے کے لیے تیار ہیں؟',
-    readyDesc: 'پروجیکٹ بنائیں، اپنے مقصد کی وضاحت کریں، اور FlowSync اسے قابل عمل کاموں میں تبدیل کر دے گا۔'
+    readyDesc: 'پروجیکٹ بنائیں، اپنے مقصد کی وضاحت کریں، اور FlowSync اسے قابل عمل کاموں میں تبدیل کر دے گا۔',
+    workflowLoopLabel: 'FlowSync کیسے کام کرتا ہے',
+    loopGoal: 'پروجیکٹ کا مقصد',
+    loopWorkflow: 'منظم ورک فلو',
+    loopTasks: 'قابل عمل کام',
+    loopProgress: 'حقیقی پیشرفت',
+    // Dashboard welcome & new UI keys
+    welcomeBack: 'واپسی پر خوش آمدید، {name}',
+    welcomeSubtext: 'آج آپ کے ورک اسپیس میں کیا ہو رہا ہے۔',
+    progressSuffix: 'پیشرفت',
+    recentWorkspaces: 'حالیہ ورک اسپیسز',
+    recentWorkspacesDesc: 'آپ کے 3 حال ہی میں اپڈیٹ کیے گئے ورک اسپیس کا فوری جائزہ',
+    viewAllProjects: 'تمام پروجیکٹس دیکھیں'
   }
 };

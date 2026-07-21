@@ -763,7 +763,7 @@ export default function Dashboard() {
                     <div className="db-welcome-section" style={{ marginBottom: '1.75rem' }}>
                       <div className="db-title-row" style={{ marginBottom: '0.35rem' }}>
                         <h2 className="db-title" style={{ fontSize: '1.75rem', fontWeight: 700, margin: 0 }}>
-                          Welcome back, {username}
+                          {t('welcomeBack', { name: username })}
                         </h2>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                           <div className="db-badge-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg><span>{t('global')}</span></div>
@@ -773,7 +773,7 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <p className="db-welcome-subtext" style={{ color: 'var(--text-secondary, #94A3B8)', fontSize: '0.95rem', margin: 0 }}>
-                        Here's what's happening with your workspaces today.
+                        {t('welcomeSubtext')}
                       </p>
                     </div>
 
@@ -821,7 +821,7 @@ export default function Dashboard() {
                     <div className="db-distribution-chart glass-card" style={{ padding: '1.5rem', marginTop: '1.5rem' }}>
                       <div className="db-dist-header" style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span className="db-dist-title" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t('progressDistribution')}</span>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{projects.length} Workspaces</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{projects.length} {t('activeWorkspaces')}</span>
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-around', gap: '1.5rem' }}>
@@ -863,7 +863,7 @@ export default function Dashboard() {
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                                 <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color, display: 'inline-block' }} />
                                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                                  {item.name} Progress
+                                  {item.name} {t('progressSuffix')}
                                 </span>
                               </div>
                               <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
@@ -880,10 +880,10 @@ export default function Dashboard() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                         <div>
                           <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
-                            Recent Workspaces
+                            {t('recentWorkspaces')}
                           </h3>
                           <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            Quick glance at your 3 most recently updated workspaces
+                            {t('recentWorkspacesDesc')}
                           </span>
                         </div>
                         <button 
@@ -891,7 +891,7 @@ export default function Dashboard() {
                           style={{ padding: '0.4rem 0.85rem', fontSize: '0.85rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
                           onClick={() => setActiveNav('projects')}
                         >
-                          <span>View All Projects</span>
+                          <span>{t('viewAllProjects')}</span>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                           </svg>

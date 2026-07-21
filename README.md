@@ -2,13 +2,9 @@
 
 <div align="center">
 
-<img src="src/assets/images/github-banner.png" width="100%" alt="FlowSync Banner">
+<img src="src/assets/images/github-banner.png" width="100%" alt="FlowSync">
 
-<br>
-
-<p>
-  <strong>An AI-powered workspace for turning project goals into organized workflows, actionable tasks, and measurable progress.</strong>
-</p>
+### Turn project goals into structured workflows, actionable tasks, and measurable progress.
 
 <br>
 
@@ -24,74 +20,35 @@
 
 ---
 
-## ✦ What is FlowSync?
+## ✦ About FlowSync
 
-FlowSync is a modern productivity workspace built around one simple idea:
+FlowSync is a productivity workspace built around a simple idea:
 
 > **A project goal should not remain an unstructured idea.**
 
-Users create a workspace, define a project, describe what they want to accomplish, and FlowSync transforms that goal into an organized workflow that can be managed and tracked.
+Users create a project, describe what they want to accomplish in natural language, and FlowSync transforms that goal into a structured workflow that can be managed and tracked.
 
 ### The core product loop
 
-<div align="center">
-
-**Create Workspace**
-↓
-**Create Project**
-↓
-**Describe Goal**
-↓
-**Generate Workflow**
-↓
-**Manage Tasks**
-↓
-**Track Progress**
-
-</div>
-
-For example:
-
-> **"Launch a website for my small business in 30 days."**
-
-FlowSync turns the goal into structured work such as:
-
-* Define requirements
-* Create sitemap
-* Design the interface
-* Build the website
-* Add content
-* Test the project
-* Launch the website
-
-The user can then manage the workflow, update task statuses, and track real progress from the actual project data.
+**Create a Project → Describe the Goal → Generate a Workflow → Manage Tasks → Track Progress**
 
 ---
 
-## ✨ Product Experience
+## 🎬 Product Demo
 
-### 🏠 Premium SaaS Landing Page
+<!-- Add the final product GIF here -->
 
-A complete product experience designed to communicate the value of FlowSync through:
-
-* Modern hero experience
-* Product-focused storytelling
-* Problem and solution sections
-* Feature comparison
-* Interactive pricing calculator
-* Pricing plans
-* Testimonials
-* FAQ accordion
-* Contact form
-* Responsive footer experience
+<p align="center">
+  <img src="src/assets/screenshots/flowsync-demo.gif" width="90%" alt="FlowSync product demo">
+</p>
 
 ---
+
+## ✨ Key Features
 
 ### 🧭 Workspace Onboarding
 
-New users can create a personalized FlowSync workspace through a guided onboarding experience.
-
-The onboarding collects workspace information such as:
+Users can create a personalized workspace by providing:
 
 * Personal information
 * Company details
@@ -102,89 +59,95 @@ The onboarding collects workspace information such as:
 * Theme preference
 * Language preference
 
-After completing onboarding, the user enters their workspace and can begin creating projects.
+After onboarding, users enter their workspace and can begin creating projects.
 
 ---
 
-### 📁 Project Workflows
+### 📁 Goal-Based Project Workflows
 
-Users can create and manage multiple projects.
+Users can create multiple projects and describe their desired outcome in natural language.
 
-Each project contains:
+FlowSync is designed to generate workflows that reflect the user's actual project goal instead of applying the same generic task list to every project.
 
-* Project name
-* Project goal
-* Structured workflow
-* Task progress
-* Completion status
-* Last updated information
+For example:
 
-Projects remain available when users return to their workspace.
+> **Goal:** Launch a website for a small business in 30 days.
+
+A relevant workflow may include:
+
+* Define project requirements
+* Plan the website structure
+* Design the interface
+* Build the website
+* Add and review content
+* Test the project
+* Launch the website
+
+The core concept is:
+
+**Project Context + User Goal → Relevant Workflow**
 
 ---
 
-### ✅ Task Management
+### ✅ Interactive Task Management
 
 Generated workflow tasks can be managed through a simple progress system:
 
 **Todo → In Progress → Completed**
 
-Task progress is calculated from the actual task statuses.
-
 Users can:
 
-* Update task status
+* Update task statuses
 * Track completed tasks
 * View project progress
 * Continue working on existing projects
+
+Progress is calculated from actual task data rather than hardcoded values.
 
 ---
 
 ### 📊 Workspace Dashboard
 
-The dashboard focuses on real workspace activity rather than decorative data.
-
-It provides visibility into:
+The dashboard provides an overview of the user's workspace, including:
 
 * Total projects
 * Total tasks
 * Completed tasks
 * Overall progress
-* Project completion progress
-* Workspace activity
+* Project activity
+* Individual project progress
 
-The goal is to keep the product loop focused:
-
-> **Projects → Workflows → Tasks → Progress**
+The dashboard provides a high-level overview, while each project has its own workspace for detailed task management.
 
 ---
 
 ### 🎨 Personalization
 
-FlowSync supports workspace preferences including:
+FlowSync supports:
 
 * Dark mode
 * Light mode
 * Language preferences
-* Persistent user preferences
-
-Theme and workspace preferences are preserved across sessions.
+* Persistent workspace preferences
+* Responsive layouts for desktop, tablet, and mobile
 
 ---
 
-## 💡 Interactive Experience
+## 🧩 Product Experience
 
-FlowSync combines a product-focused SaaS interface with interactive frontend experiences:
+FlowSync also includes a complete SaaS-style product experience with:
 
-* Dynamic pricing calculator
-* Monthly / yearly billing toggle
+* Product-focused landing page
+* Interactive product showcase
+* Pricing calculator
+* Monthly/yearly billing toggle
 * Feature comparison table
-* Animated statistics
-* Interactive carousels
+* Testimonials carousel
 * FAQ accordion
-* Form validation
-* Loading and success states
-* Smooth transitions
+* Contact form validation
+* Blog content with API integration
+* Loading, error, and success states
+* Smooth UI animations
 * Responsive layouts
 
 ---
@@ -205,13 +168,53 @@ FlowSync combines a product-focused SaaS interface with interactive frontend exp
 
 ---
 
+## 📸 Screenshots
+
+### 🏠 Landing Page
+
+![Landing Page](src/assets/screenshots/hero.png)
+
+---
+
+### 💰 Pricing Experience
+
+![Pricing Calculator](src/assets/screenshots/pricing-calculator.png)
+
+---
+
+### 📊 Feature Comparison
+
+![Feature Comparison](src/assets/screenshots/comparison-table.png)
+
+---
+
+### 📊 Workspace Dashboard
+
+![Workspace Dashboard](src/assets/screenshots/dashboard.png)
+
+---
+
+### 📁 Project Workspace
+
+![Project Workspace](src/assets/screenshots/project-workspace.png)
+
+---
+
+### 📱 Responsive Mobile Experience
+
+<div align="center">
+
+<img src="src/assets/screenshots/mobile-view.png" width="350" alt="FlowSync mobile experience">
+
+</div>
+
+---
+
 ## 📁 Project Structure
 
 ```text
 FlowSync/
-│
 ├── public/
-│
 ├── src/
 │   ├── assets/
 │   ├── components/
@@ -225,7 +228,6 @@ FlowSync/
 │   ├── App.jsx
 │   ├── main.jsx
 │   └── index.css
-│
 ├── package.json
 ├── vite.config.js
 └── README.md
@@ -339,6 +341,14 @@ The project focuses on turning a simple concept into a complete product experien
 
 ---
 
+🧠 Development with Codex & GPT-5.6
+
+During the hackathon submission period, Codex and GPT-5.6 were used as AI-assisted development tools to support implementation, debugging, workflow logic refinement, UI iteration, and development acceleration.
+
+The product direction, feature priorities, design decisions, testing, and final integration were guided throughout the development process.
+
+---
+
 ## 👩‍💻 Author
 
 <div align="center">
@@ -347,7 +357,7 @@ The project focuses on turning a simple concept into a complete product experien
 
 **Software Engineering Student | Frontend Developer**
 
-Building practical projects while exploring modern web development and product design.
+Building practical software projects while exploring modern web development and product design.
 
 [GitHub](https://github.com/iqraamin054-code) • [LinkedIn](https://www.linkedin.com/in/iqraamin-dev)
 
@@ -359,4 +369,4 @@ Building practical projects while exploring modern web development and product d
 
 This project was created for educational, portfolio, and demonstration purposes.
 
-All product names, branding, and content are fictional and created solely for demonstration.
+All product names and branding are fictional and created solely for demonstration.
