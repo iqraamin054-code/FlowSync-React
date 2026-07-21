@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import useScrollReveal from '../hooks/useScrollReveal.js';
 import WorkflowWorkspace from '../components/dashboard/WorkflowWorkspace.jsx';
 import useWorkflowProject from '../hooks/useWorkflowProject.js';
+import useNotifications from '../hooks/useNotifications.js';
 import { getProjectProgress } from '../utils/workflowGenerator.js';
 import { getActiveEmail, getUser, getWorkspace, setWorkspaceTheme, updateWorkspaceProfile } from '../utils/workspaceStorage.js';
 import { TRANSLATIONS } from '../data/translations.js';
@@ -30,7 +31,8 @@ function getInitials(name) {
 export default function Dashboard() {
   const navigate = useNavigate();
   const fmtDate = (dateStr) => { const d = new Date(dateStr); return `${String(d.getDate()).padStart(2, '0')} / ${String(d.getMonth() + 1).padStart(2, '0')} / ${d.getFullYear()}`; };
-  const { project, projects, selectProject, startProject, updateTask, deleteProject } = useWorkflowProject();
+  const { project, projects, selectProject, startProject: rawStartProject, updateTask: rawUpdateTask, deleteProject } = useWorkflowProject();
+  const { notifications, unreadCount, isOpen: notifOpen, togglePanel: toggleNotifPanel, markAsRead, markAllAsRead, createNotification } = useNotifications();
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pdOpen, setPdOpen] = useState(false);
@@ -134,7 +136,6 @@ export default function Dashboard() {
   const [activeNav, setActiveNav] = useState('dashboard');
   useScrollReveal(activeNav);
   const [modal, setModal] = useState(null);
-  const [notifOpen, setNotifOpen] = useState(false);
   const [notifEnabled, setNotifEnabled] = useState(true);
   const [industry, setIndustry] = useState(() => {
     try {
@@ -238,6 +239,42 @@ export default function Dashboard() {
     return text;
   };
 
+  const startProject = useCallback((values) => {
+    const newProj = rawStartProject(values);
+    createNotification({
+      type: 'project_created',
+      title: t('projectCreatedTitle'),
+      description: t('projectCreatedDesc', { name: values.name || 'Untitled' }),
+      projectName: values.name || 'Untitled',
+      projectId: newProj?.id,
+    });
+    return newProj;
+  }, [rawStartProject, createNotification, t]);
+
+  const updateTask = useCallback((taskId, updates) => {
+    const prevTask = project?.tasks?.find(t => t.id === taskId);
+    const projectName = project?.name || '';
+    const projectId = project?.id;
+    rawUpdateTask(taskId, updates);
+    if (updates.status && prevTask && updates.status !== prevTask.status) {
+      createNotification({
+        type: 'task_status_changed',
+        title: t('taskStatusChangedTitle'),
+        description: t('taskStatusChangedDesc', { task: prevTask.title, status: updates.status, project: projectName }),
+        projectName,
+        projectId,
+      });
+    } else if (updates.status === 'done' && prevTask?.status !== 'done') {
+      createNotification({
+        type: 'task_completed',
+        title: t('taskCompletedTitle'),
+        description: t('taskCompletedDesc', { task: prevTask?.title || '', project: projectName }),
+        projectName,
+        projectId,
+      });
+    }
+  }, [rawUpdateTask, project, createNotification, t]);
+
   const updateLanguage = (newLang) => {
     setLang(newLang);
     localStorage.setItem('flowsync-language', newLang);
@@ -262,10 +299,10 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!notifOpen) return;
-    const handler = (e) => { if (!e.target.closest('.header-btn[aria-label="Notifications"]')) setNotifOpen(false); };
+    const handler = (e) => { if (!e.target.closest('.header-btn[aria-label="Notifications"]')) toggleNotifPanel(); };
     document.addEventListener('click', handler);
     return () => document.removeEventListener('click', handler);
-  }, [notifOpen]);
+  }, [notifOpen, toggleNotifPanel]);
 
   useEffect(() => {
     const btn = document.querySelector('.hamburger-btn');
@@ -466,6 +503,16 @@ export default function Dashboard() {
   const totalCompleted = projects.reduce((sum, item) => sum + item.tasks.filter((task) => task.status === 'done').length, 0);
   const totalInProgress = projects.reduce((sum, item) => sum + item.tasks.filter((task) => task.status === 'in-progress').length, 0);
   const workspaceProgress = totalTasks ? Math.round((totalCompleted / totalTasks) * 100) : 0;
+  const needsAttention = projects.filter(p => getProjectProgress(p.tasks) === 0).length;
+  const distBuckets = projects.reduce((acc, p) => {
+    const pct = getProjectProgress(p.tasks);
+    if (pct <= 25) acc['0-25']++;
+    else if (pct <= 50) acc['26-50']++;
+    else if (pct <= 75) acc['51-75']++;
+    else acc['76-100']++;
+    return acc;
+  }, { '0-25': 0, '26-50': 0, '51-75': 0, '76-100': 0 });
+  const distMax = Math.max(...Object.values(distBuckets), 1);
 
   // Chart coordinates calculation (Phase Completion Progress)
   const xCoords = [50, 154, 258, 362, 466, 570];
@@ -604,15 +651,7 @@ export default function Dashboard() {
             <button className="hamburger-btn" aria-label="Open sidebar" aria-expanded={sidebarOpen} onClick={() => setSidebarOpen(true)}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <Link to="/" className="db-header-logo" aria-label="FlowSync Home">
-              <svg width="20" height="20" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-                <rect x="2" y="2" width="24" height="24" rx="6" fill="url(#hdrLogoGrad)" />
-                <path d="M9 14L13 10L19 16" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M14 9V19" stroke="white" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
-                <defs><linearGradient id="hdrLogoGrad" x1="2" y1="2" x2="26" y2="26" gradientUnits="userSpaceOnUse"><stop stopColor="var(--color-primary, #2563EB)" /><stop offset="1" stopColor="var(--color-secondary, #7C3AED)" /></linearGradient></defs>
-              </svg>
-              <span className="db-header-logo__text">FlowSync</span>
-            </Link>
+            <span className="db-header-title">{t(activeNav)}</span>
             <div className="header-search">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder={t('searchPlaceholder')} aria-label={t('searchPlaceholder')} />
@@ -621,18 +660,32 @@ export default function Dashboard() {
               </div>}
             </div>
             <div className="header-actions">
-              <button className="header-btn" aria-label="Notifications" onClick={(e) => { e.stopPropagation(); setNotifOpen(!notifOpen); }}>
+              <button className="header-btn" aria-label={t('notifications')} onClick={(e) => { e.stopPropagation(); toggleNotifPanel(); }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <span className="badge badge--danger"></span>
+                {unreadCount > 0 && <span className="badge badge--danger">{unreadCount}</span>}
                 {notifOpen && (
                   <div className="notifications-dropdown" onClick={e => e.stopPropagation()}>
-                    <div className="notif-header">Notifications</div>
-                    <div className="notif-item"><span className="notif-dot"></span> New workflow generated successfully</div>
-                    <div className="notif-item"><span className="notif-dot"></span> Welcome to your FlowSync workspace!</div>
+                    <div className="notif-header">
+                      <span>{t('notifications')}</span>
+                      {unreadCount > 0 && <button className="notif-mark-all" onClick={markAllAsRead}>{t('markAllRead')}</button>}
+                    </div>
+                    {notifications.length === 0 ? (
+                      <div className="notif-empty">{t('noNotifications')}</div>
+                    ) : (
+                      notifications.slice(0, 10).map((notif) => (
+                        <div key={notif.id} className={`notif-item ${notif.read ? 'notif-item--read' : ''}`} onClick={() => markAsRead(notif.id)}>
+                          <span className={`notif-dot ${notif.read ? 'notif-dot--read' : ''}`}></span>
+                          <div className="notif-content">
+                            <div className="notif-title">{notif.title}</div>
+                            <div className="notif-desc">{notif.description}</div>
+                            <div className="notif-time">{new Date(notif.timestamp).toLocaleDateString()}</div>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 )}
               </button>
-              <button className="header-btn" aria-label="Inbox"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></button>
               <button className="header-date"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>{new Date().toLocaleDateString(undefined, {month: 'short', day: 'numeric'})}</span></button>
               <div className="header-dropdown-wrap lang-dropdown-wrap">
                 <svg className="lang-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
@@ -701,160 +754,129 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    <div className="metrics-grid reveal-stagger">
-                      <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">{t('totalProjectsCard')}</span><span className="m-badge m-badge--yellow">{t('workspaceLabel')}</span></div>
-                        <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>
-                          {projects.length} {projects.length === 1 ? t('projectSuffix') : t('projectsSuffix')}
+                    {/* Overview Stats Row */}
+                    <div className="db-overview-stats">
+                      <div className="db-stat-card glass-card ripple">
+                        <div className="db-stat-icon" style={{ background: 'rgba(37,99,235,0.12)', color: '#3B82F6' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                         </div>
-                        <div className="m-card__chart">
-                          <svg className="sparkline-svg" viewBox="0 0 120 40">
-                            <defs>
-                              <linearGradient id="sparkGradYellow" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.3"/>
-                                <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0"/>
-                              </linearGradient>
-                            </defs>
-                            <path d="M 0 34 Q 30 28 60 20 T 100 10 T 120 6 L 120 40 L 0 40 Z" fill="url(#sparkGradYellow)"/>
-                            <path d="M 0 34 Q 30 28 60 20 T 100 10 T 120 6" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
+                        <div className="db-stat-body">
+                          <span className="db-stat-value">{projects.length}</span>
+                          <span className="db-stat-label">{t('activeWorkspaces')}</span>
                         </div>
                       </div>
-
-                      <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">{t('totalTasksCard')}</span><span className="m-badge m-badge--purple">{t('workspaceLabel')}</span></div>
-                        <div className="m-card__content-row">
-                          <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>{totalTasks} {t('tasksSuffix')}</div>
-                          <div className="m-card__circular">
-                            <svg width="44" height="44" viewBox="0 0 36 36">
-                              <circle className="donut-track" cx="18" cy="18" r="15.915" fill="transparent" stroke="var(--border-strong)" strokeWidth="3"/>
-                              <circle 
-                                className="donut-segment" 
-                                cx="18" 
-                                cy="18" 
-                                r="15.915" 
-                                fill="transparent" 
-                                stroke="#7C3AED" 
-                                strokeWidth="3.5" 
-                                strokeDasharray={`${totalTasks ? Math.round((totalCompleted / totalTasks) * 100) : 0} ${totalTasks ? 100 - Math.round((totalCompleted / totalTasks) * 100) : 100}`}
-                                strokeDashoffset="25"
-                              />
-                            </svg>
-                          </div>
+                      <div className="db-stat-card glass-card ripple">
+                        <div className="db-stat-icon" style={{ background: 'rgba(124,58,237,0.12)', color: '#7C3AED' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <div className="db-stat-body">
+                          <span className="db-stat-value">{workspaceProgress}%</span>
+                          <span className="db-stat-label">{t('overallProgress')}</span>
                         </div>
                       </div>
-
-                      <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">{t('completedTasksCard')}</span><span className="m-badge m-badge--success">{t('workspaceLabel')}</span></div>
-                        <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>{totalCompleted} {t('tasksSuffix').toLowerCase()}</div>
-                        <div className="m-card__chart">
-                          <svg className="sparkline-svg" viewBox="0 0 120 40">
-                            <defs>
-                              <linearGradient id="sparkGradGreen" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="#10B981" stopOpacity="0.3"/>
-                                <stop offset="100%" stopColor="#10B981" stopOpacity="0.0"/>
-                              </linearGradient>
-                            </defs>
-                            <path d="M 0 35 Q 15 28 30 32 T 60 22 T 90 28 T 120 10 L 120 40 L 0 40 Z" fill="url(#sparkGradGreen)"/>
-                            <path d="M 0 35 Q 15 28 30 32 T 60 22 T 90 28 T 120 10" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
+                      <div className="db-stat-card glass-card ripple">
+                        <div className="db-stat-icon" style={{ background: 'rgba(16,185,129,0.12)', color: '#10B981' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <div className="db-stat-body">
+                          <span className="db-stat-value">{totalCompleted}/{totalTasks}</span>
+                          <span className="db-stat-label">{t('completedTasksCard')}</span>
                         </div>
                       </div>
-
-                      <div className="metric-card glass-card ripple reveal">
-                        <div className="m-card__header"><span className="m-card__title">{t('workspaceProgressCard')}</span><span className="m-badge m-badge--blue">{t('allProjectsLabel')}</span></div>
-                        <div className="m-card__value" style={{ fontSize: '1.2rem', paddingTop: '0.5rem' }}>{workspaceProgress}%</div>
-                        <div className="m-card__chart">
-                          <svg className="sparkline-svg" viewBox="0 0 120 40">
-                            <g fill="var(--color-primary, #2563EB)" opacity="0.85">
-                              <rect x="5" y="24" width="8" height="16" rx="2"/>
-                              <rect x="20" y="18" width="8" height="22" rx="2"/>
-                              <rect x="35" y="26" width="8" height="14" rx="2"/>
-                              <rect x="50" y="14" width="8" height="26" rx="2"/>
-                              <rect x="65" y="20" width="8" height="20" rx="2"/>
-                              <rect x="80" y="10" width="8" height="30" rx="2"/>
-                              <rect x="95" y="16" width="8" height="24" rx="2"/>
-                              <rect x="110" y="2" width="8" height="38" rx="2"/>
-                            </g>
-                          </svg>
+                      <div className="db-stat-card glass-card ripple">
+                        <div className="db-stat-icon" style={{ background: 'rgba(239,68,68,0.12)', color: '#EF4444' }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div className="db-stat-body">
+                          <span className="db-stat-value">{needsAttention}</span>
+                          <span className="db-stat-label">{t('needsAttention')}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="db-project-list-section glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>{t('myWorkspaces')}</h3>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{projects.length} {t('activeTag')}</span>
+                    {/* Progress Distribution Chart */}
+                    <div className="db-distribution-chart glass-card">
+                      <div className="db-dist-header">
+                        <span className="db-dist-title">{t('progressDistribution')}</span>
                       </div>
-                      {projects.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '2.5rem 1rem' }}>
-                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ margin: '0 auto 1rem' }}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                          <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.4rem' }}>No projects yet</p>
-                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Create your first project to get started.</p>
-                        </div>
-                      ) : (
-                        <div className="db-overview-projects" style={{ display: 'grid', gap: '1rem' }}>
-                          {projects.map((proj, idx) => {
-                            const pct = getProjectProgress(proj.tasks);
-                            const doneTasks = proj.tasks.filter((task) => task.status === 'done').length;
-                            const totalProjTasks = proj.tasks.length;
-                            const colors = ['#2563EB', '#7C3AED', '#10B981', '#EC4899', '#F59E0B'];
-                            const color = colors[idx % colors.length];
-                            const lastUpdated = proj.updatedAt || proj.createdAt;
-                            return (
-                              <div key={proj.id} className="db-project-card glass-card reveal" style={{ padding: '1.25rem', border: `1px solid ${color}22`, cursor: 'default', borderRadius: '12px' }}>
-                                {/* Header Row */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.4rem' }}>
-                                  <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: color, flexShrink: 0, display: 'inline-block' }} />
-                                      <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>{proj.name}</h4>
-                                    </div>
-                                    <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: '0 0 0 1.1rem', lineHeight: 1.45 }}>{proj.goal}</p>
-                                  </div>
-                                  <span style={{ fontSize: '1rem', fontWeight: 800, color, flexShrink: 0, marginLeft: '1rem', letterSpacing: '-0.5px' }}>{pct}%</span>
-                                </div>
-
-                                {/* Progress Bar */}
-                                <div style={{ height: '6px', background: 'var(--border-subtle)', borderRadius: '999px', overflow: 'hidden', margin: '0.75rem 0' }}>
-                                  <div style={{ width: `${pct}%`, height: '100%', background: `linear-gradient(90deg, ${color}, ${color}bb)`, borderRadius: '999px', transition: 'width 0.6s cubic-bezier(0.16,1,0.3,1)' }} />
-                                </div>
-
-                                {/* Stats Row */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-                                  <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                                    {doneTasks} of {totalProjTasks} tasks completed
-                                  </span>
-                                  {lastUpdated && (
-                                    <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-                                      Updated {new Date(lastUpdated).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                                    </span>
-                                  )}
-                                </div>
-
-                                {/* Action Row */}
-                                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                  <button
-                                    className="workflow-primary ripple"
-                                    style={{ flex: 1, padding: '0.45rem 0.9rem', fontSize: '0.82rem' }}
-                                    onClick={() => selectProject(proj.id)}
-                                  >
-                                    {t('openWorkspace')}
-                                  </button>
-                                  <button
-                                    style={{ padding: '0.45rem 0.75rem', fontSize: '0.8rem', borderRadius: '8px', border: '1px solid rgba(239,68,68,0.35)', color: '#EF4444', background: 'rgba(239,68,68,0.06)', cursor: 'pointer', transition: 'all 0.2s ease' }}
-                                    onClick={() => { if (window.confirm(t('deleteConfirmMsg', { name: proj.name }))) deleteProject(proj.id); }}
-                                    title={t('deleteBtn')}
-                                  >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                                  </button>
-                                </div>
+                      <div className="db-dist-bars">
+                        {[
+                          { key: '0-25', label: '0–25%', color: '#EF4444' },
+                          { key: '26-50', label: '26–50%', color: '#F59E0B' },
+                          { key: '51-75', label: '51–75%', color: '#3B82F6' },
+                          { key: '76-100', label: '76–100%', color: '#10B981' },
+                        ].map(b => {
+                          const count = distBuckets[b.key];
+                          const pct = Math.round((count / distMax) * 100);
+                          return (
+                            <div key={b.key} className="db-dist-bar-row">
+                              <span className="db-dist-bar-label">{b.label}</span>
+                              <div className="db-dist-bar-track">
+                                <div className="db-dist-bar-fill" style={{ width: `${pct}%`, background: b.color }} />
                               </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                              <span className="db-dist-bar-count">{count}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
+
+                    {/* Workspace Grid */}
+                    <div className="db-workspace-header">
+                      <h3>{t('myWorkspaces')}</h3>
+                      <span>{projects.length} {t('activeTag')}</span>
+                    </div>
+                    {projects.length === 0 ? (
+                      <div className="db-workspace-empty">
+                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <p>{t('noProjectsText')}</p>
+                        <span>{t('createFirstProjectDesc')}</span>
+                      </div>
+                    ) : (
+                      <div className="db-workspace-grid">
+                        {projects.map((proj, idx) => {
+                          const pct = getProjectProgress(proj.tasks);
+                          const doneTasks = proj.tasks.filter((task) => task.status === 'done').length;
+                          const totalProjTasks = proj.tasks.length;
+                          const colors = ['#2563EB', '#7C3AED', '#10B981', '#EC4899', '#F59E0B'];
+                          const color = colors[idx % colors.length];
+                          const lastUpdated = proj.updatedAt || proj.createdAt;
+                          return (
+                            <div key={proj.id} className="db-workspace-card glass-card reveal">
+                              <div className="db-wc-top">
+                                <div className="db-wc-top-left">
+                                  <span className="db-wc-dot" style={{ background: color }} />
+                                  <h4 className="db-wc-name">{proj.name}</h4>
+                                </div>
+                                <span className="db-wc-pct" style={{ color }}>{pct}%</span>
+                              </div>
+                              <p className="db-wc-goal">{proj.goal}</p>
+                              <div className="db-wc-progress">
+                                <div className="db-wc-progress-track">
+                                  <div className="db-wc-progress-fill" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}, ${color}bb)` }} />
+                                </div>
+                                <span className="db-wc-meta">{t('tasksCompletedKicker', { completed: doneTasks, total: totalProjTasks })}</span>
+                              </div>
+                              {lastUpdated && (
+                                <span className="db-wc-updated">{t('lastUpdated')} {new Date(lastUpdated).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                              )}
+                              <div className="db-wc-actions">
+                                <button className="workflow-primary ripple" onClick={() => selectProject(proj.id)}>
+                                  {t('openWorkspace')}
+                                </button>
+                                <button
+                                  className="db-wc-delete"
+                                  onClick={() => { if (window.confirm(t('deleteConfirmMsg', { name: proj.name }))) deleteProject(proj.id); }}
+                                  title={t('deleteBtn')}
+                                >
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </>
                 )}
               </>
