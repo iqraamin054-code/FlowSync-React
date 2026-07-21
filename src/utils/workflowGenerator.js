@@ -21,12 +21,24 @@ export function getAvailableDays(targetDate, today = new Date()) {
   return Math.round((atStartOfDay(targetDate) - atStartOfDay(today)) / 86400000);
 }
 
-const detectCategory = (text) => {
+const detectCategory = (text, industry = '') => {
+  const combined = `${industry} ${text}`.toLowerCase();
+  
+  // Goal is PRIMARY source - check goal first
   if (/mobile|ios|android|fitness.*app|app|application/.test(text)) return 'mobile';
   if (/campaign|marketing|social media|ads?|brand|promotion|advertisement|instagram|facebook|twitter|tiktok|youtube|content marketing/.test(text)) return 'marketing';
-  if (/website|site|landing page|web app|webapp|e-?commerce|online store|blog|portal/.test(text)) return 'website';
+  if (/website|site|landing page|web app|webapp|e-?commerce|online store|blog|portfolio/.test(text)) return 'website';
   if (/event|conference|seminar|workshop|meetup|fest|ceremony|gala|expo|fair|university event|tech event|summit/.test(text)) return 'event';
   if (/product launch|launch.*product|release.*product|new product|go live|market launch|debut/.test(text)) return 'product_launch';
+  
+  // Industry as secondary context - only if goal doesn't match
+  if (/education|university|school|student|learning|course|training|edtech/.test(combined)) return 'event';
+  if (/marketing|advertising|agency|media|social|content|brand/.test(combined)) return 'marketing';
+  if (/software|technology|tech|development|saas|app/.test(combined)) return 'website';
+  if (/healthcare|medical|health|hospital|clinic/.test(combined)) return 'general';
+  if (/finance|banking|fintech|investment/.test(combined)) return 'general';
+  if (/retail|ecommerce|store|shop|fashion/.test(combined)) return 'product_launch';
+  
   return 'general';
 };
 
@@ -149,18 +161,18 @@ const scheduleTasks = (items, targetDate) => {
   });
 };
 
-export function generateWorkflow(goal, targetDate = '', projectName = '') {
+export function generateWorkflow(goal, targetDate = '', projectName = '', industry = '') {
   const text = `${projectName} ${goal}`.toLowerCase();
-  const kind = detectCategory(text);
+  const kind = detectCategory(text, industry);
   const availableDays = getAvailableDays(targetDate);
   const compact = availableDays !== null && availableDays <= 2;
   return scheduleTasks(template(kind, compact, goal).map(([title, description, phase, priority]) => ({ title, description, phase, priority })), targetDate)
     .map((item) => createTask(item.title, item.description, item.phase, item.priority, item.timeline));
 }
 
-export function createProject({ name, goal, targetDate }) {
+export function createProject({ name, goal, targetDate, industry }) {
   const timestamp = new Date().toISOString();
-  return { id: `project-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, name: name.trim() || 'Untitled Project', goal: goal.trim(), targetDate: targetDate || '', createdAt: timestamp, updatedAt: timestamp, tasks: generateWorkflow(goal, targetDate, name) };
+  return { id: `project-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, name: name.trim() || 'Untitled Project', goal: goal.trim(), targetDate: targetDate || '', industry: industry || '', createdAt: timestamp, updatedAt: timestamp, tasks: generateWorkflow(goal, targetDate, name, industry) };
 }
 
 export function getProjectProgress(tasks = []) {

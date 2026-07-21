@@ -655,6 +655,7 @@ export default function Dashboard() {
                 {projects.length === 0 ? (
                   <WorkflowWorkspace
                     lang={lang}
+                    industry={industry}
                     createRequest={creatingNew ? 1 : newProjectRequest}
                     onCreateRequestHandled={() => { setNewProjectRequest(0); setCreatingNew(false); }}
                     project={project}
@@ -667,6 +668,7 @@ export default function Dashboard() {
                   /* Case 2: User clicked "Create New Project" — show creation form */
                   <WorkflowWorkspace
                     lang={lang}
+                    industry={industry}
                     createRequest={1}
                     onCreateRequestHandled={() => {}}
                     project={null}

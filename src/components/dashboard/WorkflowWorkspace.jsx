@@ -4,7 +4,7 @@ import { TRANSLATIONS } from '../../data/translations.js';
 
 const PHASES = ['Planning', 'Design', 'Development', 'Content', 'Testing', 'Launch'];
 
-export default function WorkflowWorkspace({ createRequest = 0, onCreateRequestHandled, lang = 'en', project, startProject, updateTask, deleteProject, onCancel }) {
+export default function WorkflowWorkspace({ createRequest = 0, onCreateRequestHandled, lang = 'en', industry = '', project, startProject, updateTask, deleteProject, onCancel }) {
   const [name, setName] = useState('');
   const [goal, setGoal] = useState('');
   const [targetDate, setTargetDate] = useState('');
@@ -54,7 +54,7 @@ export default function WorkflowWorkspace({ createRequest = 0, onCreateRequestHa
       setDateError(t('dateError'));
       return;
     }
-    startProject({ name, goal, targetDate });
+    startProject({ name, goal, targetDate, industry });
     // Reset form fields
     setName('');
     setGoal('');
