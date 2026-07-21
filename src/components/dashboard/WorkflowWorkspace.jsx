@@ -4,7 +4,7 @@ import { TRANSLATIONS } from '../../data/translations.js';
 
 const PHASES = ['Planning', 'Design', 'Development', 'Content', 'Testing', 'Launch'];
 
-export default function WorkflowWorkspace({ createRequest = 0, onCreateRequestHandled, lang = 'en', industry = '', project, startProject, updateTask, deleteProject, onCancel }) {
+export default function WorkflowWorkspace({ createRequest = 0, onCreateRequestHandled, lang = 'en', industry = '', project, startProject, updateTask, deleteProject, onCancel, onBack }) {
   const [name, setName] = useState('');
   const [goal, setGoal] = useState('');
   const [targetDate, setTargetDate] = useState('');
@@ -231,6 +231,20 @@ export default function WorkflowWorkspace({ createRequest = 0, onCreateRequestHa
 
   return (
     <section className="workflow-workspace" aria-labelledby="project-title">
+      {onBack && (
+        <button 
+          type="button" 
+          className="workflow-back-btn ripple" 
+          onClick={onBack}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          <span>{t('backToDashboard')}</span>
+        </button>
+      )}
+
       <header className="workflow-header">
         <div className="workflow-header-info">
           <span className="workflow-kicker">{t('workspaceKicker')}</span>

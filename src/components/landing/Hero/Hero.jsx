@@ -110,9 +110,9 @@ const Hero = () => {
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeUp}
           >
-            FlowSync brings your projects, workflows, and team collaboration into one
-            intelligent workspace. Automate repetitive tasks, track progress in real time,
-            and make data-driven decisions all from a single dashboard.
+          Every project starts with a goal. 
+          FlowSync helps you turn that goal into a practical plan by organizing the work into relevant tasks, 
+          tracking progress, and giving your team a clear path from where you are to where you want to go.
           </motion.p>
 
           <motion.div

@@ -1187,11 +1187,54 @@
 .db-content {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 1.5rem 2rem;
-    padding-top: 2rem;
+    padding: 2.5rem 2rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+}
+
+.db-welcome-section {
+    margin-top: 0.5rem;
+}
+
+.workflow-empty.workflow-empty--create,
+.workflow-create-container {
+    padding-top: 1rem;
+}
+
+/* Back to Dashboard Navigation Button */
+.workflow-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary, #94A3B8);
+    cursor: pointer;
+    margin-bottom: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.workflow-back-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-primary, #F8FAFC);
+    border-color: var(--border-strong, rgba(255, 255, 255, 0.22));
+}
+
+[data-theme="light"] .workflow-back-btn {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.12);
+    color: var(--text-secondary, #64748B);
+}
+
+[data-theme="light"] .workflow-back-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--text-primary, #0F172A);
+    border-color: rgba(0, 0, 0, 0.22);
 }
 
 .db-content::-webkit-scrollbar {

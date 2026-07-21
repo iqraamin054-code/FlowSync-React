@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import useScrollReveal from '../hooks/useScrollReveal.js';
 import WorkflowWorkspace from '../components/dashboard/WorkflowWorkspace.jsx';
 import useWorkflowProject from '../hooks/useWorkflowProject.js';
@@ -514,6 +515,19 @@ export default function Dashboard() {
   }, { '0-25': 0, '26-50': 0, '51-75': 0, '76-100': 0 });
   const distMax = Math.max(...Object.values(distBuckets), 1);
 
+  const recentProjects = [...projects].sort((a, b) => {
+    const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+    const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+    return timeB - timeA;
+  }).slice(0, 3);
+
+  const chartData = [
+    { name: '0–25%', count: distBuckets['0-25'], color: '#EF4444' },
+    { name: '26–50%', count: distBuckets['26-50'], color: '#F59E0B' },
+    { name: '51–75%', count: distBuckets['51-75'], color: '#3B82F6' },
+    { name: '76–100%', count: distBuckets['76-100'], color: '#10B981' },
+  ];
+
   // Chart coordinates calculation (Phase Completion Progress)
   const xCoords = [50, 154, 258, 362, 466, 570];
   const yCoords = PHASES.map((phase) => {
@@ -740,18 +754,27 @@ export default function Dashboard() {
                     startProject={startProject}
                     updateTask={updateTask}
                     deleteProject={deleteProject}
+                    onBack={() => selectProject(null)}
                   />
                 ) : (
                   /* Case 4: Returning user — project overview dashboard */
                   <>
-                    <div className="db-title-row">
-                      <h2 className="db-title">{t('overviewTitle', { company: company.toUpperCase() })}</h2>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div className="db-badge-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>{t('global')}</span></div>
-                        <button className="workflow-primary ripple" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => setCreatingNew(true)}>
-                          + {t('createNewProjectBtn').replace('+ ', '')}
-                        </button>
+                    {/* 1. Personalized Welcome Header */}
+                    <div className="db-welcome-section" style={{ marginBottom: '1.75rem' }}>
+                      <div className="db-title-row" style={{ marginBottom: '0.35rem' }}>
+                        <h2 className="db-title" style={{ fontSize: '1.75rem', fontWeight: 700, margin: 0 }}>
+                          Welcome back, {username}
+                        </h2>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                          <div className="db-badge-tag"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"/></svg><span>{t('global')}</span></div>
+                          <button className="workflow-primary ripple" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => setCreatingNew(true)}>
+                            + {t('createNewProjectBtn').replace('+ ', '')}
+                          </button>
+                        </div>
                       </div>
+                      <p className="db-welcome-subtext" style={{ color: 'var(--text-secondary, #94A3B8)', fontSize: '0.95rem', margin: 0 }}>
+                        Here's what's happening with your workspaces today.
+                      </p>
                     </div>
 
                     {/* Overview Stats Row */}
@@ -794,89 +817,135 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    {/* Progress Distribution Chart */}
-                    <div className="db-distribution-chart glass-card">
-                      <div className="db-dist-header">
-                        <span className="db-dist-title">{t('progressDistribution')}</span>
+                    {/* Progress Distribution Donut Chart */}
+                    <div className="db-distribution-chart glass-card" style={{ padding: '1.5rem', marginTop: '1.5rem' }}>
+                      <div className="db-dist-header" style={{ marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span className="db-dist-title" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>{t('progressDistribution')}</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{projects.length} Workspaces</span>
                       </div>
-                      <div className="db-dist-bars">
-                        {[
-                          { key: '0-25', label: '0–25%', color: '#EF4444' },
-                          { key: '26-50', label: '26–50%', color: '#F59E0B' },
-                          { key: '51-75', label: '51–75%', color: '#3B82F6' },
-                          { key: '76-100', label: '76–100%', color: '#10B981' },
-                        ].map(b => {
-                          const count = distBuckets[b.key];
-                          const pct = Math.round((count / distMax) * 100);
-                          return (
-                            <div key={b.key} className="db-dist-bar-row">
-                              <span className="db-dist-bar-label">{b.label}</span>
-                              <div className="db-dist-bar-track">
-                                <div className="db-dist-bar-fill" style={{ width: `${pct}%`, background: b.color }} />
+
+                      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-around', gap: '1.5rem' }}>
+                        <div style={{ width: '100%', maxWidth: '240px', height: '200px' }}>
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={chartData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={55}
+                                outerRadius={80}
+                                paddingAngle={4}
+                                dataKey="count"
+                              >
+                                {chartData.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                                ))}
+                              </Pie>
+                              <Tooltip 
+                                contentStyle={{ 
+                                  background: '#1E293B', 
+                                  border: '1px solid rgba(255,255,255,0.1)', 
+                                  borderRadius: '8px',
+                                  color: '#F8FAFC',
+                                  fontSize: '0.85rem',
+                                  boxShadow: '0 10px 25px rgba(0,0,0,0.3)'
+                                }}
+                                formatter={(value, name) => [`${value} workspace${value !== 1 ? 's' : ''}`, `Range ${name}`]}
+                              />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </div>
+
+                        {/* Chart Legend */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', minWidth: '180px' }}>
+                          {chartData.map((item) => (
+                            <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color, display: 'inline-block' }} />
+                                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+                                  {item.name} Progress
+                                </span>
                               </div>
-                              <span className="db-dist-bar-count">{count}</span>
+                              <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                                {item.count}
+                              </span>
                             </div>
-                          );
-                        })}
+                          ))}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Workspace Grid */}
-                    <div className="db-workspace-header">
-                      <h3>{t('myWorkspaces')}</h3>
-                      <span>{projects.length} {t('activeTag')}</span>
+                    {/* Condensed Recent Workspaces Preview */}
+                    <div className="db-recent-workspaces-section glass-card" style={{ padding: '1.5rem', marginTop: '1.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                        <div>
+                          <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+                            Recent Workspaces
+                          </h3>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                            Quick glance at your 3 most recently updated workspaces
+                          </span>
+                        </div>
+                        <button 
+                          className="workflow-secondary ripple"
+                          style={{ padding: '0.4rem 0.85rem', fontSize: '0.85rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                          onClick={() => setActiveNav('projects')}
+                        >
+                          <span>View All Projects</span>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      {projects.length === 0 ? (
+                        <div className="db-workspace-empty" style={{ padding: '1.5rem', textAlign: 'center' }}>
+                          <p style={{ margin: 0, color: 'var(--text-secondary)' }}>{t('noProjectsText')}</p>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+                          {recentProjects.map((proj, idx) => {
+                            const pct = getProjectProgress(proj.tasks);
+                            const colors = ['#2563EB', '#7C3AED', '#10B981', '#EC4899', '#F59E0B'];
+                            const color = colors[idx % colors.length];
+                            return (
+                              <div 
+                                key={proj.id}
+                                onClick={() => selectProject(proj.id)}
+                                style={{
+                                  background: 'rgba(255, 255, 255, 0.03)',
+                                  border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.08))',
+                                  borderRadius: '10px',
+                                  padding: '1rem',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  gap: '0.75rem'
+                                }}
+                                className="recent-ws-item ripple"
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflow: 'hidden' }}>
+                                    <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: color, flexShrink: 0 }} />
+                                    <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {proj.name}
+                                    </span>
+                                  </div>
+                                  <span style={{ fontSize: '0.85rem', fontWeight: 700, color, flexShrink: 0 }}>
+                                    {pct}%
+                                  </span>
+                                </div>
+                                
+                                <div style={{ height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                                  <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: '3px', transition: 'width 0.4s ease' }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
-                    {projects.length === 0 ? (
-                      <div className="db-workspace-empty">
-                        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                        <p>{t('noProjectsText')}</p>
-                        <span>{t('createFirstProjectDesc')}</span>
-                      </div>
-                    ) : (
-                      <div className="db-workspace-grid">
-                        {projects.map((proj, idx) => {
-                          const pct = getProjectProgress(proj.tasks);
-                          const doneTasks = proj.tasks.filter((task) => task.status === 'done').length;
-                          const totalProjTasks = proj.tasks.length;
-                          const colors = ['#2563EB', '#7C3AED', '#10B981', '#EC4899', '#F59E0B'];
-                          const color = colors[idx % colors.length];
-                          const lastUpdated = proj.updatedAt || proj.createdAt;
-                          return (
-                            <div key={proj.id} className="db-workspace-card glass-card reveal">
-                              <div className="db-wc-top">
-                                <div className="db-wc-top-left">
-                                  <span className="db-wc-dot" style={{ background: color }} />
-                                  <h4 className="db-wc-name">{proj.name}</h4>
-                                </div>
-                                <span className="db-wc-pct" style={{ color }}>{pct}%</span>
-                              </div>
-                              <p className="db-wc-goal">{proj.goal}</p>
-                              <div className="db-wc-progress">
-                                <div className="db-wc-progress-track">
-                                  <div className="db-wc-progress-fill" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color}, ${color}bb)` }} />
-                                </div>
-                                <span className="db-wc-meta">{t('tasksCompletedKicker', { completed: doneTasks, total: totalProjTasks })}</span>
-                              </div>
-                              {lastUpdated && (
-                                <span className="db-wc-updated">{t('lastUpdated')} {new Date(lastUpdated).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                              )}
-                              <div className="db-wc-actions">
-                                <button className="workflow-primary ripple" onClick={() => selectProject(proj.id)}>
-                                  {t('openWorkspace')}
-                                </button>
-                                <button
-                                  className="db-wc-delete"
-                                  onClick={() => { if (window.confirm(t('deleteConfirmMsg', { name: proj.name }))) deleteProject(proj.id); }}
-                                  title={t('deleteBtn')}
-                                >
-                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
                   </>
                 )}
               </>

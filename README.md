@@ -220,6 +220,7 @@ FlowSync/
 │   ├── pages/
 │   ├── redux/
 │   ├── services/
+    ├── styles/
 │   ├── utils/
 │   ├── App.jsx
 │   ├── main.jsx
@@ -240,6 +241,22 @@ FlowSync/
 
 ---
 
+### 💰 Pricing Calculator
+
+![Pricing Calculator](src/assets/screenshots/pricing-calculator.png)
+
+---
+
+### 📊 Feature Comparison
+
+<div align="center">
+
+![Feature Comparison](src/assets/screenshots/comparison-table.png)
+
+</div>
+
+---
+
 ### 📊 Workspace Dashboard
 
 ![Dashboard](src/assets/screenshots/dashboard.png)
@@ -249,18 +266,6 @@ FlowSync/
 ### 📁 Project Workflow
 
 ![Project Workflow](src/assets/screenshots/project-workspace.png)
-
----
-
-### 💰 Pricing Calculator
-
-![Pricing Calculator](src/assets/screenshots/pricing-calculator.png)
-
----
-
-### 📊 Feature Comparison
-
-![Feature Comparison](src/assets/screenshots/comparison-table.png)
 
 ---
 
