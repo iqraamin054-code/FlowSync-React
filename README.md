@@ -1,4 +1,4 @@
-# 🚀 FlowSync
+# 🚀 FlowSync — Turn Project Goals Into Structured Progress
 
 <div align="center">
 
